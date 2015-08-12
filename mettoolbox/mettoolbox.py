@@ -112,8 +112,9 @@ def PET_hargreaves(latitude,
 
 
 @mando.command()
-def daily_to_hourly_trapezoid(
+def daily_to_daytime_hourly_trapezoid(
                    latitude,
+                   statistic='mean',
                    input_ts='-',
                    start_date=None,
                    end_date=None,
@@ -122,13 +123,14 @@ def daily_to_hourly_trapezoid(
     '''
     Daily to hourly disaggregation based on a trapezoidal shape.
     '''
+    from tstoolbox import tstoolbox
     tsd = tsutils.common_kwds(tsutils.read_iso_ts(input_ts),
                              start_date=start_date,
                              end_date=end_date,
                              pick=None)
     lrad = latitude*np.pi/180.0
 
-    ad = 0.40928*np.cos(0.0172141*(172 - tseries.index.dayofyear))
+    ad = 0.40928*np.cos(0.0172141*(172 - tsd.index.dayofyear))
     ss = np.sin(lrad)*np.sin(ad)
     cs = np.cos(lrad)*np.cos(ad)
     x2 = -ss/cs
@@ -139,22 +141,22 @@ def daily_to_hourly_trapezoid(
     #sunset and length of day (DELT)
     dtr2 = delt / 2.0
     dtr4 = delt / 4.0
-    crad = 2.0/3.0/dtr2*tseries.values/60 # using minutes...
+    crad = 2.0/3.0/dtr2/60 # using minutes...
     tr2 = sunr + dtr4
     tr3 = tr2 + dtr2
     tr4 = tr3 + dtr4
 
-    sdate = datetime.datetime(tseries.index[0].year, tseries.index[0].month,
-            tseries.index[0].day)
-    edate = datetime.datetime(tseries.index[-1].year, tseries.index[-1].month,
-            tseries.index[-1].day) + datetime.timedelta(days=1) - datetime.timedelta(hours=1)
+    sdate = datetime.datetime(tsd.index[0].year, tsd.index[0].month,
+            tsd.index[0].day)
+    edate = datetime.datetime(tsd.index[-1].year, tsd.index[-1].month,
+            tsd.index[-1].day) + datetime.timedelta(days=1) - datetime.timedelta(hours=1)
     datevalue = pandas.DatetimeIndex(start=sdate, end=edate,
             freq='MIN')
     fdata = pandas.Series([np.nan]*(len(datevalue)), index=datevalue)
     fdata[0] = 0.0
     fdata[-1] = 0.0
     for index in range(len(sunr)):
-        cdate = tseries.index[index]
+        cdate = tsd.index[index]
         fdata[datetime.datetime(cdate.year, cdate.month, cdate.day, int(sunr[index]), int((sunr[index] - int(sunr[index]))*60))] = 0.0
         fdata[datetime.datetime(cdate.year, cdate.month, cdate.day, int(tr4[index]), int((tr4[index] - int(tr4[index]))*60))] = 0.0
         fdata[datetime.datetime(cdate.year, cdate.month, cdate.day, int(tr2[index]), int((tr2[index] - int(tr2[index]))*60))] = crad[index]
@@ -163,12 +165,14 @@ def daily_to_hourly_trapezoid(
 
     fdata = fdata.fillna(0.0)
 
-    hourly = fdata.asfreq('H').index
-    hourly = pandas.Series([0.0]*len(hourly), index=hourly)
+    fdata = tstoolbox.aggregate(statistic=statistic,
+                                agg_interval='H',
+                                input_ts=fdata
+                                )
+    return tsutils.print_input(print_input, tsd, fdata, None,
+                               float_format=float_format)
 
-    for index in range(len(hourly)):
-        hourly[index] = sum(fdata[index*60:(index + 1)*60])
-    return hourly
+
 
 
 def main():

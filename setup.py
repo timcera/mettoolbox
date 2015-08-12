@@ -10,6 +10,14 @@ try:
 except ImportError:
     from distutils.core import setup
 
+install_requires = [
+    # List your project dependencies here.
+    # For more details, see:
+    # http://packages.python.org/distribute/setuptools.html#declaring-dependencies
+    'pandas >= 0.8.1',
+    'mando >= 0.3.2',
+]
+
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')
     os.system('python setup.py upload_docs')
@@ -32,8 +40,7 @@ setup(
     ],
     package_dir={'mettoolbox': 'mettoolbox'},
     include_package_data=True,
-    install_requires=[
-    ],
+    install_requires=install_requires,
     license="BSD",
     zip_safe=False,
     keywords='mettoolbox',
@@ -48,5 +55,9 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
     ],
+      entry_points={
+          'console_scripts':
+              ['mettoolbox=mettoolbox.mettoolbox:main']
+      },
     test_suite='tests',
 )
