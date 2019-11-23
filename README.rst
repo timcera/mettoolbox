@@ -1,6 +1,6 @@
-===============================
+==========
 mettoolbox
-===============================
+==========
 
 .. image:: https://badge.fury.io/py/mettoolbox.png
     :target: http://badge.fury.io/py/mettoolbox
