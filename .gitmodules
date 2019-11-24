@@ -1,0 +1,3 @@
+[submodule "mettoolbox/melodist"]
+	path = mettoolbox/melodist
+	url = git@github.com:timcera/melodist.git

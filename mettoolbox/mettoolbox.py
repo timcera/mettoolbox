@@ -63,147 +63,151 @@ def disaggregate_cli(variable, method):
 
         Temperature
         variable="temperature"
-        +---------------------+--------------------------------------+
-        | `method`            | Description                          |
-        +=====================+======================================+
-        | sine_min_max        | Standard sine redistribution;        |
-        |                     | preserves Tmin and Tmax but not      |
-        |                     | Tmean                                |
-        +---------------------+--------------------------------------+
-        | sine_mean           | Sine redistribution; preserves Tmean |
-        |                     | and the diurnal temperature range    |
-        |                     | (Tmax – Tmin) but not Tmin and Tmax  |
-        +---------------------+--------------------------------------+
-        | mean_course_min_max | Redistribute following a prescribed  |
-        |                     | temperature course calculated from   |
-        |                     | hourly observations; preserves Tmin  |
-        |                     | and Tmax                             |
-        +---------------------+--------------------------------------+
-        | mean_course_mean    | Redistribute following a prescribed  |
-        |                     | temperature course calculated from   |
-        |                     | hourly observations; preserves Tmean |
-        |                     | and the diurnal temperature range    |
-        +---------------------+--------------------------------------+
+        +---------------------+-------------------------------------+
+        | `method`            | Description                         |
+        +=====================+=====================================+
+        | sine_min_max        | Standard sine redistribution;       |
+        |                     | preserves Tmin and Tmax but not     |
+        |                     | Tmean.                              |
+        +---------------------+-------------------------------------+
+        | sine_mean           | Sine redistribution; preserves      |
+        |                     | Tmean and the diurnal temperature   |
+        |                     | range (Tmax – Tmin) but not Tmin    |
+        |                     | and Tmax.                           |
+        +---------------------+-------------------------------------+
+        | mean_course_min_max | Redistribute following a prescribed |
+        |                     | temperature course calculated from  |
+        |                     | hourly observations; preserves Tmin |
+        |                     | and Tmax.                           |
+        +---------------------+-------------------------------------+
+        | mean_course_mean    | Redistribute following a prescribed |
+        |                     | temperature course calculated from  |
+        |                     | hourly observations; preserves      |
+        |                     | Tmean and the diurnal temperature   |
+        |                     | range.                              |
+        +---------------------+-------------------------------------+
 
         Humidity
         variable="humidity"
-        +---------------------------+--------------------------------+
-        | `method`                  | Description                    |
-        +===========================+================================+
-        | equal                     | Duplicate mean daily humidity  |
-        |                           | for the 24 hours of the day    |
-        +---------------------------+--------------------------------+
-        | minimal                   | The dew point temperature is   |
-        |                           | set to the minimum temperature |
-        |                           | on that day                    |
-        +---------------------------+--------------------------------+
-        | dewpoint_regression       | Using hourly observations, a   |
-        |                           | regression approach is applied |
-        |                           | to calculate daily dew point   |
-        |                           | temperature. Regression        |
-        |                           | parameters must be specified   |
-        +---------------------------+--------------------------------+
-        | linear_dewpoint_variation | This method extends through    |
-        |                           | linearly varying dew point     |
-        |                           | temperature between            |
-        |                           | consecutive days. The          |
-        |                           | parameter kr needs to be       |
-        |                           | specified (kr=6 if monthly     |
-        |                           | radiation exceeds 100 W/m2     |
-        |                           | else kr=12).                   |
-        +---------------------------+--------------------------------+
-        | min_max                   | This method requires minimum   |
-        |                           | and maximum relative humidity  |
-        |                           | for each day.                  |
-        +---------------------------+--------------------------------+
-        | month_hour_precip_mean    | Calculate hourly humidity      |
-        |                           | from categorical               |
-        |                           | [month, hour, precip(y/n)]     |
-        |                           | mean values derived from       |
-        |                           | observations.                  |
-        +---------------------------+--------------------------------+
+        +---------------------------+-------------------------------+
+        | `method`                  | Description                   |
+        +===========================+===============================+
+        | equal                     | Duplicate mean daily humidity |
+        |                           | for the 24 hours of the day.  |
+        +---------------------------+-------------------------------+
+        | minimal                   | The dew point temperature is  |
+        |                           | set to the minimum            |
+        |                           | temperature on that day.      |
+        +---------------------------+-------------------------------+
+        | dewpoint_regression       | Using hourly observations, a  |
+        |                           | regression approach is        |
+        |                           | applied to calculate daily    |
+        |                           | dew point temperature.        |
+        |                           | Regression parameters must be |
+        |                           | specified.                    |
+        +---------------------------+-------------------------------+
+        | linear_dewpoint_variation | This method extends through   |
+        |                           | linearly varying dew point    |
+        |                           | temperature between           |
+        |                           | consecutive days. The         |
+        |                           | parameter kr needs to be      |
+        |                           | specified (kr=6 if monthly    |
+        |                           | radiation exceeds 100 W/m2    |
+        |                           | else kr=12).                  |
+        +---------------------------+-------------------------------+
+        | min_max                   | This method requires minimum  |
+        |                           | and maximum relative humidity |
+        |                           | for each day.                 |
+        +---------------------------+-------------------------------+
+        | month_hour_precip_mean    | Calculate hourly humidity     |
+        |                           | from categorical              |
+        |                           | [month, hour, precip(y/n)]    |
+        |                           | mean values derived from      |
+        |                           | observations.                 |
+        +---------------------------+-------------------------------+
 
         Wind Speed
         variable="wind"
-        +----------+--------------------------------------------------+
-        | `method` | Description                                      |
-        +==========+==================================================+
-        | equal    | If this method is chosen, the daily average wind |
-        |          | speed is assumed to be valid for each hour on    |
-        |          | that day.                                        |
-        +----------+--------------------------------------------------+
-        | cosine   | The cosine function option simulates a diurnal   |
-        |          | course of wind speed and requires calibration    |
-        |          | (calc_wind_stats()).                             |
-        +----------+--------------------------------------------------+
-        | random   | This option is a stochastic method that draws    |
-        |          | random numbers to disaggregate wind speed taking |
-        |          | into account the daily average (no parameter     |
-        |          | estimation required).                            |
-        +----------+--------------------------------------------------+
+        +----------+------------------------------------------------+
+        | `method` | Description                                    |
+        +==========+================================================+
+        | equal    | If this method is chosen, the daily average    |
+        |          | wind speed is assumed to be valid for each     |
+        |          | hour on that day.                              |
+        +----------+------------------------------------------------+
+        | cosine   | The cosine function option simulates a diurnal |
+        |          | course of wind speed and requires calibration  |
+        |          | (calc_wind_stats()).                           |
+        +----------+------------------------------------------------+
+        | random   | This option is a stochastic method that draws  |
+        |          | random numbers to disaggregate wind speed      |
+        |          | taking into account the daily average (no      |
+        |          | parameter estimation required).                |
+        +----------+------------------------------------------------+
 
         Radiation
         variable="radiation"
-        +-----------------+--------------------------------------------+
-        | `method`        | Description                                |
-        +=================+============================================+
-        | pot_rad         | This method allows one to disaggregate     |
-        |                 | daily averages of shortwave radiation      |
-        |                 | using hourly values of potential           |
-        |                 | (clear-sky) radiation calculated for       |
-        |                 | the location of the station.               |
-        +-----------------+--------------------------------------------+
-        | pot_rad_via_ssd | If daily sunshine recordings are           |
-        |                 | available, the Angstrom model is applied   |
-        |                 | to transform sunshine duration to          |
-        |                 | shortwave radiation.                       |
-        +-----------------+--------------------------------------------+
-        | pot_rad_via_bc  | In this case, the Bristow-Campbell model   |
-        |                 | is applied which relates minimum and       |
-        |                 | maximum temperature to shortwave           |
-        |                 | radiation.                                 |
-        +-----------------+--------------------------------------------+
-        | mean_course     | hourly radiation follows an observed       |
-        |                 | average course (calculated for each month) |
-        |                 | while preserving the daily mean.           |
-        +-----------------+--------------------------------------------+
+        +-----------------+-----------------------------------------+
+        | `method`        | Description                             |
+        +=================+=========================================+
+        | pot_rad         | This method allows one to disaggregate  |
+        |                 | daily averages of shortwave radiation   |
+        |                 | using hourly values of potential        |
+        |                 | (clear-sky) radiation calculated for    |
+        |                 | the location of the station.            |
+        +-----------------+-----------------------------------------+
+        | pot_rad_via_ssd | If daily sunshine recordings are        |
+        |                 | available, the Angstrom model is        |
+        |                 | applied to transform sunshine duration  |
+        |                 | to shortwave radiation.                 |
+        +-----------------+-----------------------------------------+
+        | pot_rad_via_bc  | In this case, the Bristow-Campbell      |
+        |                 | model is applied which relates minimum  |
+        |                 | and maximum temperature to shortwave    |
+        |                 | radiation.                              |
+        +-----------------+-----------------------------------------+
+        | mean_course     | hourly radiation follows an observed    |
+        |                 | average course (calculated for each     |
+        |                 | month) while preserving the daily mean. |
+        +-----------------+-----------------------------------------+
 
         Precipitation
         variable="precipitation"
-        +---------------+----------------------------------------------+
-        | `method`      | Description                                  |
-        +===============+==============================================+
-        | equal         | In order to derive hourly from daily values, |
-        |               | the daily total is simply divided by 24      |
-        |               | resulting in an equal distribution.          |
-        +---------------+----------------------------------------------+
-        | cascade       | The cascade model is more complex and        |
-        |               | requires a parameter estimation method       |
-        +---------------+----------------------------------------------+
-        | masterstation | If hourly values are available for another   |
-        |               | site in the vicinity of the station          |
-        |               | considered, the cumulative sub-daily mass    |
-        |               | curve can be transferred from the station    |
-        |               | that provides hourly values to the station   |
-        |               | of interest.                                 |
-        +---------------+----------------------------------------------+
+        +---------------+--------------------------------------------+
+        | `method`      | Description                                |
+        +===============+============================================+
+        | equal         | In order to derive hourly from daily       |
+        |               | values, the daily total is simply divided  |
+        |               | by 24 resulting in an equal distribution.  |
+        +---------------+--------------------------------------------+
+        | cascade       | The cascade model is more complex and      |
+        |               | requires a parameter estimation method.    |
+        +---------------+--------------------------------------------+
+        | masterstation | If hourly values are available for another |
+        |               | site in the vicinity of the station        |
+        |               | considered, the cumulative sub-daily mass  |
+        |               | curve can be transferred from the station  |
+        |               | that provides hourly values to the station |
+        |               | of interest.                               |
+        +---------------+--------------------------------------------+
 
     min_max_time: str
-        [required if `variable` is "temperature"]
+        [required if `variable` is "temperature", otherwise not used]
 
-        +----------------+---------------------------------------------+
-        | `min_max_time` | Description                                 |
-        +================+=============================================+
-        | fix            | The diurnal course of temperature is fixed  |
-        |                | without any seasonal variations.            |
-        +----------------+---------------------------------------------+
-        | sun_loc        | The diurnal course of temperature is        |
-        |                | modelled based on sunrise, noon and sunset  |
-        |                | calculations.                               |
-        +----------------+---------------------------------------------+
-        | sun_loc_shift  | This option activates empirical corrections |
-        |                | of the ideal course modelled by sun_loc     |
-        +----------------+---------------------------------------------+
+        +----------------+------------------------------------------+
+        | `min_max_time` | Description                              |
+        +================+==========================================+
+        | fix            | The diurnal course of temperature is     |
+        |                | fixed without any seasonal variations.   |
+        +----------------+------------------------------------------+
+        | sun_loc        | The diurnal course of temperature is     |
+        |                | modelled based on sunrise, noon and      |
+        |                | sunset calculations.                     |
+        +----------------+------------------------------------------+
+        | sun_loc_shift  | This option activates empirical          |
+        |                | corrections of the ideal course modelled |
+        |                | by sun_loc                               |
+        +----------------+------------------------------------------+
 
     mod_nighttime: bool
         [optional if `variable` is "temperature", default is False]
