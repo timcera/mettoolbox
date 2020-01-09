@@ -69,6 +69,7 @@ setup(
     packages=[
         "{pkg_name}".format(**locals()),
         "{pkg_name}.melodist.melodist".format(**locals()),
+        "{pkg_name}.melodist.melodist.util".format(**locals()),
     ],
     include_package_data=True,
     zip_safe=False,
