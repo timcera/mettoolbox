@@ -1,28 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-
 import sys
 import os.path
 import warnings
-import itertools
-import datetime
-from collections import namedtuple
 
-import pandas as pd
-import mando
 from mando.rst_text_formatter import RSTHelpFormatter
-from pysolar.util import mean_earth_sun_distance
-import scipy as sp
 
 from tstoolbox import tsutils
 
+from . import disaggregate
+from . import pet
+
+from mando import Program
+
 warnings.filterwarnings("ignore")
 
-DEG2RAD = pd.np.pi / 180
+program = Program("mettoolbox", "0.0")
+
+program.add_subprog("disaggregate")
+program.add_subprog("pet")
 
 _LOCAL_DOCSTRINGS = tsutils.docstrings
 _LOCAL_DOCSTRINGS[
@@ -44,51 +41,241 @@ _LOCAL_DOCSTRINGS[
         If None (the default) then `input_ts` and `columns` must be set."""
 
 
-from .functions.utils import utils
-
-
-@mando.command("disaggregate", formatter_class=RSTHelpFormatter, doctype="numpy")
+@program.disaggregate.command(
+    "temperature", formatter_class=RSTHelpFormatter, doctype="numpy"
+)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
-def disaggregate_cli(variable, method):
-    """Disaggregate daily to hourly meteorological data.
+def temperature_cli(
+    method,
+    source_units,
+    min_max_time="fix",
+    mod_nighttime=False,
+    input_ts="-",
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+    temp_min_col=None,
+    temp_max_col=None,
+    temp_mean_col=None,
+    lat=None,
+    lon=None,
+    hourly=None,
+    max_delta=False,
+):
+    """Disaggregate daily temperature to hourly temperature.
+
+    For straight disaggregation the temperature units are not relevant,
+    however other tools in mettoolbox require metric units.  You can use
+    `source_units` and `target_units` keywords to change units.
+
+    +---------------+----------------------------+
+    | Input Data    | Description                |
+    +===============+============================+
+    | temp_tmin_col | Required column name or    |
+    |               | number representing the    |
+    |               | minimum daily temperature. |
+    +---------------+----------------------------+
+    | temp_tmax_col | Required column name or    |
+    |               | number representing the    |
+    |               | maximum daily temperature. |
+    +---------------+----------------------------+
+    | temp_mean_col | Optional column name or    |
+    |               | number representing the    |
+    |               | average daily temperature. |
+    |               | Default is None and if     |
+    |               | None will be calculated as |
+    |               | average of `temp_tmin_col` |
+    |               | and `temp_tmax_col`.       |
+    +---------------+----------------------------+
 
     Parameters
     ==========
-    variable:
-        The kind of data to disaggregate.  Can be one of "temperature",
-        "humidity", "wind", "radiation", and "precipitation".
+    method: str
+        Disaggregation methods available for
+        temperature.
 
-    method:
-        Different methods are available for different variables.
+        +---------------------+--------------------------------------+
+        | `method`            | Description                          |
+        +=====================+======================================+
+        | sine_min_max        | Standard sine redistribution;        |
+        |                     | preserves Tmin and Tmax but not      |
+        |                     | Tmean.                               |
+        +---------------------+--------------------------------------+
+        | sine_mean           | Sine redistribution; preserves       |
+        |                     | Tmean and the diurnal temperature    |
+        |                     | range (Tmax – Tmin) but not Tmin     |
+        |                     | and Tmax.                            |
+        +---------------------+--------------------------------------+
+        | mean_course_min_max | Redistribute following a prescribed  |
+        |                     | temperature course calculated from   |
+        |                     | hourly observations; preserves Tmin  |
+        |                     | and Tmax.  Hourly CSV filename       |
+        |                     | specified with the `hourly` keyword. |
+        +---------------------+--------------------------------------+
+        | mean_course_mean    | Redistribute following a prescribed  |
+        |                     | temperature course calculated from   |
+        |                     | hourly observations; preserves       |
+        |                     | Tmean and the diurnal temperature    |
+        |                     | range. Hourly CSV filename specified |
+        |                     | with the `hourly` keyword.           |
+        +---------------------+--------------------------------------+
 
-        Temperature
-        variable="temperature"
-        +---------------------+-------------------------------------+
-        | `method`            | Description                         |
-        +=====================+=====================================+
-        | sine_min_max        | Standard sine redistribution;       |
-        |                     | preserves Tmin and Tmax but not     |
-        |                     | Tmean.                              |
-        +---------------------+-------------------------------------+
-        | sine_mean           | Sine redistribution; preserves      |
-        |                     | Tmean and the diurnal temperature   |
-        |                     | range (Tmax – Tmin) but not Tmin    |
-        |                     | and Tmax.                           |
-        +---------------------+-------------------------------------+
-        | mean_course_min_max | Redistribute following a prescribed |
-        |                     | temperature course calculated from  |
-        |                     | hourly observations; preserves Tmin |
-        |                     | and Tmax.                           |
-        +---------------------+-------------------------------------+
-        | mean_course_mean    | Redistribute following a prescribed |
-        |                     | temperature course calculated from  |
-        |                     | hourly observations; preserves      |
-        |                     | Tmean and the diurnal temperature   |
-        |                     | range.                              |
-        +---------------------+-------------------------------------+
+    min_max_time: str
 
-        Humidity
-        variable="humidity"
+        +----------------+------------------------------------------+
+        | `min_max_time` | Description                              |
+        +================+==========================================+
+        | fix            | The diurnal course of temperature is     |
+        |                | fixed without any seasonal variations.   |
+        +----------------+------------------------------------------+
+        | sun_loc        | The diurnal course of temperature is     |
+        |                | modelled based on sunrise, noon and      |
+        |                | sunset calculations.                     |
+        +----------------+------------------------------------------+
+        | sun_loc_shift  | This option activates empirical          |
+        |                | corrections of the ideal course modelled |
+        |                | by sun_loc                               |
+        +----------------+------------------------------------------+
+
+    mod_nighttime: bool
+        Allows one to apply a linear interpolation of night time values,
+        which proves preferable during polar nights.
+
+    {input_ts}
+    {start_date}
+    {end_date}
+    {dropna}
+    {clean}
+    {round_index}
+    {skiprows}
+    {index_type}
+    {names}
+    {source_units}
+    {target_units}
+    {print_input}
+    {tablefmt}
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+    lat: float
+        The latitude of the station.  Required if `min_max_time` is
+        "sun_loc" or "sun_loc_shift".
+    lon: float
+        The longitude of the station.  Required if `min_max_time` is
+        "sun_loc" or "sun_loc_shift".
+    hourly: str
+        File name that contains the hourly time series of temperatures
+        to use when `method` is "mean_course_min" or "mean_course_mean"
+        or when `max_delta` is True.
+    max_delta: bool
+        Uses maximum delta of hourly values for each month to constrain
+        the disaggregated hourly temperature values.  If set to True
+        requires an hourly time-series filename specified with the
+        `hourly` keyword.
+    """
+    tsutils._printiso(
+        disaggregate.temperature(
+            method,
+            source_units,
+            input_ts=input_ts,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            target_units=target_units,
+            print_input=print_input,
+            min_max_time=min_max_time,
+            mod_nighttime=mod_nighttime,
+            temp_min_col=temp_min_col,
+            temp_max_col=temp_max_col,
+            temp_mean_col=temp_mean_col,
+            lat=lat,
+            lon=lon,
+            hourly=hourly,
+            max_delta=max_delta,
+        ),
+        tablefmt=tablefmt,
+    )
+
+
+disaggregate.temperature.__doc__ = temperature_cli.__doc__
+
+
+@program.disaggregate.command(
+    "humidity", formatter_class=RSTHelpFormatter, doctype="numpy"
+)
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def humidity_cli(
+    method,
+    source_units,
+    input_ts="-",
+    columns=None,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+    hum_min_col=None,
+    hum_max_col=None,
+    hum_mean_col=None,
+    a0=None,
+    a1=None,
+    kr=None,
+    hourly_temp=None,
+    preserve_daily_mean=None,
+):
+    """Disaggregate daily relative humidity to hourly humidity.
+
+    Relative humidity disaggregation requires the following input data.
+
+    +--------------+---------------------------------------------+
+    | Input data   | Description                                 |
+    +==============+=============================================+
+    | hum_min_col  | Required column name or number representing |
+    |              | the minimum daily relative humidity.        |
+    |              |                                             |
+    | hum_max_col  | Required column name or number representing |
+    |              | the maximum daily relative humidity.        |
+    |              |                                             |
+    | hum_mean_col | Optional column name or number representing |
+    |              | the average daily relative humidity.        |
+    |              | Default is None and if None will be         |
+    |              | calculated as average of `hum_tmin_col` and |
+    |              | `hum_tmax_col`.                             |
+    +--------------+---------------------------------------------+
+
+    Parameters
+    ==========
+    method: str
+
+        Available disaggregation methods for humidity.
+
         +---------------------------+-------------------------------+
         | `method`                  | Description                   |
         +===========================+===============================+
@@ -126,8 +313,136 @@ def disaggregate_cli(variable, method):
         |                           | observations.                 |
         +---------------------------+-------------------------------+
 
-        Wind Speed
-        variable="wind"
+        Required keywords for each method.  The "Column Name/Index
+        Keywords" represent the column name or index (data columns
+        starting numbering at 1) in the input dataset.
+
+        +---------------------------+----------------+---------------+
+        | `method`                  | Column Name/   | Other         |
+        |                           | Index Keywords | Keywords      |
+        +---------------------------+----------------+---------------+
+        | equal                     | `hum_mean_col` |               |
+        +---------------------------+----------------+---------------+
+        | minimal                   | `temp_min_col` | `hourly_temp` |
+        +---------------------------+----------------+---------------+
+        | dewpoint_regression       | `temp_min_col` | `a0`          |
+        |                           |                | `a1`          |
+        |                           |                | `hourly_temp` |
+        +---------------------------+----------------+---------------+
+        | linear_dewpoint_variation | `temp_min_col` | `a0`          |
+        |                           |                | `a1`          |
+        |                           |                | `kr`          |
+        |                           |                | `hourly_temp` |
+        +---------------------------+----------------+---------------+
+        | min_max                   | `hum_min_col`  | `hourly_temp` |
+        |                           | `hum_max_col`  |               |
+        |                           | `temp_min_col` |               |
+        |                           | `temp_max_col` |               |
+        +---------------------------+----------------+---------------+
+        | month_hour_precip_mean    | `precip_col`   |               |
+        +---------------------------+----------------+---------------+
+
+    {input_ts}
+    {columns}
+    {start_date}
+    {end_date}
+    {dropna}
+    {clean}
+    {round_index}
+    {skiprows}
+    {index_type}
+    {names}
+    {source_units}
+    {target_units}
+    {print_input}
+    {tablefmt}
+    hum_min_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily minimum humidity.
+    hum_max_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily maximum humidity.
+    hum_mean_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily maximum humidity.
+    a0: float
+        The "a0" parameter.
+    a1: float
+        The "a1" parameter.
+    kr: int
+        Parameter for the "linear_dewpoint_variation" method.
+    hourly_temp: str
+        Filename of a CSV file that contains an hourly time series of
+        temperatures.
+    preserve_daily_mean: str
+        Column name or index (data columns start at 1) that identifies
+        the observed daily mean humidity.  If not None will correct the
+        daily mean values of the disaggregated data with the observed
+        daily mean humidity.
+    """
+    tsutils._printiso(
+        disaggregate.humidity(
+            method,
+            input_ts=input_ts,
+            columns=columns,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            source_units=source_units,
+            target_units=target_units,
+            print_input=print_input,
+            hum_min_col=hum_min_col,
+            hum_max_col=hum_max_col,
+            hum_mean_col=hum_mean_col,
+            a0=a0,
+            a1=a1,
+            kr=kr,
+            hourly_temp=hourly_temp,
+            preserve_daily_mean=preserve_daily_mean,
+        ),
+        tablefmt=tablefmt,
+    )
+
+
+disaggregate.humidity.__doc__ = humidity_cli.__doc__
+
+
+@program.disaggregate.command(
+    "wind_speed", formatter_class=RSTHelpFormatter, doctype="numpy"
+)
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def wind_speed_cli(
+    method,
+    source_units,
+    input_ts="-",
+    columns=None,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+    a=None,
+    b=None,
+    t_shift=None,
+):
+    """Disaggregate daily wind speed to hourly wind speed.
+
+    Parameters
+    ==========
+    method: str
+        Disaggregation methods available for wind speed.
+
         +----------+------------------------------------------------+
         | `method` | Description                                    |
         +==========+================================================+
@@ -145,8 +460,91 @@ def disaggregate_cli(variable, method):
         |          | parameter estimation required).                |
         +----------+------------------------------------------------+
 
-        Radiation
-        variable="radiation"
+    {input_ts}
+    {columns}
+    {start_date}
+    {end_date}
+    {dropna}
+    {clean}
+    {round_index}
+    {skiprows}
+    {index_type}
+    {names}
+    {source_units}
+    {target_units}
+    {print_input}
+    {tablefmt}
+    a: float
+        Parameter `a` for method equal to "cosine".
+    b: float
+        Parameter `b` for method equal to "cosine".
+    t_shift: float
+        Parameter `t_shift` for method equal to "cosine".
+    """
+    tsutils._printiso(
+        disaggregate.wind_speed(
+            method,
+            input_ts=input_ts,
+            columns=columns,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            source_units=source_units,
+            target_units=target_units,
+            print_input=print_input,
+            a=a,
+            b=b,
+            t_shift=t_shift,
+        ),
+        tablefmt=tablefmt,
+    )
+
+
+disaggregate.wind_speed.__doc__ = wind_speed_cli.__doc__
+
+
+@program.disaggregate.command(
+    "radiation", formatter_class=RSTHelpFormatter, doctype="numpy"
+)
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def radiation_cli(
+    method,
+    source_units,
+    input_ts="-",
+    columns=None,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+    pot_rad=None,
+    angstr_a=None,
+    angstr_b=None,
+    bristcamp_a=None,
+    bristcamp_c=None,
+    mean_course=None,
+    lat=None,
+    lon=None,
+    hourly_rad=None,
+):
+    """Disaggregate daily radiation to hourly radiation.
+
+    Parameters
+    ==========
+    method: str
+        Disaggregation methods available for radiation
+
         +-----------------+-----------------------------------------+
         | `method`        | Description                             |
         +=================+=========================================+
@@ -171,8 +569,100 @@ def disaggregate_cli(variable, method):
         |                 | month) while preserving the daily mean. |
         +-----------------+-----------------------------------------+
 
-        Precipitation
-        variable="precipitation"
+    {input_ts}
+    {columns}
+    {start_date}
+    {end_date}
+    {dropna}
+    {clean}
+    {round_index}
+    {skiprows}
+    {index_type}
+    {names}
+    {source_units}
+    {target_units}
+    {print_input}
+    {tablefmt}
+    pot_rad: str
+        hourly dataframe including potential radiation
+    angstr_a: float
+        parameter a of the Angstrom model (intercept)
+    angstr_b: float
+        parameter b of the Angstrom model (slope)
+    bristcamp_a: float
+        parameter a for bristcamp
+    bristcamp_c: float
+        parameter c for bristcamp
+    hourly_rad: str
+        monthly values of the mean hourly radiation course
+    lat: float
+        Latitude
+    lon: float
+        Longitude
+    mean_course:
+        Filename of HOURLY CSV file that contains radiation values to be
+        used with the "mean_course" method.
+    """
+    tsutils._printiso(
+        disaggregate.radiation(
+            method,
+            input_ts=input_ts,
+            columns=columns,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            source_units=source_units,
+            target_units=target_units,
+            print_input=print_input,
+            pot_rad=pot_rad,
+            angstr_a=angstr_a,
+            angstr_b=angstr_b,
+            bristcamp_a=bristcamp_a,
+            bristcamp_c=bristcamp_c,
+            hourly_rad=hourly_rad,
+            lat=lat,
+            lon=lon,
+        ),
+        tablefmt=tablefmt,
+    )
+
+
+disaggregate.radiation.__doc__ = radiation_cli.__doc__
+
+
+@program.disaggregate.command(
+    "precipitation", formatter_class=RSTHelpFormatter, doctype="numpy"
+)
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def precipitation_cli(
+    method,
+    source_units,
+    input_ts="-",
+    columns=None,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+):
+    """Disaggregate daily precipitation to hourly precipitation.
+
+    Parameters
+    ==========
+    method: str
+        Disaggregation methods available for precipitation.
+
         +---------------+--------------------------------------------+
         | `method`      | Description                                |
         +===============+============================================+
@@ -191,174 +681,229 @@ def disaggregate_cli(variable, method):
         |               | of interest.                               |
         +---------------+--------------------------------------------+
 
-    min_max_time: str
-        [required if `variable` is "temperature", otherwise not used]
-
-        +----------------+------------------------------------------+
-        | `min_max_time` | Description                              |
-        +================+==========================================+
-        | fix            | The diurnal course of temperature is     |
-        |                | fixed without any seasonal variations.   |
-        +----------------+------------------------------------------+
-        | sun_loc        | The diurnal course of temperature is     |
-        |                | modelled based on sunrise, noon and      |
-        |                | sunset calculations.                     |
-        +----------------+------------------------------------------+
-        | sun_loc_shift  | This option activates empirical          |
-        |                | corrections of the ideal course modelled |
-        |                | by sun_loc                               |
-        +----------------+------------------------------------------+
-
-    mod_nighttime: bool
-        [optional if `variable` is "temperature", default is False]
-
-        Allows one to apply a linear interpolation of
-        night time values, which proves preferable during polar
-        nights.
-
+    {input_ts}
+    {columns}
+    {start_date}
+    {end_date}
+    {dropna}
+    {clean}
+    {round_index}
+    {skiprows}
+    {index_type}
+    {names}
+    {source_units}
+    {target_units}
+    {print_input}
+    {tablefmt}
     """
-    tsutils.printiso(disaggregate(variable, method,
-                                  min_max_time=min_max_time,
-                                  mod_nighttime=mod_nigthtime))
+    tsutils._printiso(
+        disaggregate.precipitation(
+            method,
+            input_ts=input_ts,
+            columns=columns,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            source_units=source_units,
+            target_units=target_units,
+            print_input=print_input,
+        ),
+        tablefmt=tablefmt,
+    )
 
 
-@tsutils.validator(
-    variable=[
-        str,
-        ["domain", ["temperature", "humidity", "wind", "radiation", "precipitation"]],
-        1,
-    ],
-    method=[
-        str,
-        [
-            "domain",
-            [
-                "sine_min_max",
-                "sine_mean",
-                "mean_course_min_max",
-                "mean_course_mean",
-                "equal",
-                "minimal",
-                "dewpoint_regression",
-                "linear_dewpoint_variation",
-                "min_max",
-                "month_hour_precip_mean",
-                "cosine",
-                "random",
-                "pot_rad",
-                "pot_rad_via_ssd",
-                "pot_rad_via_bc",
-                "mean_course",
-                "cascade",
-                "masterstation",
-            ],
-        ],
-        1,
-    ],
-    min_max_time=[str, ["domain", ["fix", "sun_loc", "sun_loc_shift"]], 1],
-    mod_nighttime=[bool, ["pass", []], 1],
+disaggregate.precipitation.__doc__ = precipitation_cli.__doc__
+
+
+@program.disaggregate.command(
+    "evaporation", formatter_class=RSTHelpFormatter, doctype="numpy"
 )
-def disaggregate(variable, method, min_max_time=None,
-                 mod_nighttime=False):
-    pass
-
-
-disaggregate.__doc__ = disaggregate_cli.__doc__
-
-
-@mando.command(formatter_class=RSTHelpFormatter, doctype="numpy")
 @tsutils.doc(_LOCAL_DOCSTRINGS)
-def daily_to_daytime_hourly_trapezoid(
-    latitude,
+def evaporation_cli(
+    method,
+    source_units,
+    input_ts="-",
+    columns=None,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+    lat=None,
+):
+    """Disaggregate daily evaporation to hourly evaporation.
+
+    Parameters
+    ==========
+    method: str
+        This is the method that will be used to disaggregate the daily
+        evaporation data.
+
+        There are two methods, a trapezoidal shape from sunrise to
+        sunset called "trap" and a fixed, smooth curve starting at 0700
+        (7 am) and stopping at 1900 (7 pm) called "fixed".
+    {input_ts}
+    {columns}
+    {start_date}
+    {end_date}
+    {dropna}
+    {clean}
+    {round_index}
+    {skiprows}
+    {index_type}
+    {names}
+    {source_units}
+    {target_units}
+    {print_input}
+    {tablefmt}
+    lat: float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+    """
+    tsutils._printiso(
+        disaggregate.evaporation(
+            method,
+            input_ts=input_ts,
+            columns=columns,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            source_units=source_units,
+            target_units=target_units,
+            print_input=print_input,
+            lat=lat,
+        ),
+        tablefmt=tablefmt,
+    )
+
+
+disaggregate.evaporation.__doc__ = evaporation_cli.__doc__
+
+
+@program.pet.command("hargreaves", formatter_class=RSTHelpFormatter, doctype="numpy")
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def hargreaves_cli(
+    lat,
+    temp_min_col,
+    temp_max_col,
+    source_units,
     input_ts="-",
     start_date=None,
     end_date=None,
-    float_format="%g",
-    print_input="",
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+    temp_mean_col=None,
 ):
-    """
-    Daily to hourly daytime disaggregation based on a trapezoidal shape.
+    """Calculate potential evaporation using Hargreaves equation.
 
     Parameters
-    ----------
-    {latitude}
+    ==========
+    lat: float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hargreaves 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hargreaves(24,
+                                   1,
+                                   2,
+                                   ["degF", "degF"],
+                                   input_ts="tmin_tmax_data.csv")
     {input_ts}
     {start_date}
     {end_date}
-    {float_format}
+    {dropna}
+    {clean}
+    {round_index}
+    {skiprows}
+    {index_type}
+    {names}
+    {target_units}
     {print_input}
-
-    """
-
-    tsd = tsutils.common_kwds(
-        tsutils.read_iso_ts(input_ts),
-        start_date=start_date,
-        end_date=end_date,
-        pick=None,
+    {tablefmt}
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`."""
+    tsutils._printiso(
+        pet.hargreaves(
+            lat,
+            temp_min_col,
+            temp_max_col,
+            input_ts=input_ts,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            source_units=source_units,
+            target_units=target_units,
+            print_input=print_input,
+            temp_mean_col=temp_mean_col,
+        ),
+        tablefmt=tablefmt,
     )
 
-    lrad = latitude * pd.np.pi / 180.0
 
-    ad = 0.40928 * pd.np.cos(0.0172141 * (172 - tsd.index.dayofyear))
-    ss = pd.np.sin(lrad) * pd.np.sin(ad)
-    cs = pd.np.cos(lrad) * pd.np.cos(ad)
-    x2 = -ss / cs
-    delt = 7.6394 * (pd.np.pi / 2.0 - pd.np.arctan(x2 / pd.np.square(1 - x2 ** 2)))
-    sunr = 12.0 - delt / 2.0
-
-    # develop hourly distribution given sunrise,
-    # sunset and length of day (DELT)
-    dtr2 = delt / 2.0
-    dtr4 = delt / 4.0
-    crad = 2.0 / 3.0 / dtr2 / 60  # using minutes...
-    tr2 = sunr + dtr4
-    tr3 = tr2 + dtr2
-    tr4 = tr3 + dtr4
-
-    sdate = datetime.datetime(tsd.index[0].year, tsd.index[0].month, tsd.index[0].day)
-    edate = (
-        datetime.datetime(tsd.index[-1].year, tsd.index[-1].month, tsd.index[-1].day)
-        + datetime.timedelta(days=1)
-        - datetime.timedelta(hours=1)
-    )
-    datevalue = pd.DatetimeIndex(start=sdate, end=edate, freq="H")
-    fdata = pd.DataFrame([pd.np.nan] * (len(datevalue)), index=datevalue)
-    fdata[0] = 0.0
-    fdata[-1] = 0.0
-    for index in range(len(sunr)):
-        cdate = tsd.index[index]
-        fdata[
-            datetime.datetime(cdate.year, cdate.month, cdate.day, int(sunr[index]))
-        ] = 0.0
-        fdata[
-            datetime.datetime(cdate.year, cdate.month, cdate.day, int(tr4[index]))
-        ] = 0.0
-        fdata[
-            datetime.datetime(cdate.year, cdate.month, cdate.day, int(tr2[index]))
-        ] = 1.0
-        fdata[
-            datetime.datetime(cdate.year, cdate.month, cdate.day, int(tr3[index]))
-        ] = 1.0
-    fdata = fdata.interpolate("linear")
-
-    fdata = fdata.fillna(0.0)
-
-    ndf = pd.merge(
-        pd.DataFrame(crad, index=tsd.index),
-        fdata,
-        left_index=True,
-        right_index=True,
-        how="outer",
-    )
-    ndf.ffill(inplace=True)
-    return tsutils.print_input(print_input, tsd, fdata, None, float_format=float_format)
+pet.hargreaves.__doc__ = hargreaves_cli.__doc__
 
 
 def main():
     """ Main """
     if not os.path.exists("debug_mettoolbox"):
         sys.tracebacklimit = 0
-    mando.main()
+    program()
 
 
 if __name__ == "__main__":
