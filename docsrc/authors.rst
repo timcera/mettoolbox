@@ -1,1 +1,3 @@
-. include:: ../AUTHORS.rst
+.. include:: ../BADGES.rst
+.. include:: ../AUTHORS.rst
+

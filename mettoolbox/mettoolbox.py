@@ -227,7 +227,6 @@ disaggregate.temperature.__doc__ = temperature_cli.__doc__
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def humidity_cli(
     method,
-    source_units,
     input_ts="-",
     columns=None,
     start_date=None,
@@ -238,7 +237,6 @@ def humidity_cli(
     skiprows=None,
     index_type="datetime",
     names=None,
-    target_units=None,
     print_input=False,
     tablefmt="csv",
     hum_min_col=None,
@@ -250,7 +248,10 @@ def humidity_cli(
     hourly_temp=None,
     preserve_daily_mean=None,
 ):
-    """Disaggregate daily relative humidity to hourly humidity.
+    """Disaggregate daily relative humidity to hourly relative humidity.
+
+    The input and output units are relative humidity as per cent of
+    saturated air.
 
     Relative humidity disaggregation requires the following input data.
 
@@ -259,10 +260,10 @@ def humidity_cli(
     +==============+=============================================+
     | hum_min_col  | Required column name or number representing |
     |              | the minimum daily relative humidity.        |
-    |              |                                             |
+    +--------------+---------------------------------------------+
     | hum_max_col  | Required column name or number representing |
     |              | the maximum daily relative humidity.        |
-    |              |                                             |
+    +--------------+---------------------------------------------+
     | hum_mean_col | Optional column name or number representing |
     |              | the average daily relative humidity.        |
     |              | Default is None and if None will be         |
@@ -352,8 +353,6 @@ def humidity_cli(
     {skiprows}
     {index_type}
     {names}
-    {source_units}
-    {target_units}
     {print_input}
     {tablefmt}
     hum_min_col:
@@ -393,8 +392,8 @@ def humidity_cli(
             skiprows=skiprows,
             index_type=index_type,
             names=names,
-            source_units=source_units,
-            target_units=target_units,
+            source_units=None,
+            target_units=None,
             print_input=print_input,
             hum_min_col=hum_min_col,
             hum_max_col=hum_max_col,
@@ -460,6 +459,7 @@ def wind_speed_cli(
         |          | parameter estimation required).                |
         +----------+------------------------------------------------+
 
+    {source_units}
     {input_ts}
     {columns}
     {start_date}
@@ -470,7 +470,6 @@ def wind_speed_cli(
     {skiprows}
     {index_type}
     {names}
-    {source_units}
     {target_units}
     {print_input}
     {tablefmt}
@@ -569,6 +568,7 @@ def radiation_cli(
         |                 | month) while preserving the daily mean. |
         +-----------------+-----------------------------------------+
 
+    {source_units}
     {input_ts}
     {columns}
     {start_date}
@@ -579,7 +579,6 @@ def radiation_cli(
     {skiprows}
     {index_type}
     {names}
-    {source_units}
     {target_units}
     {print_input}
     {tablefmt}
@@ -681,6 +680,7 @@ def precipitation_cli(
         |               | of interest.                               |
         +---------------+--------------------------------------------+
 
+    {source_units}
     {input_ts}
     {columns}
     {start_date}
@@ -691,7 +691,6 @@ def precipitation_cli(
     {skiprows}
     {index_type}
     {names}
-    {source_units}
     {target_units}
     {print_input}
     {tablefmt}
@@ -753,6 +752,7 @@ def evaporation_cli(
         There are two methods, a trapezoidal shape from sunrise to
         sunset called "trap" and a fixed, smooth curve starting at 0700
         (7 am) and stopping at 1900 (7 pm) called "fixed".
+    {source_units}
     {input_ts}
     {columns}
     {start_date}
@@ -763,7 +763,6 @@ def evaporation_cli(
     {skiprows}
     {index_type}
     {names}
-    {source_units}
     {target_units}
     {print_input}
     {tablefmt}

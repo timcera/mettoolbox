@@ -44,7 +44,7 @@ a single "target_units".  You gave "{target_units}".
                 )
             )
         )
-    return target_units[0] * len(source_units)
+    return [target_units[0]] * len(source_units)
 
 
 @tsutils.validator(
@@ -136,7 +136,7 @@ def temperature(
     max_delta = get_shift_by_data(temp_hourly, lon, lat, round(lon/15.0))
     """
     source_units = tsutils.make_list(source_units)
-    target_units = tsutils.make_list(target_units)
+    target_units = tsutils.make_list(target_units, n=1, kwdname="target_units")
 
     target_units = single_target_units(source_units, target_units, "degC")
 

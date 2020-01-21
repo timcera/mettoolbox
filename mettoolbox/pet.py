@@ -116,6 +116,7 @@ def hargreaves(
     if temp_mean_col is not None:
         columns.append(temp_mean_col)
         column_names.append("temp")
+    internal_target_units = ["degC"] * len(column_names)
 
     tsd = tsutils.common_kwds(
         tsutils.read_iso_ts(
@@ -127,6 +128,7 @@ def hargreaves(
         round_index=round_index,
         dropna=dropna,
         source_units=source_units,
+        target_units=internal_target_units,
         clean=clean,
     )
 
