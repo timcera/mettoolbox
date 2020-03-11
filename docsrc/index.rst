@@ -6,6 +6,8 @@
 mettoolbox
 ==========
 
+Should work with Python 3.6+.
+
 Contents:
 
 Table of Contents

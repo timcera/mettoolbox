@@ -44,7 +44,7 @@ a single "target_units".  You gave "{target_units}".
                 )
             )
         )
-    return [target_units[0]] * len(source_units)
+    return target_units[0] * len(source_units)
 
 
 @tsutils.validator(
@@ -74,6 +74,7 @@ a single "target_units".  You gave "{target_units}".
 )
 def temperature(
     method,
+    source_units,
     min_max_time="fix",
     mod_nighttime=False,
     input_ts="-",
@@ -86,7 +87,6 @@ def temperature(
     index_type="datetime",
     names=None,
     print_input=False,
-    source_units=None,
     target_units=None,
     max_delta=False,
     temp_min_col=None,
@@ -136,7 +136,7 @@ def temperature(
     max_delta = get_shift_by_data(temp_hourly, lon, lat, round(lon/15.0))
     """
     source_units = tsutils.make_list(source_units)
-    target_units = tsutils.make_list(target_units, n=1, kwdname="target_units")
+    target_units = tsutils.make_list(target_units)
 
     target_units = single_target_units(source_units, target_units, "degC")
 
@@ -251,9 +251,8 @@ On the following dates:
 
 {0},
 
-the daily average is either below or equal to the minimum temperature in
-column {1} or higher or equal to the maximum temperature in column
-{2}.""".format(
+the daily average is either below or equal to the minimum temperature in column {1}
+or higher or equal to the maximum temperature in column {2}.""".format(
                         tsd[tsd.tmin >= tsd.temp | tsd.tmax <= tsd.temp],
                         temp_min_col,
                         temp_max_col,
@@ -327,6 +326,7 @@ You gave:
 )
 def humidity(
     method,
+    source_units,
     input_ts="-",
     columns=None,
     start_date=None,
@@ -337,7 +337,6 @@ def humidity(
     skiprows=None,
     index_type="datetime",
     names=None,
-    source_units=None,
     target_units=None,
     print_input=False,
     hum_min_col=None,
@@ -355,22 +354,20 @@ def humidity(
 
     disaggregate_humidity(data_daily, method='equal', temp=None,
                           a0=None, a1=None, kr=None,
-                          month_hour_precip_mean=None,
-                          preserve_daily_mean=False):
-
+                          month_hour_precip_mean=None, preserve_daily_mean=False):
     Args:
         daily_data: daily values
         method: keyword specifying the disaggregation method to be used
         temp: hourly temperature time series (necessary for some methods)
         kr: parameter for linear_dewpoint_variation method (6 or 12)
-        month_hour_precip_mean: [month, hour, precip(y/n)] categorical
-        mean values preserve_daily_mean: if True, correct the daily mean
-        values of the disaggregated data with the observed daily means.
+        month_hour_precip_mean: [month, hour, precip(y/n)] categorical mean values
+        preserve_daily_mean: if True, correct the daily mean values of the disaggregated
+            data with the observed daily means.
+
 
     if method=equal
         .hum from hum_mean_col
-    if method in ["minimal", "dewpoint_regression",
-    "linear_dewpoint_variation"]
+    if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]
         .tmin from temp_min_col
     if method=min_max need
         .hum_min from hum_min_col
@@ -552,6 +549,7 @@ required identified by the filename in keyword `hourly_temp`."""
 @tsutils.validator(method=[str, ["domain", ["equal", "cosine", "random",],], 1,],)
 def wind_speed(
     method,
+    source_units,
     input_ts="-",
     columns=None,
     start_date=None,
@@ -563,7 +561,6 @@ def wind_speed(
     index_type="datetime",
     names=None,
     target_units=None,
-    source_units=None,
     print_input=False,
     a=None,
     b=None,
@@ -639,6 +636,7 @@ t_shift = {t_shift}
 )
 def radiation(
     method,
+    source_units,
     input_ts="-",
     columns=None,
     start_date=None,
@@ -649,7 +647,6 @@ def radiation(
     skiprows=None,
     index_type="datetime",
     names=None,
-    source_units=None,
     target_units=None,
     print_input=False,
     pot_rad=None,
@@ -783,6 +780,7 @@ and `bristcamp_c`."""
 )
 def precipitation(
     method,
+    source_units,
     input_ts="-",
     columns=None,
     start_date=None,
@@ -793,7 +791,6 @@ def precipitation(
     skiprows=None,
     index_type="datetime",
     names=None,
-    source_units=None,
     target_units=None,
     print_input=False,
 ):
@@ -830,6 +827,7 @@ def precipitation(
 )
 def evaporation(
     method,
+    source_units,
     input_ts="-",
     columns=None,
     start_date=None,
@@ -840,7 +838,6 @@ def evaporation(
     skiprows=None,
     index_type="datetime",
     names=None,
-    source_units=None,
     target_units=None,
     print_input=False,
     lat=None,

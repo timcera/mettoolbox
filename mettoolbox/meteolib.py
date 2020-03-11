@@ -6,14 +6,14 @@ Meteorological function names
 =============================
 
     - cp_calc:    Calculate specific heat
-    - delta_calc: Calculate slope of vapour pressure curve
+    - Delta_calc: Calculate slope of vapour pressure curve
     - es_calc:    Calculate saturation vapour pressures
     - ea_calc:    Calculate actual vapour pressures
     - gamma_calc: Calculate psychrometric constant
-    - l_calc:     Calculate latent heat of vapourisation
+    - L_calc:     Calculate latent heat of vapourisation
     - pottemp:    Calculate potential temperature (1000 hPa reference pressure)
     - rho_calc:   Calculate air density
-    - sun_nr:     Maximum sunshine duration [h] and extraterrestrial radiation [J/day]
+    - sun_NR:     Maximum sunshine duration [h] and extraterrestrial radiation [J/day]
     - vpd_calc:   Calculate vapour pressure deficits
     - windvec:    Calculate average wind direction and speed
 
@@ -52,12 +52,12 @@ def meteolib():
         - es_calc:    Calculate saturation vapour pressures.
         - ea_calc:    Calculate actual vapour pressures.
         - vpd_calc:   Calculate vapour pressure deficits.
-        - delta_calc: Calculate slope of vapour pressure curve.
-        - l_calc:     Calculate latent heat of vapourisation.
+        - Delta_calc: Calculate slope of vapour pressure curve.
+        - L_calc:     Calculate latent heat of vapourisation.
         - cp_calc:    Calculate specific heat.
         - gamma_calc: Calculate psychrometric constant.
         - rho_calc:   Calculate air density.
-        - sun_nr:     Calculate extraterrestrial radiation and daylenght.
+        - sun_NR:     Calculate extraterrestrial radiation and daylenght.
         - pottemp:    Calculate potential temperature (1000 hPa reference\
         pressure).
         - windvec:    Calculate average wind direction and speed.
@@ -70,14 +70,14 @@ def meteolib():
     print("Python library with functions meteorology.\n")
     print("Functions:\n")
     print("- cp_calc: Calculate specific heat.")
-    print("- delta_calc: Calculate slope of vapour pressure curve.")
+    print("- Delta_calc: Calculate slope of vapour pressure curve.")
     print("- ea_calc: Calculate actual vapour pressures.")
     print("- es_calc: Calculate saturation vapour pressures.")
     print("- gamma_calc: Calculate psychrometric constant.")
-    print("- l_calc: Calculate latent heat of vapourisation.")
+    print("- L_calc: Calculate latent heat of vapourisation.")
     print("- pottemp: Calculate potential temperature (1000 hPa reference pressure)")
     print("- rho_calc: Calculate air density.")
-    print("- sun_nr: Calculate extraterrestrial radiation and daylenght.")
+    print("- sun_NR: Calculate extraterrestrial radiation and daylenght.")
     print("- vpd_calc: Calculate vapour pressure deficits.")
     print("- windvec: Calculate average wind direction and speed.\n")
     print("Author: ", __author__)
@@ -175,13 +175,13 @@ def cp_calc(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array([]
     return cp  # in J/kg/K
 
 
-def delta_calc(airtemp=scipy.array([])):
+def Delta_calc(airtemp=scipy.array([])):
     """
     Function to calculate the slope of the temperature - vapour pressure curve
     (Delta) from air temperature T:
 
     .. math::
-        \\delta = 1000 \\cdot \\frac{e_s \\cdot 4098}{(T + 237.3)^2}
+        \\Delta = 1000 \\cdot \\frac{e_s \\cdot 4098}{(T + 237.3)^2}
 
     where es is the saturated vapour pressure at temperature T.
 
@@ -189,7 +189,7 @@ def delta_calc(airtemp=scipy.array([])):
         - airtemp: (array of) air temperature [Celsius].
 
     Returns:
-        - delta: (array of) slope of saturated vapour curve [Pa K-1].
+        - Delta: (array of) slope of saturated vapour curve [Pa K-1].
 
     References
     ----------
@@ -199,10 +199,10 @@ def delta_calc(airtemp=scipy.array([])):
 
     Examples
     --------
-        >>> delta_calc(30.0)
+        >>> Delta_calc(30.0)
         243.34309166827094
         >>> x = [20, 25]
-        >>> delta_calc(x)
+        >>> Delta_calc(x)
         array([ 144.6658414 ,  188.62504569])
 
     """
@@ -214,9 +214,9 @@ def delta_calc(airtemp=scipy.array([])):
     es = es_calc(airtemp)  # in Pa
     # Convert es (Pa) to kPa
     es = es / 1000.0
-    # Calculate delta
-    delta = es * 4098.0 / ((airtemp + 237.3) ** 2) * 1000
-    return delta  # in Pa/K
+    # Calculate Delta
+    Delta = es * 4098.0 / ((airtemp + 237.3) ** 2) * 1000
+    return Delta  # in Pa/K
 
 
 def ea_calc(airtemp=scipy.array([]), rh=scipy.array([])):
@@ -403,13 +403,13 @@ def gamma_calc(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array
 
     # Calculate cp and Lambda values
     cp = cp_calc(airtemp, rh, airpress)
-    L = l_calc(airtemp)
+    L = L_calc(airtemp)
     # Calculate gamma
     gamma = cp * airpress / (0.622 * L)
     return gamma  # in Pa\K
 
 
-def l_calc(airtemp=scipy.array([])):
+def L_calc(airtemp=scipy.array([])):
     """
     Function to calculate the latent heat of vapourisation from air temperature.
 
@@ -428,10 +428,10 @@ def l_calc(airtemp=scipy.array([])):
     Examples
     --------
 
-        >>> l_calc(25)
+        >>> L_calc(25)
         2440883.8804625
         >>> t=[10, 20, 30]
-        >>> l_calc(t)
+        >>> L_calc(t)
         array([ 2476387.3842125,  2452718.3817125,  2429049.3792125])
 
     """
@@ -524,7 +524,7 @@ def rho_calc(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array([
     return rho  # in kg/m3
 
 
-def sun_nr(doy=scipy.array([]), lat=float):
+def sun_NR(doy=scipy.array([]), lat=float):
     """
     Function to calculate the maximum sunshine duration [h] and incoming
     radiation [MJ/day] at the top of the atmosphere from day of year and
@@ -555,11 +555,11 @@ def sun_nr(doy=scipy.array([]), lat=float):
     Examples
     --------
 
-        >>> sun_nr(50,60)
+        >>> sun_NR(50,60)
         (9.1631820597268163, 9346987.824773483)
         >>> days = [100,200,300]
         >>> latitude = 52.
-        >>> sun_nr(days,latitude)
+        >>> sun_NR(days,latitude)
         (array([ 13.31552077,  15.87073276,   9.54607624]), array([ 29354803.66244921,  39422316.42084264,  12619144.54566777]))
 
     """
