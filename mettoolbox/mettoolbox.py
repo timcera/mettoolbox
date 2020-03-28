@@ -41,6 +41,13 @@ _LOCAL_DOCSTRINGS[
         If None (the default) then `input_ts` and `columns` must be set."""
 
 
+@program.command()
+def about():
+    """Display version number and system information.
+    """
+    tsutils.about(__name__)
+
+
 @program.disaggregate.command(
     "temperature", formatter_class=RSTHelpFormatter, doctype="numpy"
 )
