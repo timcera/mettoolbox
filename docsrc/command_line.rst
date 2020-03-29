@@ -5,7 +5,8 @@ Command Line
 
 Help::
 
-     mettoolbox –help
+.. program-output:: mettoolbox –help
+   :prompt:
 
 about
 ~~~~~
