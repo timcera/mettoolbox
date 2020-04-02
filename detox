@@ -32,7 +32,7 @@ for env in ${envs[@]}; do
     pip uninstall -y ${program}
     rm -rf build
     pip install -e ../${program}
-    pytest ${pytest_opts}
+    pytest ${pytest_opts} tests/test_*.py
     deactivate
 done
 
