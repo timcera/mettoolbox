@@ -7,6 +7,7 @@ from __future__ import absolute_import
 
 import warnings
 
+import numpy as np
 import pandas as pd
 
 # import pyeto
@@ -176,26 +177,26 @@ or higher or equal to the maximum temperature in column {2}.""".format(
             )
         )
     # 'Roll-out' the distribution from day to day.
-    jday = pd.np.arange(1, 367)
+    jday = np.arange(1, 367)
 
     # FAO declination calculation
-    dec = 0.409 * pd.np.sin(2.0 * pd.np.pi * jday / 365.0 - 1.39)
+    dec = 0.409 * np.sin(2.0 * np.pi * jday / 365.0 - 1.39)
 
-    lrad = lat * pd.np.pi / 180.0
+    lrad = lat * np.pi / 180.0
 
-    s = pd.np.arccos(-pd.np.tan(dec) * pd.np.tan(lrad))
+    s = np.arccos(-np.tan(dec) * np.tan(lrad))
 
     # FAO radiation calculation
-    dr = 1.0 + 0.033 * pd.np.cos(2 * pd.np.pi * jday / 365)
+    dr = 1.0 + 0.033 * np.cos(2 * np.pi * jday / 365)
 
     # FAO radiation calculation
     ra = (
         118.08
-        / pd.np.pi
+        / np.pi
         * dr
         * (
-            s * pd.np.sin(lrad) * pd.np.sin(dec)
-            + pd.np.cos(lrad) * pd.np.cos(dec) * pd.np.sin(s)
+            s * np.sin(lrad) * np.sin(dec)
+            + np.cos(lrad) * np.cos(dec) * np.sin(s)
         )
     )
 
@@ -208,7 +209,7 @@ or higher or equal to the maximum temperature in column {2}.""".format(
 
     # Copy tsd.temp in order to get all of the time components correct.
     pe = tsd.temp.copy()
-    pe = 0.408 * 0.0023 * newra * (tsd.temp + 17.8) * pd.np.sqrt(abs(tsdiff))
+    pe = 0.408 * 0.0023 * newra * (tsd.temp + 17.8) * np.sqrt(abs(tsdiff))
 
     pe = pd.DataFrame(pe, columns=["pet_hargreaves:mm"])
     if target_units != source_units:

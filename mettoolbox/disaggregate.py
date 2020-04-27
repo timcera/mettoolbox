@@ -8,6 +8,7 @@ from __future__ import absolute_import
 import warnings
 import datetime
 
+import numpy as np
 import pandas as pd
 
 from tstoolbox import tsutils
@@ -885,13 +886,13 @@ The "trap" method requires latitude with the `lat` keyword.  You gave
     fdata = pd.DataFrame(columns=ndata.columns, index=ndata.index, dtype="f")
 
     if method == "trap":
-        lrad = lat * pd.np.pi / 180.0
+        lrad = lat * np.pi / 180.0
 
-        ad = 0.40928 * pd.np.cos(0.0172141 * (172 - tsd.index.dayofyear))
-        ss = pd.np.sin(lrad) * pd.np.sin(ad)
-        cs = pd.np.cos(lrad) * pd.np.cos(ad)
+        ad = 0.40928 * np.cos(0.0172141 * (172 - tsd.index.dayofyear))
+        ss = np.sin(lrad) * np.sin(ad)
+        cs = np.cos(lrad) * np.cos(ad)
         x2 = -ss / cs
-        delt = 7.6394 * (pd.np.pi / 2.0 - pd.np.arctan(x2 / pd.np.square(1 - x2 ** 2)))
+        delt = 7.6394 * (np.pi / 2.0 - np.arctan(x2 / np.square(1 - x2 ** 2)))
         sunr = 12.0 - delt / 2.0
 
         # develop hourly distribution given sunrise,
