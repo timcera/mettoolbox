@@ -39,6 +39,10 @@ _LOCAL_DOCSTRINGS[
         on commas and use as array_like.
 
         If None (the default) then `input_ts` and `columns` must be set."""
+sunits = _LOCAL_DOCSTRINGS["source_units"]
+sunits = sunits.split("\n")
+del sunits[1:3]
+_LOCAL_DOCSTRINGS["psource_units"] = "\n".join(sunits)
 
 
 @program.command()
@@ -106,8 +110,8 @@ def temperature_cli(
     Parameters
     ==========
     method: str
-        Disaggregation methods available for
-        temperature.
+
+        Disaggregation methods available for temperature.
 
         +---------------------+--------------------------------------+
         | `method`            | Description                          |
@@ -134,6 +138,7 @@ def temperature_cli(
         |                     | range. Hourly CSV filename specified |
         |                     | with the `hourly` keyword.           |
         +---------------------+--------------------------------------+
+    {psource_units}
 
     min_max_time: str
 
@@ -165,7 +170,6 @@ def temperature_cli(
     {skiprows}
     {index_type}
     {names}
-    {source_units}
     {target_units}
     {print_input}
     {tablefmt}
@@ -266,10 +270,10 @@ def humidity_cli(
     +==============+=============================================+
     | hum_min_col  | Required column name or number representing |
     |              | the minimum daily relative humidity.        |
-    |              |                                             |
+    +--------------+---------------------------------------------+
     | hum_max_col  | Required column name or number representing |
     |              | the maximum daily relative humidity.        |
-    |              |                                             |
+    +--------------+---------------------------------------------+
     | hum_mean_col | Optional column name or number representing |
     |              | the average daily relative humidity.        |
     |              | Default is None and if None will be         |
@@ -281,7 +285,8 @@ def humidity_cli(
     ==========
     method: str
 
-        Available disaggregation methods for humidity.
+        Available disaggregation methods for
+        humidity.
 
         +---------------------------+-------------------------------+
         | `method`                  | Description                   |
@@ -348,7 +353,7 @@ def humidity_cli(
         +---------------------------+----------------+---------------+
         | month_hour_precip_mean    | `precip_col`   |               |
         +---------------------------+----------------+---------------+
-
+    {psource_units}
     {input_ts}
     {columns}
     {start_date}
@@ -359,7 +364,6 @@ def humidity_cli(
     {skiprows}
     {index_type}
     {names}
-    {source_units}
     {target_units}
     {print_input}
     {tablefmt}
@@ -373,11 +377,14 @@ def humidity_cli(
         Column index (data columns start numbering at 1) or column name
         from the input data that contains the daily maximum humidity.
     a0: float
-        The "a0" parameter.
+        The "a0"
+        parameter.
     a1: float
-        The "a1" parameter.
+        The "a1"
+        parameter.
     kr: int
-        Parameter for the "linear_dewpoint_variation" method.
+        Parameter for the "linear_dewpoint_variation"
+        method.
     hourly_temp: str
         Filename of a CSV file that contains an hourly time series of
         temperatures.
@@ -467,6 +474,7 @@ def wind_speed_cli(
         |          | parameter estimation required).                |
         +----------+------------------------------------------------+
 
+    {psource_units}
     {input_ts}
     {columns}
     {start_date}
@@ -477,7 +485,6 @@ def wind_speed_cli(
     {skiprows}
     {index_type}
     {names}
-    {source_units}
     {target_units}
     {print_input}
     {tablefmt}
@@ -586,7 +593,7 @@ def radiation_cli(
     {skiprows}
     {index_type}
     {names}
-    {source_units}
+    {psource_units}
     {target_units}
     {print_input}
     {tablefmt}
@@ -698,7 +705,7 @@ def precipitation_cli(
     {skiprows}
     {index_type}
     {names}
-    {source_units}
+    {psource_units}
     {target_units}
     {print_input}
     {tablefmt}
@@ -770,7 +777,7 @@ def evaporation_cli(
     {skiprows}
     {index_type}
     {names}
-    {source_units}
+    {psource_units}
     {target_units}
     {print_input}
     {tablefmt}

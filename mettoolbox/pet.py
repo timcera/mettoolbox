@@ -194,10 +194,7 @@ or higher or equal to the maximum temperature in column {2}.""".format(
         118.08
         / np.pi
         * dr
-        * (
-            s * np.sin(lrad) * np.sin(dec)
-            + np.cos(lrad) * np.cos(dec) * np.sin(s)
-        )
+        * (s * np.sin(lrad) * np.sin(dec) + np.cos(lrad) * np.cos(dec) * np.sin(s))
     )
 
     # ra just covers 1 year - need to map onto all years...
