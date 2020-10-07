@@ -489,11 +489,11 @@ def wind_speed_cli(
     {print_input}
     {tablefmt}
     a: float
-        Parameter `a` for method equal to "cosine".
+        Parameter `a` when method is equal to "cosine".
     b: float
-        Parameter `b` for method equal to "cosine".
+        Parameter `b` when method is equal to "cosine".
     t_shift: float
-        Parameter `t_shift` for method equal to "cosine".
+        Parameter `t_shift` when method is equal to "cosine".
     """
     tsutils._printiso(
         disaggregate.wind_speed(
@@ -892,6 +892,8 @@ def hargreaves_cli(
             lat,
             temp_min_col,
             temp_max_col,
+            source_units,
+            temp_mean_col=temp_mean_col,
             input_ts=input_ts,
             start_date=start_date,
             end_date=end_date,
@@ -901,16 +903,127 @@ def hargreaves_cli(
             skiprows=skiprows,
             index_type=index_type,
             names=names,
-            source_units=source_units,
             target_units=target_units,
             print_input=print_input,
-            temp_mean_col=temp_mean_col,
         ),
         tablefmt=tablefmt,
     )
 
 
 pet.hargreaves.__doc__ = hargreaves_cli.__doc__
+
+
+@program.pet.command("oudin", formatter_class=RSTHelpFormatter, doctype="numpy")
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def oudin_cli(
+    lat,
+    source_units,
+    temp_min_col=None,
+    temp_max_col=None,
+    temp_mean_col=None,
+    input_ts="-",
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+):
+    """Estimate PET using the formula propsed by Oudin (2005).
+
+    This model uses daily mean temperature to estimate PET based
+    on the Julian day of year and latitude. The later are used
+    to estimate extraterrestrial solar radiation.
+
+    Reference,
+        Ludovic Oudin et al, Which potential evapotranspiration input for a lumped rainfall–runoff model?:
+        Part 2—Towards a simple and efficient potential evapotranspiration model for rainfall–runoff modelling,
+        Journal of Hydrology, Volume 303, Issues 1–4, 1 March 2005, Pages 290-306, ISSN 0022-1694,
+        http://dx.doi.org/10.1016/j.jhydrol.2004.08.026.
+        (http://www.sciencedirect.com/science/article/pii/S0022169404004056)
+
+    Parameters
+    ==========
+    lat: float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet oudin 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.oudin(24,
+                              1,
+                              2,
+                              ["degF", "degF"],
+                              input_ts="tmin_tmax_data.csv")
+    {input_ts}
+    {start_date}
+    {end_date}
+    {dropna}
+    {clean}
+    {round_index}
+    {skiprows}
+    {index_type}
+    {names}
+    {target_units}
+    {print_input}
+    {tablefmt}
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`."""
+    tsutils._printiso(
+        pet.oudin(
+            lat,
+            source_units,
+            temp_min_col=temp_min_col,
+            temp_max_col=temp_max_col,
+            temp_mean_col=temp_mean_col,
+            input_ts=input_ts,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            target_units=target_units,
+            print_input=print_input,
+        ),
+        tablefmt=tablefmt,
+    )
+
+
+pet.oudin.__doc__ = oudin_cli.__doc__
 
 
 def main():

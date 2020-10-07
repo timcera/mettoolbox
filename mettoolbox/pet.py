@@ -15,6 +15,7 @@ import pandas as pd
 from tstoolbox import tsutils
 
 from . import evaplib
+from . import utils
 
 warnings.filterwarnings("ignore")
 
@@ -39,6 +40,7 @@ Instead you gave {1}""".format(
             nloopvar = int(loopvar) - 1
         except TypeError:
             nloopvar = loopvar
+
         if nloopvar is None:
             collect.append(None)
         else:
@@ -96,6 +98,7 @@ def hargreaves(
     temp_min_col,
     temp_max_col,
     source_units,
+    temp_mean_col=None,
     input_ts="-",
     start_date=None,
     end_date=None,
@@ -107,16 +110,17 @@ def hargreaves(
     names=None,
     target_units=None,
     print_input=False,
-    temp_mean_col=None,
 ):
     """hargreaves
 
     """
-    columns = [temp_min_col, temp_max_col]
-    column_names = ["tmin", "tmax"]
-    if temp_mean_col is not None:
-        columns.append(temp_mean_col)
-        column_names.append("temp")
+    columns, column_names = utils._check_temperature_cols(
+        temp_min_col=temp_min_col,
+        temp_max_col=temp_max_col,
+        temp_mean_col=temp_mean_col,
+        temp_min_required=True,
+        temp_max_required=True,
+    )
 
     tsd = tsutils.common_kwds(
         tsutils.read_iso_ts(
@@ -133,82 +137,80 @@ def hargreaves(
 
     tsd.columns = column_names
 
-    if any(tsd.tmax <= tsd.tmin):
-        raise ValueError(
-            tsutils.error_wrapper(
-                """
-On the following dates:
+    tsd = utils._validate_temperatures(tsd)
 
-{0},
-
-minimum temperature values in column "{1}" are greater than or equal to
-the maximum temperature values in column "{2}".""".format(
-                    tsd[tsd.tmax <= tsd.tmin].index, temp_min_col, temp_max_col
-                )
-            )
-        )
-
-    if temp_mean_col is None:
-        warnings.warn(
-            tsutils.error_wrapper(
-                """
-Since `temp_mean_col` is None, the average daily temperature will be
-estimated by the average of `temp_min_col` and `temp_max_col`""".format(
-                    **locals()
-                )
-            )
-        )
-        tsd.temp = (tsd.tmin + tsd.tmax) / 2.0
-
-    if any(tsd.tmin >= tsd.temp) or any(tsd.tmax <= tsd.temp):
-        raise ValueError(
-            tsutils.error_wrapper(
-                """
-On the following dates:
-
-{0},
-
-the daily average is either below or equal to the minimum temperature in column {1}
-or higher or equal to the maximum temperature in column {2}.""".format(
-                    tsd[tsd.tmin >= tsd.temp | tsd.tmax <= tsd.temp],
-                    temp_min_col,
-                    temp_max_col,
-                )
-            )
-        )
-    # 'Roll-out' the distribution from day to day.
-    jday = np.arange(1, 367)
-
-    # FAO declination calculation
-    dec = 0.409 * np.sin(2.0 * np.pi * jday / 365.0 - 1.39)
-
-    lrad = lat * np.pi / 180.0
-
-    s = np.arccos(-np.tan(dec) * np.tan(lrad))
-
-    # FAO radiation calculation
-    dr = 1.0 + 0.033 * np.cos(2 * np.pi * jday / 365)
-
-    # FAO radiation calculation
-    ra = (
-        118.08
-        / np.pi
-        * dr
-        * (s * np.sin(lrad) * np.sin(dec) + np.cos(lrad) * np.cos(dec) * np.sin(s))
-    )
-
-    # ra just covers 1 year - need to map onto all years...
-    newra = tsd.tmin.copy()
-    for day in jday:
-        newra[newra.index.dayofyear == day] = ra[day - 1]
+    newra = utils.radiation(tsd, lat)
 
     tsdiff = tsd.tmax - tsd.tmin
 
-    # Copy tsd.temp in order to get all of the time components correct.
-    pe = tsd.temp.copy()
-    pe = 0.408 * 0.0023 * newra * (tsd.temp + 17.8) * np.sqrt(abs(tsdiff))
+    # Create new dataframe with tsd.index as index in
+    # order to get all of the time components correct.
+    pe = pd.DataFrame(0.0, index=tsd.index, columns=["pet_hargreaves:mm"])
+    pe["pet_hargreaves:mm"] = (
+        0.408 * 0.0023 * newra.ra * (tsd.tmean + 17.8) * np.sqrt(abs(tsdiff))
+    )
+    if target_units != source_units:
+        pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
+    return tsutils.return_input(print_input, tsd, pe)
 
-    pe = pd.DataFrame(pe, columns=["pet_hargreaves:mm"])
+
+def oudin(
+    lat,
+    source_units,
+    temp_min_col=None,
+    temp_max_col=None,
+    temp_mean_col=None,
+    input_ts="-",
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+):
+    """oudin
+
+    """
+    columns, column_names = utils._check_temperature_cols(
+        temp_min_col=temp_min_col,
+        temp_max_col=temp_max_col,
+        temp_mean_col=temp_mean_col,
+    )
+
+    tsd = tsutils.common_kwds(
+        tsutils.read_iso_ts(
+            input_ts, skiprows=skiprows, names=names, index_type=index_type
+        ),
+        start_date=start_date,
+        end_date=end_date,
+        pick=columns,
+        round_index=round_index,
+        dropna=dropna,
+        source_units=source_units,
+        clean=clean,
+    )
+
+    tsd.columns = column_names
+
+    tsd = utils._validate_temperatures(tsd)
+
+    newra = utils.radiation(tsd, lat)
+
+    # Create new dataframe with tsd.index as index in
+    # order to get all of the time components correct.
+    pe = pd.DataFrame(0.0, index=tsd.index, columns=["pet_oudin:mm"])
+
+    gamma = 2.45  # the latent heat flux (MJ kg−1)
+    rho = 1000.0  # density of water (kg m-3)
+
+    pe.loc[tsd.tmean > -5.0, "pet_oudin:mm"] = (
+        newra.ra / (gamma * rho) * (tsd.tmean + 5.0) / 100 * 1000
+    )
+
     if target_units != source_units:
         pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
     return tsutils.return_input(print_input, tsd, pe)
