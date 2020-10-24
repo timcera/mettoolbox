@@ -50,3 +50,8 @@ pet hargreaves
 ~~~~~~~~~~~~~~
 .. program-output:: mettoolbox pet hargreaves --help
    :prompt:
+
+pet oudin
+~~~~~~~~~
+.. program-output:: mettoolbox pet oudin --help
+   :prompt:

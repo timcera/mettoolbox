@@ -26,63 +26,8 @@ Function descriptions
 
 """
 
-import math  # import math library
-import scipy  # import scientific python functions
-
-
-__author__ = "Maarten J. Waterloo <maarten.waterloo@acaciawater.com> and\
- J. Delsman"
-__version__ = "1.0"
-__release__ = "1.0.1"
-__date__ = "November 2014"
-
-# Make a help entry for this library
-def meteolib():
-    """
-    A libray of functions for calculation of micrometeorological
-    parameters.
-
-    This is the help function which prints a list of functions and contact
-    information about the author, version and last modification date.
-
-    Functions
-    ---------
-
-    The metolib module includes the following functions:
-        - es_calc:    Calculate saturation vapour pressures.
-        - ea_calc:    Calculate actual vapour pressures.
-        - vpd_calc:   Calculate vapour pressure deficits.
-        - Delta_calc: Calculate slope of vapour pressure curve.
-        - L_calc:     Calculate latent heat of vapourisation.
-        - cp_calc:    Calculate specific heat.
-        - gamma_calc: Calculate psychrometric constant.
-        - rho_calc:   Calculate air density.
-        - sun_NR:     Calculate extraterrestrial radiation and daylenght.
-        - pottemp:    Calculate potential temperature (1000 hPa reference\
-        pressure).
-        - windvec:    Calculate average wind direction and speed.
-
-    Author: Maarten J. Waterloo <m.j.waterloo@vu.nl>
-    Version: 1.0
-    Date: November 2014
-
-    """
-    print("Python library with functions meteorology.\n")
-    print("Functions:\n")
-    print("- cp_calc: Calculate specific heat.")
-    print("- Delta_calc: Calculate slope of vapour pressure curve.")
-    print("- ea_calc: Calculate actual vapour pressures.")
-    print("- es_calc: Calculate saturation vapour pressures.")
-    print("- gamma_calc: Calculate psychrometric constant.")
-    print("- L_calc: Calculate latent heat of vapourisation.")
-    print("- pottemp: Calculate potential temperature (1000 hPa reference pressure)")
-    print("- rho_calc: Calculate air density.")
-    print("- sun_NR: Calculate extraterrestrial radiation and daylenght.")
-    print("- vpd_calc: Calculate vapour pressure deficits.")
-    print("- windvec: Calculate average wind direction and speed.\n")
-    print("Author: ", __author__)
-    print("Version: ", __version__)
-    print("Date: ", __date__)
+import math
+import scipy
 
 
 def _arraytest(*args):
