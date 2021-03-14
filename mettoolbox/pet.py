@@ -5,10 +5,12 @@ from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
 
+from typing import Optional, Union
 import warnings
 
 import numpy as np
 import pandas as pd
+import typic
 
 # import pyeto
 
@@ -73,9 +75,7 @@ def et0_pm(
     avp_from_tmin=None,
     lat=None,
 ):
-    """Penman-Monteith evaporation.
-
-    """
+    """Penman-Monteith evaporation."""
     tsd = tsutils.common_kwds(
         tsutils.read_iso_ts(
             input_ts, skiprows=skiprows, names=names, index_type=index_type
@@ -93,12 +93,18 @@ def et0_pm(
     return tsd
 
 
+@typic.constrained(ge=-90, le=90)
+class FloatLatitude(float):
+    """ -90 <= float <= 90 """
+
+
+@typic.al
 def hargreaves(
-    lat,
-    temp_min_col,
-    temp_max_col,
-    source_units,
-    temp_mean_col=None,
+    lat: FloatLatitude,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    source_units=None,
     input_ts="-",
     start_date=None,
     end_date=None,
@@ -111,9 +117,7 @@ def hargreaves(
     target_units=None,
     print_input=False,
 ):
-    """hargreaves
-
-    """
+    """hargreaves"""
     columns, column_names = utils._check_temperature_cols(
         temp_min_col=temp_min_col,
         temp_max_col=temp_max_col,
@@ -154,12 +158,13 @@ def hargreaves(
     return tsutils.return_input(print_input, tsd, pe)
 
 
+@typic.al
 def oudin(
-    lat,
-    source_units,
-    temp_min_col=None,
-    temp_max_col=None,
-    temp_mean_col=None,
+    lat: FloatLatitude,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    source_units=None,
     input_ts="-",
     start_date=None,
     end_date=None,
@@ -172,9 +177,7 @@ def oudin(
     target_units=None,
     print_input=False,
 ):
-    """oudin
-
-    """
+    """oudin"""
     columns, column_names = utils._check_temperature_cols(
         temp_min_col=temp_min_col,
         temp_max_col=temp_max_col,
@@ -217,14 +220,10 @@ def oudin(
 
 
 def reference():
-    """reference penman-monteith
-
-    """
+    """reference penman-monteith"""
     print("reference")
 
 
 def potential():
-    """potential
-
-    """
+    """potential"""
     print("potential")

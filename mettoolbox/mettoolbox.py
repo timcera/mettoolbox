@@ -47,8 +47,7 @@ _LOCAL_DOCSTRINGS["psource_units"] = "\n".join(sunits)
 
 @program.command()
 def about():
-    """Display version number and system information.
-    """
+    """Display version number and system information."""
     tsutils.about(__name__)
 
 
@@ -815,9 +814,10 @@ disaggregate.wind_speed.__doc__ = wind_speed_cli.__doc__
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def hargreaves_cli(
     lat,
-    temp_min_col,
-    temp_max_col,
-    source_units,
+    temp_min_col=None,
+    temp_max_col=None,
+    temp_mean_col=None,
+    source_units=None,
     input_ts="-",
     start_date=None,
     end_date=None,
@@ -830,7 +830,6 @@ def hargreaves_cli(
     target_units=None,
     print_input=False,
     tablefmt="csv",
-    temp_mean_col=None,
 ):
     """Calculate potential evaporation using Hargreaves equation.
 
@@ -890,10 +889,10 @@ def hargreaves_cli(
     tsutils._printiso(
         pet.hargreaves(
             lat,
-            temp_min_col,
-            temp_max_col,
-            source_units,
+            temp_min_col=temp_min_col,
+            temp_max_col=temp_max_col,
             temp_mean_col=temp_mean_col,
+            source_units=source_units,
             input_ts=input_ts,
             start_date=start_date,
             end_date=end_date,
@@ -917,10 +916,10 @@ pet.hargreaves.__doc__ = hargreaves_cli.__doc__
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def oudin_cli(
     lat,
-    source_units,
     temp_min_col=None,
     temp_max_col=None,
     temp_mean_col=None,
+    source_units=None,
     input_ts="-",
     start_date=None,
     end_date=None,
@@ -1003,7 +1002,7 @@ def oudin_cli(
     tsutils._printiso(
         pet.oudin(
             lat,
-            source_units,
+            source_units=source_units,
             temp_min_col=temp_min_col,
             temp_max_col=temp_max_col,
             temp_mean_col=temp_mean_col,

@@ -5,11 +5,19 @@ from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
 
+from typing import Optional, Union
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+
 import warnings
 import datetime
 
 import numpy as np
 import pandas as pd
+import typic
 
 from tstoolbox import tsutils
 from tstoolbox import tstoolbox
@@ -48,36 +56,24 @@ a single "target_units".  You gave "{target_units}".
     return target_units[0] * len(source_units)
 
 
-@tsutils.validator(
-    method=[
-        str,
-        [
-            "domain",
-            [
-                "sine_min_max",
-                "sine_mean",
-                "sine",
-                "mean_course_min_max",
-                "mean_course_mean",
-            ],
-        ],
-        1,
-    ],
-    min_max_time=[str, ["domain", ["fix", "sun_loc", "sun_loc_shift"]], 1],
-    mod_nighttime=[bool, ["pass", []], 1],
-    lat=[float, ["range", [-90, 90]], 1],
-    lon=[float, ["range", [-180, 180]], 1],
-    temp_min_col=[[int, ["domain", [1, None]], 1], [str, ["pass", []], 1]],
-    temp_max_col=[[int, ["domain", [1, None]], 1], [str, ["pass", []], 1]],
-    temp_mean_col=[[int, ["domain", [1, None]], 1], [str, ["pass", []], 1]],
-    max_delta=[bool, ["domain", [True, False]], 1],
-    hourly=[str, ["pass", []], 1],
-)
+@typic.constrained(ge=-90, le=90)
+class FloatLatitude(float):
+    """ -90 <= float <= 90 """
+
+
+@typic.constrained(ge=-180, le=180)
+class FloatLongitude(float):
+    """ -180 <= float <= 180 """
+
+
+@typic.al
 def temperature(
-    method,
+    method: Literal[
+        "sine_min_max", "sine_mean", "sine", "mean_course_min_max", "mean_course_mean"
+    ],
     source_units,
-    min_max_time="fix",
-    mod_nighttime=False,
+    min_max_time: Literal["fix", "sun_loc", "sun_loc_shift"] = "fix",
+    mod_nighttime: bool = False,
     input_ts="-",
     start_date=None,
     end_date=None,
@@ -89,13 +85,13 @@ def temperature(
     names=None,
     print_input=False,
     target_units=None,
-    max_delta=False,
-    temp_min_col=None,
-    temp_max_col=None,
-    temp_mean_col=None,
-    lat=None,
-    lon=None,
-    hourly=None,
+    max_delta: bool = False,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    lat: Optional[FloatLatitude] = None,
+    lon: Optional[FloatLongitude] = None,
+    hourly: Optional[str] = None,
 ):
     """Disaggregate daily to hourly data.
 
@@ -308,25 +304,16 @@ You gave:
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@tsutils.validator(
-    method=[
-        str,
-        [
-            "domain",
-            [
-                "equal",
-                "minimal",
-                "dewpoint_regression",
-                "linear_dewpoint_variation",
-                "min_max",
-                "month_hour_precip_mean",
-            ],
-        ],
-        1,
-    ],
-)
+@typic.al
 def humidity(
-    method,
+    method: Literal[
+        "equal",
+        "minimal",
+        "dewpoint_regression",
+        "linear_dewpoint_variation",
+        "min_max",
+        "month_hour_precip_mean",
+    ],
     source_units,
     input_ts="-",
     columns=None,
@@ -547,9 +534,9 @@ required identified by the filename in keyword `hourly_temp`."""
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@tsutils.validator(method=[str, ["domain", ["equal", "cosine", "random",],], 1,],)
+@typic.al
 def wind_speed(
-    method,
+    method: Literal["equal", "cosine", "random"],
     source_units,
     input_ts="-",
     columns=None,
@@ -628,15 +615,9 @@ t_shift = {t_shift}
     )
 
 
-@tsutils.validator(
-    method=[
-        str,
-        ["domain", ["pot_rad", "pot_rad_via_ssd", "pot_rad_via_bc", "mean_course",],],
-        1,
-    ],
-)
+@typic.al
 def radiation(
-    method,
+    method: Literal["pot_rad", "pot_rad_via_ssd", "pot_rad_via_bc", "mean_course"],
     source_units,
     input_ts="-",
     columns=None,
@@ -776,11 +757,9 @@ and `bristcamp_c`."""
     )
 
 
-@tsutils.validator(
-    method=[str, ["domain", ["equal", "cascade", "masterstation",],], 1,],
-)
+@typic.al
 def precipitation(
-    method,
+    method: Literal["equal", "cascade", "masterstation"],
     source_units,
     input_ts="-",
     columns=None,
@@ -818,16 +797,20 @@ def precipitation(
     )
 
     return tsutils.return_input(
-        print_input, tsd, pd.DataFrame(disagg_prec(tsd, method=method,))
+        print_input,
+        tsd,
+        pd.DataFrame(
+            disagg_prec(
+                tsd,
+                method=method,
+            )
+        ),
     )
 
 
-@tsutils.validator(
-    method=[str, ["domain", ["trap", "fixed"]], 1],
-    lat=[float, ["range", [-90, 90]], 1],
-)
+@typic.al
 def evaporation(
-    method,
+    method: Literal["trap", "fixed"],
     source_units,
     input_ts="-",
     columns=None,
@@ -841,7 +824,7 @@ def evaporation(
     names=None,
     target_units=None,
     print_input=False,
-    lat=None,
+    lat: Optional[FloatLatitude] = None,
 ):
     """Disaggregate daily to hourly data."""
     source_units = tsutils.make_list(source_units)

@@ -17,7 +17,7 @@ def _check_temperature_cols(
     if temp_min_col is None and temp_min_required is True:
         raise ValueError(
             tsutils.error_wrapper(
-                """ 
+                """
             This evaporation method requires the minimum daily temperature column to be specified with "temp_min_col".""".format(
                     **locals
                 )
@@ -26,7 +26,7 @@ def _check_temperature_cols(
     if temp_max_col is None and temp_max_required is True:
         raise ValueError(
             tsutils.error_wrapper(
-                """ 
+                """
             This evaporation method requires the maximum daily temperature column to be specified with "temp_max_col".""".format(
                     **locals
                 )
@@ -35,12 +35,12 @@ def _check_temperature_cols(
     if temp_min_col is None or temp_max_col is None:
         raise ValueError(
             tsutils.error_wrapper(
-                """ 
-            If you do not pass a mean daily temperature column in "temp_mean_col" 
-            you must give both minimum and maximum daily temperatures using 
+                """
+            If you do not pass a mean daily temperature column in "temp_mean_col"
+            you must give both minimum and maximum daily temperatures using
             "temp_min_col" and "temp_max_col".
 
-    You gave {temp_min_col} for "temp_min_col" and 
+    You gave {temp_min_col} for "temp_min_col" and
              {temp_max_col} for "temp_max_col". """.format(
                     **locals
                 )
@@ -62,15 +62,15 @@ def _check_temperature_cols(
 
 def _validate_temperatures(tsd):
     if "tmean" not in tsd.columns:
-        if any(tsd.tmax <= tsd.tmin):
+        if (tsd.tmax <= tsd.tmin).any():
             raise ValueError(
                 tsutils.error_wrapper(
-                    """ 
+                    """
                 On the following dates:
 
         {0},
 
-        minimum temperature values in column "{1}" are greater than or 
+        minimum temperature values in column "{1}" are greater than or
         equal to the maximum temperature values in column "{2}".""".format(
                         tsd[tsd.tmax <= tsd.tmin].index, temp_min_col, temp_max_col
                     )
@@ -79,7 +79,7 @@ def _validate_temperatures(tsd):
 
         warnings.warn(
             tsutils.error_wrapper(
-                """ Since `temp_mean_col` is None, the average daily temperature will be 
+                """ Since `temp_mean_col` is None, the average daily temperature will be
 estimated by the average of `temp_min_col` and `temp_max_col`""".format(
                     **locals()
                 )
@@ -87,14 +87,14 @@ estimated by the average of `temp_min_col` and `temp_max_col`""".format(
         )
         tsd["tmean"] = (tsd.tmin + tsd.tmax) / 2.0
     else:
-        if any(tsd.tmin >= tsd.tmean) or any(tsd.tmax <= tsd.tmean):
+        if (tsd.tmin >= tsd.tmean).any() or (tsd.tmax <= tsd.tmean).any():
             raise ValueError(
                 tsutils.error_wrapper(
                     """ On the following dates:
 
         {0},
 
-        the daily average is either below or equal to the minimum temperature in column {1} or higher or equal to the maximum temperature in column 
+        the daily average is either below or equal to the minimum temperature in column {1} or higher or equal to the maximum temperature in column
     {2}.""".format(
                         tsd[tsd.tmin >= tsd.tmean | tsd.tmax <= tsd.tmean],
                         temp_min_col,
@@ -118,7 +118,6 @@ def declination():
 def radiation(tsd, lat):
     # 'Roll-out' the distribution from day to day.
     jday = np.arange(1, 367)
-
     lrad = lat * np.pi / 180.0
 
     dec = declination()
