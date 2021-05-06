@@ -34,7 +34,9 @@ from .melodist.melodist.precipitation import disagg_prec
 warnings.filterwarnings("ignore")
 
 
-def single_target_units(source_units, target_units, default=None):
+@tsutils.transform_args(source_units=tsutils.make_list, target_units=tsutils.make_list)
+@typic.al
+def single_target_units(source_units, target_units, default=None, cnt=1):
     if default is None:
         return source_units
 
@@ -42,7 +44,7 @@ def single_target_units(source_units, target_units, default=None):
         return [default] * len(source_units)
 
     tunits = set(target_units)
-    if len(tunits) != 1:
+    if len(tunits) != cnt:
         raise ValueError(
             tsutils.error_wrapper(
                 """
@@ -53,7 +55,10 @@ a single "target_units".  You gave "{target_units}".
                 )
             )
         )
-    return target_units[0] * len(source_units)
+    if len(source_units) == len(target_units):
+        return target_units
+
+    return [target_units[0]] * len(source_units)
 
 
 @typic.constrained(ge=-90, le=90)
@@ -132,9 +137,6 @@ def temperature(
 
     max_delta = get_shift_by_data(temp_hourly, lon, lat, round(lon/15.0))
     """
-    source_units = tsutils.make_list(source_units)
-    target_units = tsutils.make_list(target_units)
-
     target_units = single_target_units(source_units, target_units, "degC")
 
     pd.options.display.width = 60
@@ -378,9 +380,6 @@ def humidity(
                   "min_max"]
         need HOURLY temperature in 'temp'
     """
-    source_units = tsutils.make_list(source_units)
-    target_units = tsutils.make_list(target_units)
-
     target_units = single_target_units(source_units, target_units, "")
 
     if method == "equal" and hum_mean_col is None:
@@ -568,9 +567,6 @@ def wind_speed(
         b: parameter b for the cosine function
         t_shift: parameter t_shift for the cosine function
     """
-    source_units = tsutils.make_list(source_units)
-    target_units = tsutils.make_list(target_units)
-
     target_units = single_target_units(source_units, target_units, "m/s")
 
     target_units = target_units[0] * len(source_units)
@@ -676,9 +672,6 @@ def radiation(
         bristcamp_a
         bristcamp_c
     """
-    source_units = tsutils.make_list(source_units)
-    target_units = tsutils.make_list(target_units)
-
     target_units = single_target_units(source_units, target_units, "W/m2")
 
     target_units = target_units[0] * len(source_units)
@@ -762,7 +755,6 @@ def precipitation(
     method: Literal["equal", "cascade", "masterstation"],
     source_units,
     input_ts="-",
-    columns=None,
     start_date=None,
     end_date=None,
     dropna="no",
@@ -773,11 +765,10 @@ def precipitation(
     names=None,
     target_units=None,
     print_input=False,
+    columns=None,
+    masterstation_hour_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
 ):
     """Disaggregate daily to hourly data."""
-    source_units = tsutils.make_list(source_units)
-    target_units = tsutils.make_list(target_units)
-
     target_units = single_target_units(source_units, target_units, "mm")
 
     pd.options.display.width = 60
@@ -796,16 +787,44 @@ def precipitation(
         clean=clean,
     )
 
-    return tsutils.return_input(
-        print_input,
-        tsd,
-        pd.DataFrame(
-            disagg_prec(
-                tsd,
-                method=method,
-            )
-        ),
-    )
+    if method == "masterstation":
+        try:
+            # If masterstations_hour_col is a column name:
+            masterstation_hour_col = tsd.columns.get_loc(masterstation_hour_col)
+        except KeyError:
+            # If masterstations_hour_col is a column number:
+            masterstation_hour_col = int(masterstation_hour_col) - 1
+
+        masterstation_hour_col = tsd.columns[masterstation_hour_col]
+
+        # Should only be one hourly column in the input.
+        mhour = tsd[masterstation_hour_col].to_frame()
+        dsum = mhour.groupby(pd.Grouper(freq="D")).sum().asfreq("H", method="ffill")
+        master = mhour.join(dsum, rsuffix="sum")
+        mask = master.iloc[:, 0] > 0.0
+        master = (
+            master.loc[mask, master.columns[0]] / master.loc[mask, master.columns[1]]
+        ).to_frame()
+        print(master)
+        ntsd = tsd.loc[:, tsd.columns != masterstation_hour_col].asfreq(
+            "H", method="ffill"
+        )
+        print(ntsd)
+        ntsd = ntsd.join(master)
+        print(ntsd)
+        ntsd = ntsd.loc[:, tsd.columns != masterstation_hour_col].multiply(
+            ntsd.iloc[:, -1:], axis="index"
+        )
+        print(ntsd)
+        sys.exit()
+        # All the remaining columns are daily.
+        ntsd = (
+            tsd.loc[:, tsd.columns != masterstation_hour_col]
+            .asfreq("H", method="ffill")
+            .mul(master, axis="rows")
+        )
+
+    return tsutils.return_input(print_input, tsd, ntsd)
 
 
 @typic.al
@@ -827,9 +846,6 @@ def evaporation(
     lat: Optional[FloatLatitude] = None,
 ):
     """Disaggregate daily to hourly data."""
-    source_units = tsutils.make_list(source_units)
-    target_units = tsutils.make_list(target_units)
-
     target_units = single_target_units(source_units, target_units)
 
     pd.options.display.width = 60

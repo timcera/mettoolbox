@@ -330,7 +330,6 @@ def precipitation_cli(
     method,
     source_units,
     input_ts="-",
-    columns=None,
     start_date=None,
     end_date=None,
     dropna="no",
@@ -342,6 +341,8 @@ def precipitation_cli(
     target_units=None,
     print_input=False,
     tablefmt="csv",
+    columns=None,
+    masterstation_hour_col=None,
 ):
     """Disaggregate daily precipitation to hourly precipitation.
 
@@ -369,7 +370,6 @@ def precipitation_cli(
         +---------------+--------------------------------------------+
 
     {input_ts}
-    {columns}
     {start_date}
     {end_date}
     {dropna}
@@ -382,6 +382,10 @@ def precipitation_cli(
     {target_units}
     {print_input}
     {tablefmt}
+    {columns}
+    masterstation_hour_col
+        The column number or name that contains the hourly data used as the reference
+        station.
     """
     tsutils._printiso(
         disaggregate.precipitation(
@@ -399,6 +403,7 @@ def precipitation_cli(
             source_units=source_units,
             target_units=target_units,
             print_input=print_input,
+            masterstation_hour_col=masterstation_hour_col,
         ),
         tablefmt=tablefmt,
     )
@@ -810,6 +815,111 @@ def wind_speed_cli(
 disaggregate.wind_speed.__doc__ = wind_speed_cli.__doc__
 
 
+@program.pet.command("allen", formatter_class=RSTHelpFormatter, doctype="numpy")
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def allen_cli(
+    lat,
+    temp_min_col=None,
+    temp_max_col=None,
+    temp_mean_col=None,
+    source_units=None,
+    input_ts="-",
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+):
+    """Allen PET: f(Tmin, Tmax, Tavg, latitude)
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ==========
+    lat: float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hargreaves 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hargreaves(24,
+                                   1,
+                                   2,
+                                   ["degF", "degF"],
+                                   input_ts="tmin_tmax_data.csv")
+    {input_ts}
+    {start_date}
+    {end_date}
+    {dropna}
+    {clean}
+    {round_index}
+    {skiprows}
+    {index_type}
+    {names}
+    {target_units}
+    {print_input}
+    {tablefmt}
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`."""
+    tsutils._printiso(
+        pet.allen(
+            lat,
+            temp_min_col=temp_min_col,
+            temp_max_col=temp_max_col,
+            temp_mean_col=temp_mean_col,
+            source_units=source_units,
+            input_ts=input_ts,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            target_units=target_units,
+            print_input=print_input,
+        ),
+        tablefmt=tablefmt,
+    )
+
+
+pet.allen.__doc__ = allen_cli.__doc__
+
+
 @program.pet.command("hargreaves", formatter_class=RSTHelpFormatter, doctype="numpy")
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def hargreaves_cli(
@@ -831,7 +941,10 @@ def hargreaves_cli(
     print_input=False,
     tablefmt="csv",
 ):
-    """Calculate potential evaporation using Hargreaves equation.
+    """Hargreaves PET: f(Tmin, Tmax, Tavg, latitude)
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
 
     Parameters
     ==========
@@ -912,13 +1025,15 @@ def hargreaves_cli(
 pet.hargreaves.__doc__ = hargreaves_cli.__doc__
 
 
-@program.pet.command("oudin", formatter_class=RSTHelpFormatter, doctype="numpy")
+@program.pet.command("oudin_form", formatter_class=RSTHelpFormatter, doctype="numpy")
 @tsutils.doc(_LOCAL_DOCSTRINGS)
-def oudin_cli(
+def oudin_form_cli(
     lat,
     temp_min_col=None,
     temp_max_col=None,
     temp_mean_col=None,
+    k1 = 100,
+    k2 = 5,
     source_units=None,
     input_ts="-",
     start_date=None,
@@ -933,16 +1048,32 @@ def oudin_cli(
     print_input=False,
     tablefmt="csv",
 ):
-    """Estimate PET using the formula propsed by Oudin (2005).
+    """Oudin PET: f(Tavg, latitude)
 
     This model uses daily mean temperature to estimate PET based
     on the Julian day of year and latitude. The later are used
     to estimate extraterrestrial solar radiation.
 
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    The constants `k1` and `k2` are used in the generic form of the equation to adjust
+    the PET.
+
+    The defaults for k1 and k2 for this function are from Oudin with k1=100 and k2=5.
+
+    Jensen-Haise presented k1=40, and k2=0,
+
+    Mcguiness presented k1=68, and k2=5.
+
+    The k2 parameter represents the point in degrees C at which potential evaporation is
+    0.  The k1 parameter is a scaling parameter.
+
     Reference,
-        Ludovic Oudin et al, Which potential evapotranspiration input for a lumped rainfall–runoff model?:
-        Part 2—Towards a simple and efficient potential evapotranspiration model for rainfall–runoff modelling,
-        Journal of Hydrology, Volume 303, Issues 1–4, 1 March 2005, Pages 290-306, ISSN 0022-1694,
+        Ludovic Oudin et al, Which potential evapotranspiration input for a lumped
+        rainfall–runoff model?: Part 2—Towards a simple and efficient potential
+        evapotranspiration model for rainfall–runoff modelling, Journal of Hydrology,
+        Volume 303, Issues 1–4, 1 March 2005, Pages 290-306, ISSN 0022-1694,
         http://dx.doi.org/10.1016/j.jhydrol.2004.08.026.
         (http://www.sciencedirect.com/science/article/pii/S0022169404004056)
 
@@ -1000,12 +1131,14 @@ def oudin_cli(
         None will be estimated by the average of `temp_min_col` and
         `temp_max_col`."""
     tsutils._printiso(
-        pet.oudin(
+        pet.oudin_form(
             lat,
             source_units=source_units,
             temp_min_col=temp_min_col,
             temp_max_col=temp_max_col,
             temp_mean_col=temp_mean_col,
+            k1 = k1,
+            k2 = k2,
             input_ts=input_ts,
             start_date=start_date,
             end_date=end_date,
@@ -1022,7 +1155,7 @@ def oudin_cli(
     )
 
 
-pet.oudin.__doc__ = oudin_cli.__doc__
+pet.oudin_form.__doc__ = oudin_form_cli.__doc__
 
 
 def main():

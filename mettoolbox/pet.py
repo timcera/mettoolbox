@@ -151,7 +151,7 @@ def hargreaves(
     # order to get all of the time components correct.
     pe = pd.DataFrame(0.0, index=tsd.index, columns=["pet_hargreaves:mm"])
     pe["pet_hargreaves:mm"] = (
-        0.408 * 0.0023 * newra.ra * (tsd.tmean + 17.8) * np.sqrt(abs(tsdiff))
+        0.408 * 0.0023 * newra.ra * np.sqrt(abs(tsdiff)) * (tsd.tmean + 17.8)
     )
     if target_units != source_units:
         pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
@@ -159,11 +159,13 @@ def hargreaves(
 
 
 @typic.al
-def oudin(
+def oudin_form(
     lat: FloatLatitude,
     temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
     temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
     temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    k1 = 100,
+    k2 = 5,
     source_units=None,
     input_ts="-",
     start_date=None,
@@ -177,7 +179,7 @@ def oudin(
     target_units=None,
     print_input=False,
 ):
-    """oudin"""
+    """oudin form"""
     columns, column_names = utils._check_temperature_cols(
         temp_min_col=temp_min_col,
         temp_max_col=temp_max_col,
@@ -210,8 +212,66 @@ def oudin(
     gamma = 2.45  # the latent heat flux (MJ kg−1)
     rho = 1000.0  # density of water (kg m-3)
 
-    pe.loc[tsd.tmean > -5.0, "pet_oudin:mm"] = (
-        newra.ra / (gamma * rho) * (tsd.tmean + 5.0) / 100 * 1000
+    pe.loc[tsd.tmean > k2, "pet_oudin:mm"] = (
+        newra.ra / (gamma * rho) * (tsd.tmean + k2) / k1 * 1000
+    )
+
+    if target_units != source_units:
+        pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
+    return tsutils.return_input(print_input, tsd, pe)
+
+
+@typic.al
+def allen(
+    lat: FloatLatitude,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    source_units=None,
+    input_ts="-",
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+):
+    """Allen"""
+    columns, column_names = utils._check_temperature_cols(
+        temp_min_col=temp_min_col,
+        temp_max_col=temp_max_col,
+        temp_mean_col=temp_mean_col,
+    )
+
+    tsd = tsutils.common_kwds(
+        tsutils.read_iso_ts(
+            input_ts, skiprows=skiprows, names=names, index_type=index_type
+        ),
+        start_date=start_date,
+        end_date=end_date,
+        pick=columns,
+        round_index=round_index,
+        dropna=dropna,
+        source_units=source_units,
+        clean=clean,
+    )
+
+    tsd.columns = column_names
+
+    tsd = utils._validate_temperatures(tsd)
+
+    newra = utils.radiation(tsd, lat)
+
+    # Create new dataframe with tsd.index as index in
+    # order to get all of the time components correct.
+    pe = pd.DataFrame(0.0, index=tsd.index, columns=["pet_allen:mm"])
+
+    pe["pet_allen:mm"] = (
+        0.408 * 0.0029 * newra.ra * (tsd.tmax - tsd.tmin) ** 0.4 * (tsd.tmean + 20)
     )
 
     if target_units != source_units:

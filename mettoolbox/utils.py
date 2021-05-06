@@ -6,6 +6,18 @@ import pandas as pd
 from tstoolbox import tsutils
 
 
+def _check_cols(*args):
+    # (2, "tmin")
+    coll_cols = []
+    coll_names = []
+    for col, name in args:
+        if col is None:
+            continue
+        coll_cols.append(col)
+        coll_names.append(name)
+    return coll_cols, coll_names
+
+
 def _check_temperature_cols(
     temp_min_col=None,
     temp_max_col=None,
@@ -46,18 +58,9 @@ def _check_temperature_cols(
                 )
             )
         )
-    coll_cols = []
-    coll_names = []
-    for col, name in [
-        (temp_min_col, "tmin"),
-        (temp_max_col, "tmax"),
-        (temp_mean_col, "tmean"),
-    ]:
-        if col is None:
-            continue
-        coll_cols.append(col)
-        coll_names.append(name)
-    return coll_cols, coll_names
+    return _check_cols(
+        (temp_min_col, "tmin"), (temp_max_col, "tmax"), (temp_mean_col, "tmean")
+    )
 
 
 def _validate_temperatures(tsd):
