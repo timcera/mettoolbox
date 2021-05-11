@@ -99,6 +99,74 @@ class FloatLatitude(float):
 
 
 @typic.al
+def hamon(
+    lat: FloatLatitude,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    k: float = 1,
+    source_units=None,
+    input_ts="-",
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+):
+    """hamon"""
+    from solarpy import declination
+    from . import meteolib
+
+    columns, column_names = utils._check_temperature_cols(
+        temp_min_col=temp_min_col,
+        temp_max_col=temp_max_col,
+        temp_mean_col=temp_mean_col,
+        temp_min_required=True,
+        temp_max_required=True,
+    )
+
+    tsd = tsutils.common_kwds(
+        tsutils.read_iso_ts(
+            input_ts, skiprows=skiprows, names=names, index_type=index_type
+        ),
+        start_date=start_date,
+        end_date=end_date,
+        pick=columns,
+        round_index=round_index,
+        dropna=dropna,
+        source_units=source_units,
+        clean=clean,
+    )
+
+    tsd.columns = column_names
+
+    tsd = utils._validate_temperatures(tsd)
+
+    decl = [declination(i) for i in tsd.index.to_pydatetime()]
+
+    w = np.arccos(-np.tan(decl) * np.tan(lat))
+
+    es = meteolib.es_calc(tsd.tmean)
+
+    N = 24 * w / np.pi
+
+    # Create new dataframe with tsd.index as index in
+    # order to get all of the time components correct.
+    pe = pd.DataFrame(0.0, index=tsd.index, columns=["pet_hamon:mm"])
+    pe["pet_hamon:mm"] = k * 29.8 * N * es / (273.3 + tsd.tmean)
+    pe.loc[tsd.tmean <= 0, "pet_hamon:mm"] = 0.0
+
+    if target_units != source_units:
+        pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
+    return tsutils.return_input(print_input, tsd, pe)
+
+
+@typic.al
 def hargreaves(
     lat: FloatLatitude,
     temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
@@ -164,8 +232,8 @@ def oudin_form(
     temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
     temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
     temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    k1 = 100,
-    k2 = 5,
+    k1=100,
+    k2=5,
     source_units=None,
     input_ts="-",
     start_date=None,

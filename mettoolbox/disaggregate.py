@@ -215,7 +215,7 @@ Instead `temp_min_col` is {temp_min_col} and `temp_max_col` is
     else:
         tsd.columns = ["tmin", "tmax"]
 
-    if any(tsd.tmax <= tsd.tmin):
+    if any((tsd.tmax <= tsd.tmin).dropna()):
         raise ValueError(
             tsutils.error_wrapper(
                 """
@@ -240,9 +240,9 @@ estimated by the average of `temp_min_col` and `temp_max_col`""".format(
                 )
             )
         )
-        tsd.temp = (tsd.tmin + tsd.tmax) / 2.0
+        tsd["temp"] = (tsd.tmin + tsd.tmax) / 2.0
 
-        if any(tsd.tmin >= tsd.temp) or any(tsd.tmax <= tsd.temp):
+        if any((tsd.tmin >= tsd.temp).dropna()) or any((tsd.tmax <= tsd.temp).dropna()):
             raise ValueError(
                 tsutils.error_wrapper(
                     """

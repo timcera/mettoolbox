@@ -108,16 +108,6 @@ estimated by the average of `temp_min_col` and `temp_max_col`""".format(
     return tsd
 
 
-def declination():
-    # 'Roll-out' the distribution from day to day.
-    jday = np.arange(1, 367)
-
-    # FAO declination calculation
-    dec = 0.409 * np.sin(2.0 * np.pi * jday / 365.0 - 1.39)
-
-    return dec
-
-
 def radiation(tsd, lat):
     # 'Roll-out' the distribution from day to day.
     jday = np.arange(1, 367)

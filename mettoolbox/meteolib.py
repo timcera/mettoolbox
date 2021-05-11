@@ -28,6 +28,8 @@ Function descriptions
 
 import math
 import scipy
+import numpy as np
+import pandas as pd
 
 
 def _arraytest(*args):
@@ -198,113 +200,51 @@ def ea_calc(airtemp=scipy.array([]), rh=scipy.array([])):
     return eact  # in Pa
 
 
-def es_calc(airtemp=scipy.array([])):
+def es_calc(airtemp):
     """
     Function to calculate saturated vapour pressure from temperature.
 
-    For T<0 C the saturation vapour pressure equation for ice is used
-    accoring to Goff and Gratch (1946), whereas for T>=0 C that of
-    Goff (1957) is used.
+    Uses the Arden-Buck equations.
 
     Parameters:
         - airtemp : (data-type) measured air temperature [Celsius].
 
     Returns:
-        - es : (data-type) saturated vapour pressure [Pa].
+        - es : (data-type) saturated vapour pressure [kPa].
 
     References
     ----------
+    https://en.wikipedia.org/wiki/Arden_Buck_equation
 
-    - Goff, J.A.,and S. Gratch, Low-pressure properties of water from -160
-    to 212 F. Transactions of the American society of heating and
-    ventilating engineers, p. 95-122, presented at the 52nd annual
-    meeting of the American society of
-    heating and ventilating engineers, New York, 1946.
-    - Goff, J. A. Saturation pressure of water on the new Kelvin
-    temperature scale, Transactions of the American
-    society of heating and ventilating engineers, pp 347-354,
-    presented at the semi-annual meeting of the American
-    society of heating and ventilating engineers, Murray Bay,
-    Quebec. Canada, 1957.
+    Buck, A. L. (1981), "New equations for computing vapor pressure and enhancement
+    factor", J. Appl. Meteorol., 20: 1527–1532
+
+    Buck (1996), Buck Research CR-1A User's Manual, Appendix 1. (PDF)
 
     Examples
     --------
         >>> es_calc(30.0)
-        4242.725994656632
+        4.245126
         >>> x = [20, 25]
         >>> es_calc(x)
-        array([ 2337.08019792,  3166.82441912])
+        array([ 2.338340,  3.168531])
 
     """
 
-    # Test input array/value
-    airtemp = _arraytest(airtemp)
+    # Calculate saturated vapour pressures, distinguish between water/ice
+    mask = airtemp > 0
 
-    # Determine length of array
-    n = scipy.size(airtemp)
-    # Check if we have a single (array) value or an array
-    if n < 2:
-        # Calculate saturated vapour pressures, distinguish between water/ice
-        if airtemp < 0:
-            # Calculate saturation vapour pressure for ice
-            log_pi = (
-                -9.09718 * (273.16 / (airtemp + 273.15) - 1.0)
-                - 3.56654 * math.log10(273.16 / (airtemp + 273.15))
-                + 0.876793 * (1.0 - (airtemp + 273.15) / 273.16)
-                + math.log10(6.1071)
-            )
-            es = math.pow(10, log_pi)
-        else:
-            # Calculate saturation vapour pressure for water
-            log_pw = (
-                10.79574 * (1.0 - 273.16 / (airtemp + 273.15))
-                - 5.02800 * math.log10((airtemp + 273.15) / 273.16)
-                + 1.50475e-4
-                * (1 - math.pow(10, (-8.2969 * ((airtemp + 273.15) / 273.16 - 1.0))))
-                + 0.42873e-3
-                * (math.pow(10, (+4.76955 * (1.0 - 273.16 / (airtemp + 273.15)))) - 1)
-                + 0.78614
-            )
-            es = math.pow(10, log_pw)
-    else:  # Dealing with an array
-        # Initiate the output array
-        es = scipy.zeros(n)
-        # Calculate saturated vapour pressures, distinguish between water/ice
-        for i in range(0, n):
-            if airtemp[i] < 0:
-                # Saturation vapour pressure equation for ice
-                log_pi = (
-                    -9.09718 * (273.16 / (airtemp[i] + 273.15) - 1.0)
-                    - 3.56654 * math.log10(273.16 / (airtemp[i] + 273.15))
-                    + 0.876793 * (1.0 - (airtemp[i] + 273.15) / 273.16)
-                    + math.log10(6.1071)
-                )
-                es[i] = math.pow(10, log_pi)
-            else:
-                # Calculate saturation vapour pressure for water
-                log_pw = (
-                    10.79574 * (1.0 - 273.16 / (airtemp[i] + 273.15))
-                    - 5.02800 * math.log10((airtemp[i] + 273.15) / 273.16)
-                    + 1.50475e-4
-                    * (
-                        1
-                        - math.pow(
-                            10, (-8.2969 * ((airtemp[i] + 273.15) / 273.16 - 1.0))
-                        )
-                    )
-                    + 0.42873e-3
-                    * (
-                        math.pow(
-                            10, (+4.76955 * (1.0 - 273.16 / (airtemp[i] + 273.15)))
-                        )
-                        - 1
-                    )
-                    + 0.78614
-                )
-                es[i] = pow(10, log_pw)
-    # Convert from hPa to Pa
-    es = es * 100.0
-    return es  # in Pa
+    es = pd.Series(0.0, index=airtemp.index)
+
+    # Calculate saturation vapour pressure over liquid water.
+    es[mask] = 6.1121*np.exp((18.678-(airtemp[mask]/234.5))*(airtemp[mask]/(257.14 + airtemp[mask])))
+
+    # Calculate saturation vapour pressure for ice
+    es[~mask] = 6.1115*np.exp((23.036-(airtemp[~mask]/333.7))*(airtemp[~mask]/(279.82 + airtemp[~mask])))
+
+    # Convert from hPa to kPa
+    es = es / 10.0
+    return es  # in kPa
 
 
 def gamma_calc(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array([])):

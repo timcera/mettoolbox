@@ -920,6 +920,123 @@ def allen_cli(
 pet.allen.__doc__ = allen_cli.__doc__
 
 
+@program.pet.command("hamon", formatter_class=RSTHelpFormatter, doctype="numpy")
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def hamon_cli(
+    lat,
+    temp_min_col=None,
+    temp_max_col=None,
+    temp_mean_col=None,
+    k=1.0,
+    source_units=None,
+    input_ts="-",
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+):
+    """Hamon PET: f(Tavg, latitude)
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ==========
+    lat: float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    k: float
+        A scaling factor, defaults to 1.  This is an adjustment for local conditions,
+        for example, Lu, 2005 found that k=1.2 was a better fit for the southeastern
+        United States.
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hargreaves 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hamon(24,
+                                   1,
+                                   2,
+                                   ["degF", "degF"],
+                                   input_ts="tmin_tmax_data.csv")
+    {input_ts}
+    {start_date}
+    {end_date}
+    {dropna}
+    {clean}
+    {round_index}
+    {skiprows}
+    {index_type}
+    {names}
+    {target_units}
+    {print_input}
+    {tablefmt}
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+
+    References
+    ----------
+    Lu et al. (2005). A comparison of six potential evaportranspiration methods for
+    regional use in the southeastern United States. Journal of the American Water
+    Resources Association, 41, 621- 633."""
+    tsutils._printiso(
+        pet.hamon(
+            lat,
+            temp_min_col=temp_min_col,
+            temp_max_col=temp_max_col,
+            temp_mean_col=temp_mean_col,
+            k=k,
+            source_units=source_units,
+            input_ts=input_ts,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            target_units=target_units,
+            print_input=print_input,
+        ),
+        tablefmt=tablefmt,
+    )
+
+
+pet.hamon.__doc__ = hamon_cli.__doc__
+
+
 @program.pet.command("hargreaves", formatter_class=RSTHelpFormatter, doctype="numpy")
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def hargreaves_cli(
@@ -1032,8 +1149,8 @@ def oudin_form_cli(
     temp_min_col=None,
     temp_max_col=None,
     temp_mean_col=None,
-    k1 = 100,
-    k2 = 5,
+    k1=100,
+    k2=5,
     source_units=None,
     input_ts="-",
     start_date=None,
@@ -1137,8 +1254,8 @@ def oudin_form_cli(
             temp_min_col=temp_min_col,
             temp_max_col=temp_max_col,
             temp_mean_col=temp_mean_col,
-            k1 = k1,
-            k2 = k2,
+            k1=k1,
+            k2=k2,
             input_ts=input_ts,
             start_date=start_date,
             end_date=end_date,
