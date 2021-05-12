@@ -927,7 +927,7 @@ def hamon_cli(
     temp_min_col=None,
     temp_max_col=None,
     temp_mean_col=None,
-    k=1.0,
+    k=1.2,
     source_units=None,
     input_ts="-",
     start_date=None,

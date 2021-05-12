@@ -46,12 +46,22 @@ disaggregate wind_speed
 .. program-output:: mettoolbox disaggregate wind_speed --help
    :prompt:
 
+pet allen
+~~~~~~~~~
+.. program-output:: mettoolbox pet allen --help
+   :prompt:
+
+pet hamon
+~~~~~~~~~
+.. program-output:: mettoolbox pet hamon --help
+   :prompt:
+
 pet hargreaves
 ~~~~~~~~~~~~~~
 .. program-output:: mettoolbox pet hargreaves --help
    :prompt:
 
-pet oudin
-~~~~~~~~~
-.. program-output:: mettoolbox pet oudin --help
+pet oudin_form
+~~~~~~~~~~~~~~
+.. program-output:: mettoolbox pet oudin_form --help
    :prompt:

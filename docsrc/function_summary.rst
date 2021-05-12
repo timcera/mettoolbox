@@ -12,5 +12,7 @@ Python API Function Summary
     mettoolbox.mettoolbox.disaggregate.radiation
     mettoolbox.mettoolbox.disaggregate.temperature
     mettoolbox.mettoolbox.disaggregate.wind_speed
+    mettoolbox.mettoolbox.pet.allen
+    mettoolbox.mettoolbox.pet.hamon
     mettoolbox.mettoolbox.pet.hargreaves
-    mettoolbox.mettoolbox.pet.oudin
+    mettoolbox.mettoolbox.pet.oudin_form

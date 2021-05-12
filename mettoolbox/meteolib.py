@@ -158,9 +158,8 @@ def Delta_calc(airtemp=scipy.array([])):
     airtemp = _arraytest(airtemp)
 
     # calculate saturation vapour pressure at temperature
-    es = es_calc(airtemp)  # in Pa
-    # Convert es (Pa) to kPa
-    es = es / 1000.0
+    es = es_calc(airtemp)  # in kPa
+
     # Calculate Delta
     Delta = es * 4098.0 / ((airtemp + 237.3) ** 2) * 1000
     return Delta  # in Pa/K
@@ -194,7 +193,8 @@ def ea_calc(airtemp=scipy.array([]), rh=scipy.array([])):
     airtemp, rh = _arraytest(airtemp, rh)
 
     # Calculate saturation vapour pressures
-    es = es_calc(airtemp)
+    es = es_calc(airtemp) * 10  # kPa convert to hPa
+
     # Calculate actual vapour pressure
     eact = rh / 100.0 * es
     return eact  # in Pa
@@ -237,10 +237,15 @@ def es_calc(airtemp):
     es = pd.Series(0.0, index=airtemp.index)
 
     # Calculate saturation vapour pressure over liquid water.
-    es[mask] = 6.1121*np.exp((18.678-(airtemp[mask]/234.5))*(airtemp[mask]/(257.14 + airtemp[mask])))
+    es[mask] = 6.1121 * np.exp(
+        (18.678 - (airtemp[mask] / 234.5)) * (airtemp[mask] / (257.14 + airtemp[mask]))
+    )
 
     # Calculate saturation vapour pressure for ice
-    es[~mask] = 6.1115*np.exp((23.036-(airtemp[~mask]/333.7))*(airtemp[~mask]/(279.82 + airtemp[~mask])))
+    es[~mask] = 6.1115 * np.exp(
+        (23.036 - (airtemp[~mask] / 333.7))
+        * (airtemp[~mask] / (279.82 + airtemp[~mask]))
+    )
 
     # Convert from hPa to kPa
     es = es / 10.0
@@ -510,7 +515,7 @@ def vpd_calc(airtemp=scipy.array([]), rh=scipy.array([])):
     airtemp, rh = _arraytest(airtemp, rh)
 
     # Calculate saturation vapour pressures
-    es = es_calc(airtemp)
+    es = es_calc(airtemp) * 10  # kPa convert to hPa
     eact = ea_calc(airtemp, rh)
     # Calculate vapour pressure deficit
     vpd = es - eact
