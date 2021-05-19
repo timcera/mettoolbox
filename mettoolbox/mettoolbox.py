@@ -76,14 +76,15 @@ def evaporation_cli(
     """Disaggregate daily evaporation to hourly evaporation.
 
     Parameters
-    ==========
+    ----------
     method: str
-        This is the method that will be used to disaggregate the daily
-        evaporation data.
+        This is the method that will be used to disaggregate
+        the daily evaporation data.
 
         There are two methods, a trapezoidal shape from sunrise to
         sunset called "trap" and a fixed, smooth curve starting at 0700
         (7 am) and stopping at 1900 (7 pm) called "fixed".
+    {source_units}
     {input_ts}
     {columns}
     {start_date}
@@ -94,7 +95,6 @@ def evaporation_cli(
     {skiprows}
     {index_type}
     {names}
-    {psource_units}
     {target_units}
     {print_input}
     {tablefmt}
@@ -178,7 +178,7 @@ def humidity_cli(
     +--------------+---------------------------------------------+
 
     Parameters
-    ==========
+    ----------
     method: str
 
         Available disaggregation methods for
@@ -347,7 +347,7 @@ def precipitation_cli(
     """Disaggregate daily precipitation to hourly precipitation.
 
     Parameters
-    ==========
+    ----------
     method: str
         Disaggregation methods available for precipitation.
 
@@ -445,7 +445,7 @@ def radiation_cli(
     """Disaggregate daily radiation to hourly radiation.
 
     Parameters
-    ==========
+    ----------
     method: str
         Disaggregation methods available for radiation
 
@@ -595,7 +595,7 @@ def temperature_cli(
     +---------------+----------------------------+
 
     Parameters
-    ==========
+    ----------
     method: str
 
         Disaggregation methods available for temperature.
@@ -746,7 +746,7 @@ def wind_speed_cli(
     """Disaggregate daily wind speed to hourly wind speed.
 
     Parameters
-    ==========
+    ----------
     method: str
         Disaggregation methods available for wind speed.
 
@@ -842,7 +842,7 @@ def allen_cli(
     (Tmax+Tmin)/2.
 
     Parameters
-    ==========
+    ----------
     lat: float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
@@ -948,7 +948,7 @@ def hamon_cli(
     (Tmax+Tmin)/2.
 
     Parameters
-    ==========
+    ----------
     lat: float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
@@ -1064,7 +1064,7 @@ def hargreaves_cli(
     (Tmax+Tmin)/2.
 
     Parameters
-    ==========
+    ----------
     lat: float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
@@ -1195,7 +1195,7 @@ def oudin_form_cli(
         (http://www.sciencedirect.com/science/article/pii/S0022169404004056)
 
     Parameters
-    ==========
+    ----------
     lat: float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern

@@ -2,6 +2,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
+from solarpy import declination
 
 from tstoolbox import tsutils
 
@@ -109,11 +110,11 @@ estimated by the average of `temp_min_col` and `temp_max_col`""".format(
 
 
 def radiation(tsd, lat):
-    # 'Roll-out' the distribution from day to day.
-    jday = np.arange(1, 367)
+    jday = tsd.index.dayofyear.astype("i").values
+
     lrad = lat * np.pi / 180.0
 
-    dec = declination()
+    dec = [declination(i) for i in tsd.index.to_pydatetime()]
 
     s = np.arccos(-np.tan(dec) * np.tan(lrad))
 
@@ -128,8 +129,5 @@ def radiation(tsd, lat):
         * (s * np.sin(lrad) * np.sin(dec) + np.cos(lrad) * np.cos(dec) * np.sin(s))
     )
 
-    # ra just covers 1 year - need to map onto all years...
-    newra = pd.DataFrame(0.0, index=tsd.index, columns=["ra"])
-    for day in jday:
-        newra.loc[newra.index.dayofyear == day, "ra"] = ra[day - 1]
+    newra = pd.DataFrame(ra, index=tsd.index, columns=["ra"])
     return newra

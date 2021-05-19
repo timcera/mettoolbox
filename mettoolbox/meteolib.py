@@ -230,6 +230,7 @@ def es_calc(airtemp):
         array([ 2.338340,  3.168531])
 
     """
+    airtemp = pd.to_numeric(airtemp, errors="coerce")
 
     # Calculate saturated vapour pressures, distinguish between water/ice
     mask = airtemp > 0
@@ -238,13 +239,13 @@ def es_calc(airtemp):
 
     # Calculate saturation vapour pressure over liquid water.
     es[mask] = 6.1121 * np.exp(
-        (18.678 - (airtemp[mask] / 234.5)) * (airtemp[mask] / (257.14 + airtemp[mask]))
+        ((18.678 - (airtemp[mask] / 234.5)) * (airtemp[mask] / (257.14 + airtemp[mask]))).astype(float)
     )
 
     # Calculate saturation vapour pressure for ice
-    es[~mask] = 6.1115 * np.exp(
+    es[~mask] = 6.1115 * np.exp((
         (23.036 - (airtemp[~mask] / 333.7))
-        * (airtemp[~mask] / (279.82 + airtemp[~mask]))
+        * (airtemp[~mask] / (279.82 + airtemp[~mask]))).astype(float)
     )
 
     # Convert from hPa to kPa

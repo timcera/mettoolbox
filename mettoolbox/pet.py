@@ -12,11 +12,12 @@ import numpy as np
 import pandas as pd
 import typic
 
-# import pyeto
+from solarpy import declination
+from . import meteolib
+
 
 from tstoolbox import tsutils
 
-from . import evaplib
 from . import utils
 
 warnings.filterwarnings("ignore")
@@ -49,6 +50,83 @@ Instead you gave {1}""".format(
             collect.append(tsd.ix[:, nloopvar])
 
     return collect
+
+
+def _preprocess(
+    input_ts,
+    temp_min_col,
+    temp_max_col,
+    temp_mean_col,
+    temp_min_required,
+    temp_max_required,
+    skiprows,
+    names,
+    index_type,
+    start_date,
+    end_date,
+    round_index,
+    dropna,
+    clean,
+    source_units,
+):
+    columns, column_names = utils._check_temperature_cols(
+        temp_min_col=temp_min_col,
+        temp_max_col=temp_max_col,
+        temp_mean_col=temp_mean_col,
+        temp_min_required=temp_min_required,
+        temp_max_required=temp_max_required,
+    )
+
+    tsd = tsutils.common_kwds(
+        input_ts,
+        skiprows=skiprows,
+        names=names,
+        index_type=index_type,
+        start_date=start_date,
+        end_date=end_date,
+        pick=columns,
+        round_index=round_index,
+        dropna=dropna,
+        clean=clean,
+    )
+
+    if source_units is None:
+        # If "source_units" keyword is None must have source_units in column name.
+        source_units = []
+        for units in tsd.columns:
+            words = units.split(":")
+            if len(words) >= 2:
+                source_units.append(words[1])
+            else:
+                raise ValueError(
+                    tsutils.error_wrapper(
+                        """
+If "source_units" are not supplied as the second ":" delimited field in the column name
+they must be supplied with the "source_units" keyword.  """
+                    )
+                )
+    else:
+        source_units = tsutils.make_list(source_units)
+    if len(source_units) != len(tsd.columns):
+        raise ValueError(
+            tsutils.error_wrapper(
+                """
+The number of "source_units" terms must match the number of temperature columns.
+                                               """
+            )
+        )
+    interim_target_units = ["degC"] * len(tsd.columns)
+
+    tsd = tsutils.common_kwds(
+        tsd,
+        source_units=source_units,
+        target_units=interim_target_units,
+    )
+
+    tsd.columns = column_names
+
+    tsd = utils._validate_temperatures(tsd)
+    return tsd
 
 
 def et0_pm(
@@ -119,33 +197,25 @@ def hamon(
     print_input=False,
 ):
     """hamon"""
-    from solarpy import declination
-    from . import meteolib
-
-    columns, column_names = utils._check_temperature_cols(
-        temp_min_col=temp_min_col,
-        temp_max_col=temp_max_col,
-        temp_mean_col=temp_mean_col,
-        temp_min_required=True,
-        temp_max_required=True,
+    temp_min_required = True
+    temp_max_required = True
+    tsd = _preprocess(
+        input_ts,
+        temp_min_col,
+        temp_max_col,
+        temp_mean_col,
+        temp_min_required,
+        temp_max_required,
+        skiprows,
+        names,
+        index_type,
+        start_date,
+        end_date,
+        round_index,
+        dropna,
+        clean,
+        source_units,
     )
-
-    tsd = tsutils.common_kwds(
-        tsutils.read_iso_ts(
-            input_ts, skiprows=skiprows, names=names, index_type=index_type
-        ),
-        start_date=start_date,
-        end_date=end_date,
-        pick=columns,
-        round_index=round_index,
-        dropna=dropna,
-        source_units=source_units,
-        clean=clean,
-    )
-
-    tsd.columns = column_names
-
-    tsd = utils._validate_temperatures(tsd)
 
     decl = [declination(i) for i in tsd.index.to_pydatetime()]
 
@@ -182,34 +252,29 @@ def hargreaves(
     skiprows=None,
     index_type="datetime",
     names=None,
-    target_units=None,
+    target_units="mm",
     print_input=False,
 ):
     """hargreaves"""
-    columns, column_names = utils._check_temperature_cols(
-        temp_min_col=temp_min_col,
-        temp_max_col=temp_max_col,
-        temp_mean_col=temp_mean_col,
-        temp_min_required=True,
-        temp_max_required=True,
+    temp_min_required = True
+    temp_max_required = True
+    tsd = _preprocess(
+        input_ts,
+        temp_min_col,
+        temp_max_col,
+        temp_mean_col,
+        temp_min_required,
+        temp_max_required,
+        skiprows,
+        names,
+        index_type,
+        start_date,
+        end_date,
+        round_index,
+        dropna,
+        clean,
+        source_units,
     )
-
-    tsd = tsutils.common_kwds(
-        tsutils.read_iso_ts(
-            input_ts, skiprows=skiprows, names=names, index_type=index_type
-        ),
-        start_date=start_date,
-        end_date=end_date,
-        pick=columns,
-        round_index=round_index,
-        dropna=dropna,
-        source_units=source_units,
-        clean=clean,
-    )
-
-    tsd.columns = column_names
-
-    tsd = utils._validate_temperatures(tsd)
 
     newra = utils.radiation(tsd, lat)
 
@@ -218,8 +283,13 @@ def hargreaves(
     # Create new dataframe with tsd.index as index in
     # order to get all of the time components correct.
     pe = pd.DataFrame(0.0, index=tsd.index, columns=["pet_hargreaves:mm"])
+
     pe["pet_hargreaves:mm"] = (
-        0.408 * 0.0023 * newra.ra * np.sqrt(abs(tsdiff)) * (tsd.tmean + 17.8)
+        0.408
+        * 0.0023
+        * newra.ra.values
+        * abs(tsdiff.values) ** 0.5
+        * (tsd.tmean.values + 17.8)
     )
     if target_units != source_units:
         pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
@@ -248,28 +318,25 @@ def oudin_form(
     print_input=False,
 ):
     """oudin form"""
-    columns, column_names = utils._check_temperature_cols(
-        temp_min_col=temp_min_col,
-        temp_max_col=temp_max_col,
-        temp_mean_col=temp_mean_col,
+    temp_min_required = False
+    temp_max_required = False
+    tsd = _preprocess(
+        input_ts,
+        temp_min_col,
+        temp_max_col,
+        temp_mean_col,
+        temp_min_required,
+        temp_max_required,
+        skiprows,
+        names,
+        index_type,
+        start_date,
+        end_date,
+        round_index,
+        dropna,
+        clean,
+        source_units,
     )
-
-    tsd = tsutils.common_kwds(
-        tsutils.read_iso_ts(
-            input_ts, skiprows=skiprows, names=names, index_type=index_type
-        ),
-        start_date=start_date,
-        end_date=end_date,
-        pick=columns,
-        round_index=round_index,
-        dropna=dropna,
-        source_units=source_units,
-        clean=clean,
-    )
-
-    tsd.columns = column_names
-
-    tsd = utils._validate_temperatures(tsd)
 
     newra = utils.radiation(tsd, lat)
 
@@ -309,28 +376,25 @@ def allen(
     print_input=False,
 ):
     """Allen"""
-    columns, column_names = utils._check_temperature_cols(
-        temp_min_col=temp_min_col,
-        temp_max_col=temp_max_col,
-        temp_mean_col=temp_mean_col,
+    temp_min_required = False
+    temp_max_required = False
+    tsd = _preprocess(
+        input_ts,
+        temp_min_col,
+        temp_max_col,
+        temp_mean_col,
+        temp_min_required,
+        temp_max_required,
+        skiprows,
+        names,
+        index_type,
+        start_date,
+        end_date,
+        round_index,
+        dropna,
+        clean,
+        source_units,
     )
-
-    tsd = tsutils.common_kwds(
-        tsutils.read_iso_ts(
-            input_ts, skiprows=skiprows, names=names, index_type=index_type
-        ),
-        start_date=start_date,
-        end_date=end_date,
-        pick=columns,
-        round_index=round_index,
-        dropna=dropna,
-        source_units=source_units,
-        clean=clean,
-    )
-
-    tsd.columns = column_names
-
-    tsd = utils._validate_temperatures(tsd)
 
     newra = utils.radiation(tsd, lat)
 
