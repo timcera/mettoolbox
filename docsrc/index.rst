@@ -1,6 +1,6 @@
 .. include:: ../BADGES.rst
 
-.. _mettoolbox_documentation:    
+.. _mettoolbox_documentation:
 
 mettoolbox
 ==========

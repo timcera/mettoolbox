@@ -24,8 +24,9 @@ Function descriptions
 
 """
 
-from . import meteolib
 import scipy
+
+from . import meteolib
 
 __author__ = "Dr. Maarten J. Waterloo <maarten.waterloo@acaciawater.com>"
 __version__ = "1.0"

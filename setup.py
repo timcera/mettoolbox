@@ -1,11 +1,9 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
 import sys
 
 from setuptools import setup
-
 
 pkg_name = "mettoolbox"
 
@@ -24,6 +22,7 @@ install_requires = [
     # http://packages.python.org/distribute/setuptools.html#declaring-dependencies
     "tstoolbox >= 103",
     "solarpy",
+    "standard-precip",
 ]
 
 setup(

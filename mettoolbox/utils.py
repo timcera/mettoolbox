@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 import warnings
 
 import numpy as np
 import pandas as pd
 from solarpy import declination
-
 from tstoolbox import tsutils
 
 
@@ -26,7 +26,7 @@ def _check_temperature_cols(
     temp_min_required=False,
     temp_max_required=False,
 ):
-    """ Check temperature columns to make sure necessary ones are filled in. """
+    """Check temperature columns to make sure necessary ones are filled in."""
     if temp_min_col is None and temp_min_required is True:
         raise ValueError(
             tsutils.error_wrapper(
@@ -64,9 +64,9 @@ def _check_temperature_cols(
     )
 
 
-def _validate_temperatures(tsd):
+def _validate_temperatures(tsd, temp_min_col, temp_max_col):
     if "tmean" not in tsd.columns:
-        if (tsd.tmax <= tsd.tmin).any():
+        if (tsd.tmax < tsd.tmin).any():
             raise ValueError(
                 tsutils.error_wrapper(
                     """
@@ -76,7 +76,7 @@ def _validate_temperatures(tsd):
 
         minimum temperature values in column "{1}" are greater than or
         equal to the maximum temperature values in column "{2}".""".format(
-                        tsd[tsd.tmax <= tsd.tmin].index, temp_min_col, temp_max_col
+                        tsd[tsd.tmax < tsd.tmin].index, temp_min_col, temp_max_col
                     )
                 )
             )

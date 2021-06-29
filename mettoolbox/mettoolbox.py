@@ -1,18 +1,14 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
 import os.path
+import sys
 import warnings
 
+from mando import Program
 from mando.rst_text_formatter import RSTHelpFormatter
-
 from tstoolbox import tsutils
 
-from . import disaggregate
-from . import pet
-
-from mando import Program
+from . import disaggregate, pet
 
 warnings.filterwarnings("ignore")
 
@@ -867,16 +863,16 @@ def allen_cli(
 
         Command line::
 
-            mettoolbox pet hargreaves 24 1 2 degF,degF < tmin_tmax_data.csv
+            mettoolbox pet allen 24 1 2 degF,degF < tmin_tmax_data.csv
 
         Python::
 
             from mettoolbox import mettoolbox as mt
-            df = mt.pet.hargreaves(24,
-                                   1,
-                                   2,
-                                   ["degF", "degF"],
-                                   input_ts="tmin_tmax_data.csv")
+            df = mt.pet.allen(24,
+                              1,
+                              2,
+                              ["degF", "degF"],
+                              input_ts="tmin_tmax_data.csv")
     {input_ts}
     {start_date}
     {end_date}
@@ -977,16 +973,16 @@ def hamon_cli(
 
         Command line::
 
-            mettoolbox pet hargreaves 24 1 2 degF,degF < tmin_tmax_data.csv
+            mettoolbox pet hamon 24 1 2 degF,degF < tmin_tmax_data.csv
 
         Python::
 
             from mettoolbox import mettoolbox as mt
             df = mt.pet.hamon(24,
-                                   1,
-                                   2,
-                                   ["degF", "degF"],
-                                   input_ts="tmin_tmax_data.csv")
+                              1,
+                              2,
+                              ["degF", "degF"],
+                              input_ts="tmin_tmax_data.csv")
     {input_ts}
     {start_date}
     {end_date}
@@ -1220,16 +1216,16 @@ def oudin_form_cli(
 
         Command line::
 
-            mettoolbox pet oudin 24 1 2 degF,degF < tmin_tmax_data.csv
+            mettoolbox pet oudin_form 24 1 2 degF,degF < tmin_tmax_data.csv
 
         Python::
 
             from mettoolbox import mettoolbox as mt
-            df = mt.pet.oudin(24,
-                              1,
-                              2,
-                              ["degF", "degF"],
-                              input_ts="tmin_tmax_data.csv")
+            df = mt.pet.oudin_form(24,
+                                   1,
+                                   2,
+                                   ["degF", "degF"],
+                                   input_ts="tmin_tmax_data.csv")
     {input_ts}
     {start_date}
     {end_date}
@@ -1276,7 +1272,7 @@ pet.oudin_form.__doc__ = oudin_form_cli.__doc__
 
 
 def main():
-    """ Main """
+    """Main"""
     if not os.path.exists("debug_mettoolbox"):
         sys.tracebacklimit = 0
     program()

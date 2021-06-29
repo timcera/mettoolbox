@@ -1,24 +1,17 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
+from __future__ import absolute_import, division, print_function
 
-from typing import Optional, Union
 import warnings
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
 import typic
-
 from solarpy import declination
-from . import meteolib
-
-
 from tstoolbox import tsutils
 
-from . import utils
+from . import meteolib, utils
 
 warnings.filterwarnings("ignore")
 
@@ -125,7 +118,7 @@ The number of "source_units" terms must match the number of temperature columns.
 
     tsd.columns = column_names
 
-    tsd = utils._validate_temperatures(tsd)
+    tsd = utils._validate_temperatures(tsd, temp_min_col, temp_max_col)
     return tsd
 
 
@@ -173,7 +166,7 @@ def et0_pm(
 
 @typic.constrained(ge=-90, le=90)
 class FloatLatitude(float):
-    """ -90 <= float <= 90 """
+    """-90 <= float <= 90"""
 
 
 @typic.al
@@ -288,7 +281,7 @@ def hargreaves(
         0.408
         * 0.0023
         * newra.ra.values
-        * abs(tsdiff.values) ** 0.5
+        * np.abs(tsdiff.values) ** 0.5
         * (tsd.tmean.values + 17.8)
     )
     if target_units != source_units:

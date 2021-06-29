@@ -27,9 +27,10 @@ Function descriptions
 """
 
 import math
-import scipy
+
 import numpy as np
 import pandas as pd
+import scipy
 
 
 def _arraytest(*args):
@@ -239,13 +240,18 @@ def es_calc(airtemp):
 
     # Calculate saturation vapour pressure over liquid water.
     es[mask] = 6.1121 * np.exp(
-        ((18.678 - (airtemp[mask] / 234.5)) * (airtemp[mask] / (257.14 + airtemp[mask]))).astype(float)
+        (
+            (18.678 - (airtemp[mask] / 234.5))
+            * (airtemp[mask] / (257.14 + airtemp[mask]))
+        ).astype(float)
     )
 
     # Calculate saturation vapour pressure for ice
-    es[~mask] = 6.1115 * np.exp((
-        (23.036 - (airtemp[~mask] / 333.7))
-        * (airtemp[~mask] / (279.82 + airtemp[~mask]))).astype(float)
+    es[~mask] = 6.1115 * np.exp(
+        (
+            (23.036 - (airtemp[~mask] / 333.7))
+            * (airtemp[~mask] / (279.82 + airtemp[~mask]))
+        ).astype(float)
     )
 
     # Convert from hPa to kPa

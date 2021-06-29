@@ -3,7 +3,7 @@ mettoolbox
 
 .. image:: https://badge.fury.io/py/mettoolbox.png
     :target: http://badge.fury.io/py/mettoolbox
-    
+
 .. image:: https://travis-ci.org/timcera/mettoolbox.png?branch=master
         :target: https://travis-ci.org/timcera/mettoolbox
 
@@ -23,12 +23,12 @@ Usage - Command Line
 Just run 'mettoolbox --help' to get a list of subcommands::
 
     usage: mettoolbox [-h] [-v] {disaggregate,pet} ...
-    
+
     positional arguments:
       {disaggregate,pet}
         disaggregate      disaggregate subcommand
         pet               pet subcommand
-    
+
     optional arguments:
       -h, --help          show this help message and exit
       -v, --version       show program's version number and exit
@@ -36,6 +36,6 @@ Just run 'mettoolbox --help' to get a list of subcommands::
 Usage - Python
 --------------
 ::
-    
+
     from mettoolbox import mettoolbox
     df = mettoolbox.disaggregate.temperature('sine_min_max', ['degC', 'degC'], temp_min_col=1, temp_max_col=2)

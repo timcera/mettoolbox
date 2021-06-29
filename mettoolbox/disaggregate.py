@@ -1,9 +1,6 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
+from __future__ import absolute_import, division, print_function
 
 from typing import Optional, Union
 
@@ -12,24 +9,23 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-import warnings
 import datetime
+import warnings
 
 import numpy as np
 import pandas as pd
 import typic
+from tstoolbox import tstoolbox, tsutils
 
-from tstoolbox import tsutils
-from tstoolbox import tstoolbox
-
-from .melodist.melodist.util.util import get_sun_times
-from .melodist.melodist.temperature import disaggregate_temperature
-from .melodist.melodist.temperature import get_shift_by_data
-from .melodist.melodist.humidity import calculate_month_hour_precip_mean
-from .melodist.melodist.humidity import disaggregate_humidity
-from .melodist.melodist.wind import disaggregate_wind
-from .melodist.melodist.radiation import disaggregate_radiation
+from .melodist.melodist.humidity import (
+    calculate_month_hour_precip_mean,
+    disaggregate_humidity,
+)
 from .melodist.melodist.precipitation import disagg_prec
+from .melodist.melodist.radiation import disaggregate_radiation
+from .melodist.melodist.temperature import disaggregate_temperature, get_shift_by_data
+from .melodist.melodist.util.util import get_sun_times
+from .melodist.melodist.wind import disaggregate_wind
 
 warnings.filterwarnings("ignore")
 
@@ -63,12 +59,12 @@ a single "target_units".  You gave "{target_units}".
 
 @typic.constrained(ge=-90, le=90)
 class FloatLatitude(float):
-    """ -90 <= float <= 90 """
+    """-90 <= float <= 90"""
 
 
 @typic.constrained(ge=-180, le=180)
 class FloatLongitude(float):
-    """ -180 <= float <= 180 """
+    """-180 <= float <= 180"""
 
 
 @typic.al

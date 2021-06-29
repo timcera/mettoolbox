@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -11,8 +10,9 @@ Tests for `mettoolbox` module.
 import unittest
 
 from pandas.testing import assert_frame_equal
-from mettoolbox import mettoolbox
 from tstoolbox import tstoolbox
+
+from mettoolbox import mettoolbox
 
 
 class TestMettoolbox(unittest.TestCase):
