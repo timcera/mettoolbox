@@ -6,13 +6,13 @@ Python API Function Summary
 .. autosummary::
     :toctree: _function_autosummary
 
-    mettoolbox.mettoolbox.disaggregate.evaporation
-    mettoolbox.mettoolbox.disaggregate.humidity
-    mettoolbox.mettoolbox.disaggregate.precipitation
-    mettoolbox.mettoolbox.disaggregate.radiation
-    mettoolbox.mettoolbox.disaggregate.temperature
-    mettoolbox.mettoolbox.disaggregate.wind_speed
-    mettoolbox.mettoolbox.pet.allen
-    mettoolbox.mettoolbox.pet.hamon
-    mettoolbox.mettoolbox.pet.hargreaves
-    mettoolbox.mettoolbox.pet.oudin_form
+    mettoolbox.disaggregate.evaporation
+    mettoolbox.disaggregate.humidity
+    mettoolbox.disaggregate.precipitation
+    mettoolbox.disaggregate.radiation
+    mettoolbox.disaggregate.temperature
+    mettoolbox.disaggregate.wind_speed
+    mettoolbox.pet.allen
+    mettoolbox.pet.hamon
+    mettoolbox.pet.hargreaves
+    mettoolbox.pet.oudin_form

@@ -281,7 +281,7 @@ def hargreaves(
         0.408
         * 0.0023
         * newra.ra.values
-        * np.abs(tsdiff.values) ** 0.5
+        * tsdiff.values ** 0.5
         * (tsd.tmean.values + 17.8)
     )
     if target_units != source_units:
