@@ -3,19 +3,24 @@
 import os.path
 import sys
 import warnings
+from typing import Optional, Union
 
+import pandas as pd
+import typic
 from mando import Program
 from mando.rst_text_formatter import RSTHelpFormatter
+from standard_precip.spi import SPI
 from tstoolbox import tsutils
-
-from . import disaggregate, pet
-
-warnings.filterwarnings("ignore")
 
 program = Program("mettoolbox", "0.0")
 
+from . import disaggregate, indices, pe
+
+warnings.filterwarnings("ignore")
+
 program.add_subprog("disaggregate")
 program.add_subprog("pet")
+program.add_subprog("indices")
 
 _LOCAL_DOCSTRINGS = tsutils.docstrings
 _LOCAL_DOCSTRINGS[
@@ -1269,6 +1274,73 @@ def oudin_form_cli(
 
 
 pet.oudin_form.__doc__ = oudin_form_cli.__doc__
+
+
+@program.indices.command("spei", formatter_class=RSTHelpFormatter, doctype="numpy")
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def spei_cli(
+    rainfall: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
+    pet: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
+    source_units=None,
+    input_ts="-",
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    print_input=False,
+):
+    """Standard Precipitation/Evaporation Index"""
+    tsutils._printiso(
+        indices.spei(
+            rainfall,
+            pet,
+            source_units=source_units,
+            input_ts=input_ts,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            print_input=print_input,
+        ),
+        tablefmt=tablefmt,
+    )
+
+
+@program.indices.command("pe", formatter_class=RSTHelpFormatter, doctype="numpy")
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def pe_cli():
+    """Precipitation-Evaporation index."""
+    tsutils._printiso(
+        indices.pe(
+            lat,
+            source_units=source_units,
+            temp_min_col=temp_min_col,
+            temp_max_col=temp_max_col,
+            temp_mean_col=temp_mean_col,
+            k1=k1,
+            k2=k2,
+            input_ts=input_ts,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            target_units=target_units,
+            print_input=print_input,
+        ),
+        tablefmt=tablefmt,
+    )
 
 
 def main():

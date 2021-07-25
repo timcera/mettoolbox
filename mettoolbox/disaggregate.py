@@ -94,45 +94,7 @@ def temperature(
     lon: Optional[FloatLongitude] = None,
     hourly: Optional[str] = None,
 ):
-    """Disaggregate daily to hourly data.
-
-    disaggregate_temperature(data_daily,
-                             method='sine_min_max',
-                             min_max_time='fix',
-                             mod_nighttime=False,
-                             max_delta=None,
-                             mean_course=None,
-                             sun_times=None):
-
-    data_daily :      daily data
-    method :          method to disaggregate
-    min_max_time:     "fix" - min/max temperature at fixed times 7h/14h,
-                      "sun_loc" - min/max calculated by sunrise/sunnoon + 2h,
-                      "sun_loc_shift" - min/max calculated by sunrise/sunnoon +
-                                        monthly mean shift,
-    mod_nighttime:    ?
-    max_delta:        maximum monthly temperature shift as returned by
-                      get_shift_by_data()
-    mean_course:      ?
-    sun_times:        times of sunrise/noon as returned by get_sun_times()
-
-    if method in ('sine_min_max', 'sine_mean', 'sine')
-        .tmin from temp_min_col
-        .tmax from temp_max_col
-        .temp from temp_mean_col
-
-    if method in ('mean_course_min', 'mean_course_mean')
-        .tmin from temp_min_col
-        .tmax from temp_max_col
-        require hourly temperature perhaps from nearby station in 'mean_course'
-
-    if method == 'mean_course_mean'
-        .temp from temp_mean_col
-
-    sun_times = get_sun_times(dates, lon, lat, round(lon/15.0))
-
-    max_delta = get_shift_by_data(temp_hourly, lon, lat, round(lon/15.0))
-    """
+    """Disaggregate daily temperature to hourly temperature."""
     target_units = single_target_units(source_units, target_units, "degC")
 
     pd.options.display.width = 60
@@ -336,46 +298,7 @@ def humidity(
     hourly_temp=None,
     preserve_daily_mean=None,
 ):
-    """Disaggregate daily humidity to hourly humidity data.
-
-    disaggregate_humidity(data_daily, method='equal', temp=None,
-                          a0=None, a1=None, kr=None,
-                          month_hour_precip_mean=None, preserve_daily_mean=False):
-    Args:
-        daily_data: daily values
-        method: keyword specifying the disaggregation method to be used
-        temp: hourly temperature time series (necessary for some methods)
-        kr: parameter for linear_dewpoint_variation method (6 or 12)
-        month_hour_precip_mean: [month, hour, precip(y/n)] categorical mean values
-        preserve_daily_mean: if True, correct the daily mean values of the disaggregated
-            data with the observed daily means.
-
-
-    if method=equal
-        .hum from hum_mean_col
-    if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]
-        .tmin from temp_min_col
-    if method=min_max need
-        .hum_min from hum_min_col
-        .hum_max from hum_max_col
-        .tmin from temp_min_col
-        .tmax from temp_max_col
-
-    if method in ["dewpoint_regression", "linear_dewpoint_variation"]
-        a0
-        a1
-    if method in ["linear_dewpoint_variation"]
-        kr
-
-    if preserve_daily_mean is True
-        .hum from hum_mean_col
-
-    if method in ["minimal",
-                  "dewpoint_regression",
-                  "linear_dewpoint_variation",
-                  "min_max"]
-        need HOURLY temperature in 'temp'
-    """
+    """Disaggregate daily humidity to hourly humidity data."""
     target_units = single_target_units(source_units, target_units, "")
 
     if method == "equal" and hum_mean_col is None:
@@ -549,20 +472,7 @@ def wind_speed(
     b=None,
     t_shift=None,
 ):
-    """Disaggregate daily to hourly data.
-    disaggregate_wind(wind_daily,
-                      method='equal',
-                      a=None,
-                      b=None,
-                      t_shift=None):
-
-    Args:
-        wind_daily: daily values
-        method: keyword specifying the disaggregation method to be used
-        a: parameter a for the cosine function
-        b: parameter b for the cosine function
-        t_shift: parameter t_shift for the cosine function
-    """
+    """Disaggregate daily to hourly data."""
     target_units = single_target_units(source_units, target_units, "m/s")
 
     target_units = target_units[0] * len(source_units)
@@ -633,41 +543,7 @@ def radiation(
     lon=None,
     glob_swr_col=None,
 ):
-    """Disaggregate daily to hourly data.
-
-    disaggregate_radiation(data_daily,
-                           sun_times=None,
-                           pot_rad=None,
-                           method='pot_rad',
-                           angstr_a=0.25,
-                           angstr_b=0.5,
-                           bristcamp_a=0.75,
-                           bristcamp_c=2.4,
-                           mean_course=None):
-    Args:
-        daily_data: daily values
-        sun_times: daily dataframe including results of the util.sun_times function
-        pot_rad: hourly dataframe including potential radiation
-        method: keyword specifying the disaggregation method to be used
-        angstr_a: parameter a of the Angstrom model (intercept)
-        angstr_b: parameter b of the Angstrom model (slope)
-        bristcamp_a: ?
-        bristcamp_c: ?
-        mean_course: monthly values of the mean hourly radiation course
-
-    if method == 'mean_course':
-        HOURLY radiation in "mean_course"
-
-    if method in ('pot_rad', 'mean_course')
-        .glob from glob_swr_col
-
-    if method == 'pot_rad_via_ssd'
-        daily sun_times
-
-    if method == 'pot_rad_via_bc'
-        bristcamp_a
-        bristcamp_c
-    """
+    """Disaggregate daily to hourly data."""
     target_units = single_target_units(source_units, target_units, "W/m2")
 
     target_units = target_units[0] * len(source_units)

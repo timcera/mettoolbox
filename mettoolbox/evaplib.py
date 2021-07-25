@@ -593,7 +593,7 @@ def gash79(Pg=scipy.array([]), ER=float, S=float, St=float, p=float, pt=float):
 
     """
     Function to calculate precipitation interception loss from daily
-    precipitation values and and vegetation parameters.
+    precipitation values and vegetation parameters.
 
     Parameters:
         - Pg: daily rainfall data [mm].
