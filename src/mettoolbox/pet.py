@@ -172,8 +172,8 @@ class FloatLatitude(float):
 @typic.al
 def hamon(
     lat: FloatLatitude,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
     temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
     k: float = 1,
     source_units=None,
@@ -230,12 +230,17 @@ def hamon(
 
 
 @typic.al
+@tsutils.transform_args(
+    temp_min_col=tsutils.make_list,
+    temp_max_col=tsutils.make_list,
+    temp_mean_col=tsutils.make_list,
+)
 def hargreaves(
     lat: FloatLatitude,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
+    source_units: Optional[Union[str, list]],
     temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    source_units=None,
     input_ts="-",
     start_date=None,
     end_date=None,
@@ -249,29 +254,43 @@ def hargreaves(
     print_input=False,
 ):
     """hargreaves"""
-    temp_min_required = True
-    temp_max_required = True
-    tsd = _preprocess(
-        input_ts,
-        temp_min_col,
-        temp_max_col,
-        temp_mean_col,
-        temp_min_required,
-        temp_max_required,
-        skiprows,
-        names,
-        index_type,
-        start_date,
-        end_date,
-        round_index,
-        dropna,
-        clean,
-        source_units,
-    )
+    # If temp_min_col, temp_max_col, or temp_mean_col have a "," then the
+    # source is the first comma delimited word, and the remaining words are
+    # modifiers.
+    #
+    # If temp_min_col, temp_max_col, or temp_mean_col do not have a "," then
+    # they are integer column numbers or string column names in "input_ts".
+    from tstoolbox.tstoolbox import read
+
+    if len(temp_min_col) == 1:
+        temp_min_col = [input_ts, temp_min_col[0]]
+    if len(temp_max_col) == 1:
+        temp_max_col = [input_ts, temp_max_col[0]]
+    if temp_mean_col is not None and len(temp_mean_col) == 1:
+        temp_mean_col = [input_ts, temp_mean_col[0]]
+
+    if temp_mean_col is None:
+        tsd = read(
+            temp_min_col,
+            temp_max_col,
+            names=["tmin", "tmax"],
+            source_units=source_units,
+            target_units=["degC", "degC"],
+        )
+        tsd["tmean:degC"] = (tsd["tmin:degC"] + tsd["tmax:degC"]) / 2
+    else:
+        tsd = read(
+            temp_min_col,
+            temp_max_col,
+            temp_max_col,
+            names=["tmin", "tmax", "tmean"],
+            source_units=source_units,
+            target_units=["degC", "degC", "degC"],
+        )
 
     newra = utils.radiation(tsd, lat)
 
-    tsdiff = tsd.tmax - tsd.tmin
+    tsdiff = tsd["tmax:degC"] - tsd["tmin:degC"]
 
     # Create new dataframe with tsd.index as index in
     # order to get all of the time components correct.
@@ -282,7 +301,7 @@ def hargreaves(
         * 0.0023
         * newra.ra.values
         * tsdiff.values ** 0.5
-        * (tsd.tmean.values + 17.8)
+        * (tsd["tmean:degC"].values + 17.8)
     )
     if target_units != source_units:
         pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
@@ -292,8 +311,8 @@ def hargreaves(
 @typic.al
 def oudin_form(
     lat: FloatLatitude,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
     temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
     k1=100,
     k2=5,
@@ -352,8 +371,8 @@ def oudin_form(
 @typic.al
 def allen(
     lat: FloatLatitude,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
     temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
     source_units=None,
     input_ts="-",

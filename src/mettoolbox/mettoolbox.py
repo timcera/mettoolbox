@@ -14,7 +14,7 @@ from tstoolbox import tsutils
 
 program = Program("mettoolbox", "0.0")
 
-from . import disaggregate, indices, pe
+from . import disaggregate, indices, pet
 
 warnings.filterwarnings("ignore")
 
@@ -820,8 +820,8 @@ disaggregate.wind_speed.__doc__ = wind_speed_cli.__doc__
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def allen_cli(
     lat,
-    temp_min_col=None,
-    temp_max_col=None,
+    temp_min_col,
+    temp_max_col,
     temp_mean_col=None,
     source_units=None,
     input_ts="-",
@@ -925,8 +925,8 @@ pet.allen.__doc__ = allen_cli.__doc__
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def hamon_cli(
     lat,
-    temp_min_col=None,
-    temp_max_col=None,
+    temp_min_col,
+    temp_max_col,
     temp_mean_col=None,
     k=1.2,
     source_units=None,
@@ -1042,10 +1042,10 @@ pet.hamon.__doc__ = hamon_cli.__doc__
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def hargreaves_cli(
     lat,
-    temp_min_col=None,
-    temp_max_col=None,
+    temp_min_col,
+    temp_max_col,
+    source_units,
     temp_mean_col=None,
-    source_units=None,
     input_ts="-",
     start_date=None,
     end_date=None,
@@ -1147,8 +1147,8 @@ pet.hargreaves.__doc__ = hargreaves_cli.__doc__
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def oudin_form_cli(
     lat,
-    temp_min_col=None,
-    temp_max_col=None,
+    temp_min_col,
+    temp_max_col,
     temp_mean_col=None,
     k1=100,
     k2=5,
@@ -1279,8 +1279,8 @@ pet.oudin_form.__doc__ = oudin_form_cli.__doc__
 @program.indices.command("spei", formatter_class=RSTHelpFormatter, doctype="numpy")
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def spei_cli(
-    rainfall: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
-    pet: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
+    rainfall: Optional[Union[tsutils.FloatGreaterEqualToZero, str]],
+    pet: Optional[Union[tsutils.FloatGreaterEqualToZero, str]],
     source_units=None,
     input_ts="-",
     start_date=None,
@@ -1314,33 +1314,112 @@ def spei_cli(
     )
 
 
+indices.spei.__doc__ = spei_cli.__doc__
+
+
 @program.indices.command("pe", formatter_class=RSTHelpFormatter, doctype="numpy")
 @tsutils.doc(_LOCAL_DOCSTRINGS)
-def pe_cli():
-    """Precipitation-Evaporation index."""
+def pe_cli(
+    rainfall,
+    pet,
+    source_units,
+    window=180,
+    min_periods=170,
+    center=False,
+    win_type=None,
+    closed=None,
+    input_ts="-",
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    index_type="datetime",
+    names=None,
+    target_units="mm",
+    print_input=False,
+    tablefmt="csv",
+):
+    """Precipitation minus evaporation index.
+
+    Calculates a windows cumulative sum of daily precipitation minus evaporation.
+
+    Parameters
+    ----------
+    rainfall
+        A csv, wdm, hdf5, xlsx file or a pandas DataFrame or Series or
+        an integer column or string name of standard input.
+
+        Represents a daily time-series of precipitation in units specified in
+        `source_units`.
+    pet
+        A csv, wdm, hdf5, xlsx file or a pandas DataFrame or Series or
+        an integer column or string name of standard input.
+
+        Represents a daily time-series of evaporation in units specified in
+        `source_units`.
+    {source_units}
+    window : int, default 180 days
+        Size of the moving window. This is the number of observations used for
+        calculating the statistic. Each window will be a fixed size.
+
+        If its an offset then this will be the time period of each window. Each
+        window will be a variable sized based on the observations included in
+        the time-period. This is only valid for datetimelike indexes.
+
+    min_periods: int, default 170 days
+        Minimum number of observations in window required to have a value
+        (otherwise result is NA). For a window that is specified by an offset,
+        min_periods will default to 1. Otherwise, min_periods will default to
+        the size of the window.
+
+    center: bool, default False
+        Set the labels at the center of the window.
+
+    win_type: str, default None
+        Provide a window type. If None, all points are evenly weighted. See the
+        notes below for further information.
+
+    closed: str, default None
+        Make the interval closed on the ‘right’, ‘left’, ‘both’ or ‘neither’
+        endpoints. Defaults to ‘right’.
+    {input_ts}
+    {start_date}
+    {end_date}
+    {dropna}
+    {clean}
+    {round_index}
+    {index_type}
+    {names}
+    {target_units}
+    {print_input}
+    {tablefmt}
+    """
     tsutils._printiso(
         indices.pe(
-            lat,
-            source_units=source_units,
-            temp_min_col=temp_min_col,
-            temp_max_col=temp_max_col,
-            temp_mean_col=temp_mean_col,
-            k1=k1,
-            k2=k2,
+            rainfall,
+            pet,
+            source_units,
+            window=window,
+            min_periods=min_periods,
+            center=center,
+            win_type=win_type,
+            closed=closed,
             input_ts=input_ts,
             start_date=start_date,
             end_date=end_date,
             dropna=dropna,
             clean=clean,
             round_index=round_index,
-            skiprows=skiprows,
-            index_type=index_type,
             names=names,
             target_units=target_units,
             print_input=print_input,
         ),
         tablefmt=tablefmt,
     )
+
+
+indices.pe.__doc__ = pe_cli.__doc__
 
 
 def main():

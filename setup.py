@@ -3,13 +3,14 @@
 import os
 import sys
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 pkg_name = "mettoolbox"
 
 version = open("VERSION").readline().strip()
 
 if sys.argv[-1] == "publish":
+    os.system("cleanpy .")
     os.system("python setup.py sdist")
     os.system("twine upload dist/{pkg_name}-{version}.tar.gz".format(**locals()))
     sys.exit()
@@ -20,10 +21,24 @@ install_requires = [
     # List your project dependencies here.
     # For more details, see:
     # http://packages.python.org/distribute/setuptools.html#declaring-dependencies
-    "tstoolbox >= 103.11.8",
+    "tstoolbox >= 103.13.8",
     "solarpy",
     "standard-precip",
 ]
+
+extras_require = {
+    "dev": [
+        "black",
+        "cleanpy",
+        "twine",
+        "pytest",
+        "coverage",
+        "flake8",
+        "pytest-cov",
+        "pytest-mpl",
+        "pre-commit",
+    ]
+}
 
 setup(
     name=pkg_name,
@@ -49,18 +64,16 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     keywords="time_series",
-    author="Tim Cera, P.E.",
+    author="Tim Cera, PE",
     author_email="tim@cerazone.net",
     url="http://timcera.bitbucket.io/{pkg_name}/docsrc/index.html".format(**locals()),
     license="BSD",
-    packages=[
-        "{pkg_name}".format(**locals()),
-        "{pkg_name}.melodist.melodist".format(**locals()),
-        "{pkg_name}.melodist.melodist.util".format(**locals()),
-    ],
+    packages=find_packages("src"),
+    package_dir={"": "src"},
     include_package_data=True,
     zip_safe=False,
     install_requires=install_requires,
+    extras_require=extras_require,
     entry_points={
         "console_scripts": ["{pkg_name}={pkg_name}.{pkg_name}:main".format(**locals())]
     },
