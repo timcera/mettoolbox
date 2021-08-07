@@ -22,9 +22,9 @@ def _columns(tsd, req_column_list=[], optional_column_list=[]):
             tsutils.error_wrapper(
                 """
 You need to supply the column (name or number, data column numbering
-starts at 1) for {0} time-series.
+starts at 1) for {} time-series.
 
-Instead you gave {1}""".format(
+Instead you gave {}""".format(
                     len(req_column_list), req_column_list
                 )
             )
@@ -230,11 +230,6 @@ def hamon(
 
 
 @typic.al
-@tsutils.transform_args(
-    temp_min_col=tsutils.make_list,
-    temp_max_col=tsutils.make_list,
-    temp_mean_col=tsutils.make_list,
-)
 def hargreaves(
     lat: FloatLatitude,
     temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
@@ -261,13 +256,6 @@ def hargreaves(
     # If temp_min_col, temp_max_col, or temp_mean_col do not have a "," then
     # they are integer column numbers or string column names in "input_ts".
     from tstoolbox.tstoolbox import read
-
-    if len(temp_min_col) == 1:
-        temp_min_col = [input_ts, temp_min_col[0]]
-    if len(temp_max_col) == 1:
-        temp_max_col = [input_ts, temp_max_col[0]]
-    if temp_mean_col is not None and len(temp_mean_col) == 1:
-        temp_mean_col = [input_ts, temp_mean_col[0]]
 
     if temp_mean_col is None:
         tsd = read(

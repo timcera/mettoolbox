@@ -57,3 +57,4 @@ htmlcov
 *.pyo
 
 __pycache__
+docs/_function_autosummary

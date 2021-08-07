@@ -40,22 +40,26 @@ __date__ = "June 2016"
 # Make a help entry for this library
 def evaplib():
     """
-    Evaplib: A libray with Python functions for calculation of
-    evaporation from meteorological data.
+    Evaplib: Python libray for calculation of evaporation from meteorological data.
 
-    Evaporation functions
-    ---------------------
-
-        - E0: Calculate Penman (1948, 1956) open water evaporation.
-        - Em: Calculate evaporation according to Makkink (1965).
-        - Ept: Calculate evaporation according to Priestley and Taylor (1972).
-        - ET0pm: Calculate Penman Monteith reference evaporation short grass (FAO).
-        - Epm: Calculate Penman Monteith reference evaporation (Monteith, 1965).
-        - ra: Calculate  from windspeed and roughnes parameters.
-        - tvardry: calculate sensible heat flux from temperature variations
-          (Vugts et al., 1993).
-        - gash79: calculate rainfall interception (Gash, 1979).
-
+    Parameters
+    ----------
+    E0:
+        Calculate Penman (1948, 1956) open water evaporation.
+    Em:
+        Calculate evaporation according to Makkink (1965).
+    Ept:
+        Calculate evaporation according to Priestley and Taylor (1972).
+    ET0pm:
+        Calculate Penman Monteith reference evaporation short grass (FAO).
+    Epm:
+        Calculate Penman Monteith reference evaporation (Monteith, 1965).
+    ra:
+        Calculate  from windspeed and roughnes parameters.
+    tvardry:
+        Calculate sensible heat flux from temperature variations (Vugts et al., 1993).
+    gash79:
+        Calculate rainfall interception (Gash, 1979).
     Author: Dr. Maarten J. Waterloo <maarten.waterloo@acaciawater.com>.
     Version 1.0.
     Date: Sep 2012, last modified November June 2016.
@@ -611,14 +615,12 @@ def gash79(Pg=scipy.array([]), ER=float, S=float, St=float, p=float, pt=float):
 
     References
     ----------
-
     J.H.C. Gash, An analytical model of rainfall interception by forests,
     Quarterly Journal of the Royal Meteorological Society, 1979, 105,
     pp. 43-55.
 
     Examples
     --------
-
         >>> gash79(12.4,0.15,1.3,0.2,0.2,0.02)
         (12.4, 8.4778854123725971, 0, 3.9221145876274024)
         >>> gash79(60.0,0.15,1.3,0.2,0.2,0.02)
@@ -634,7 +636,7 @@ def gash79(Pg=scipy.array([]), ER=float, S=float, St=float, p=float, pt=float):
     if l < 2:  # Dealing with single value...
 
         # PGsat calculation (for the saturation of the canopy)
-        PGsat = -(1 / ER * S) * scipy.log((1 - (ER / (1 - p - pt))))
+        PGsat = -(1 / ER * S) * scipy.log(1 - (ER / (1 - p - pt)))
 
         # Set initial values to zero
         Ecan = 0.0
@@ -674,7 +676,7 @@ def gash79(Pg=scipy.array([]), ER=float, S=float, St=float, p=float, pt=float):
         Etrunk[Pg == 0] = 0.0
 
         # PGsat calc (for the saturation of the canopy)
-        PGsat = -(1 / ER * S) * scipy.log((1 - (ER / (1 - p - pt))))
+        PGsat = -(1 / ER * S) * scipy.log(1 - (ER / (1 - p - pt)))
 
         # Process rainfall series
         for i in range(0, n):

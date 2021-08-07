@@ -49,7 +49,6 @@ def _arraytest(*args):
 
     Examples
     --------
-
         >>> _arraytest(12.76)
         12.76
         >>> _arraytest([(1,2,3,4,5),(6,7,8,9)])
@@ -318,13 +317,11 @@ def L_calc(airtemp=scipy.array([])):
 
     References
     ----------
-
     J. Bringfelt. Test of a forest evapotranspiration model. Meteorology and
     Climatology Reports 52, SMHI, Norrköpping, Sweden, 1986.
 
     Examples
     --------
-
         >>> L_calc(25)
         2440883.8804625
         >>> t=[10, 20, 30]
@@ -357,7 +354,6 @@ def pottemp(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array([]
 
     Examples
     --------
-
         >>> t = [5, 10, 20]
         >>> rh = [45, 65, 89]
         >>> airpress = [101300, 102000, 99800]
@@ -442,7 +438,6 @@ def sun_NR(doy=scipy.array([]), lat=float):
 
     References
     ----------
-
     R.G. Allen, L.S. Pereira, D. Raes and M. Smith (1998). Crop
     Evaporation - Guidelines for computing crop water requirements,
     FAO - Food and Agriculture Organization of the United Nations.
@@ -451,7 +446,6 @@ def sun_NR(doy=scipy.array([]), lat=float):
 
     Examples
     --------
-
         >>> sun_NR(50,60)
         (9.1631820597268163, 9346987.824773483)
         >>> days = [100,200,300]
@@ -508,7 +502,6 @@ def vpd_calc(airtemp=scipy.array([]), rh=scipy.array([])):
 
     Examples
     --------
-
         >>> vpd_calc(30,60)
         1697.090397862653
         >>> T=[20,25]
@@ -544,7 +537,6 @@ def windvec(u=scipy.array([]), D=scipy.array([])):
 
     Examples
     --------
-
         >>> u = scipy.array([[ 3.],[7.5],[2.1]])
         >>> D = scipy.array([[340],[356],[2]])
         >>> windvec(u,D)

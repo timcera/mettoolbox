@@ -85,20 +85,35 @@ def evaporation_cli(
         There are two methods, a trapezoidal shape from sunrise to
         sunset called "trap" and a fixed, smooth curve starting at 0700
         (7 am) and stopping at 1900 (7 pm) called "fixed".
+
     {source_units}
+
     {input_ts}
+
     {columns}
+
     {start_date}
+
     {end_date}
+
     {dropna}
+
     {clean}
+
     {round_index}
+
     {skiprows}
+
     {index_type}
+
     {names}
+
     {target_units}
+
     {print_input}
+
     {tablefmt}
+
     lat: float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
@@ -181,7 +196,6 @@ def humidity_cli(
     Parameters
     ----------
     method: str
-
         Available disaggregation methods for
         humidity.
 
@@ -250,41 +264,63 @@ def humidity_cli(
         +---------------------------+----------------+---------------+
         | month_hour_precip_mean    | `precip_col`   |               |
         +---------------------------+----------------+---------------+
+
     {psource_units}
+
     {input_ts}
+
     {columns}
+
     {start_date}
+
     {end_date}
+
     {dropna}
+
     {clean}
+
     {round_index}
+
     {skiprows}
+
     {index_type}
+
     {names}
+
     {target_units}
+
     {print_input}
+
     {tablefmt}
+
     hum_min_col:
         Column index (data columns start numbering at 1) or column name
         from the input data that contains the daily minimum humidity.
+
     hum_max_col:
         Column index (data columns start numbering at 1) or column name
         from the input data that contains the daily maximum humidity.
+
     hum_mean_col:
         Column index (data columns start numbering at 1) or column name
         from the input data that contains the daily maximum humidity.
+
     a0: float
         The "a0"
         parameter.
+
     a1: float
         The "a1"
         parameter.
+
     kr: int
         Parameter for the "linear_dewpoint_variation"
         method.
+
     hourly_temp: str
         Filename of a CSV file that contains an hourly time series of
         temperatures.
+
     preserve_daily_mean: str
         Column name or index (data columns start at 1) that identifies
         the observed daily mean humidity.  If not None will correct the
@@ -371,19 +407,33 @@ def precipitation_cli(
         +---------------+--------------------------------------------+
 
     {input_ts}
+
     {start_date}
+
     {end_date}
+
     {dropna}
+
     {clean}
+
     {round_index}
+
     {skiprows}
+
     {index_type}
+
     {names}
+
     {psource_units}
+
     {target_units}
+
     {print_input}
+
     {tablefmt}
+
     {columns}
+
     masterstation_hour_col
         The column number or name that contains the hourly data used as the reference
         station.
@@ -475,35 +525,57 @@ def radiation_cli(
         +-----------------+-----------------------------------------+
 
     {input_ts}
+
     {columns}
+
     {start_date}
+
     {end_date}
+
     {dropna}
+
     {clean}
+
     {round_index}
+
     {skiprows}
+
     {index_type}
+
     {names}
+
     {psource_units}
+
     {target_units}
+
     {print_input}
+
     {tablefmt}
+
     pot_rad: str
         hourly dataframe including potential radiation
+
     angstr_a: float
         parameter a of the Angstrom model (intercept)
+
     angstr_b: float
         parameter b of the Angstrom model (slope)
+
     bristcamp_a: float
         parameter a for bristcamp
+
     bristcamp_c: float
         parameter c for bristcamp
+
     hourly_rad: str
         monthly values of the mean hourly radiation course
+
     lat: float
         Latitude
+
     lon: float
         Longitude
+
     mean_course:
         Filename of HOURLY CSV file that contains radiation values to be
         used with the "mean_course" method.
@@ -598,7 +670,6 @@ def temperature_cli(
     Parameters
     ----------
     method: str
-
         Disaggregation methods available for temperature.
 
         +---------------------+--------------------------------------+
@@ -626,10 +697,10 @@ def temperature_cli(
         |                     | range. Hourly CSV filename specified |
         |                     | with the `hourly` keyword.           |
         +---------------------+--------------------------------------+
+
     {psource_units}
 
     min_max_time: str
-
         +----------------+------------------------------------------+
         | `min_max_time` | Description                              |
         +================+==========================================+
@@ -650,38 +721,56 @@ def temperature_cli(
         which proves preferable during polar nights.
 
     {input_ts}
+
     {start_date}
+
     {end_date}
+
     {dropna}
+
     {clean}
+
     {round_index}
+
     {skiprows}
+
     {index_type}
+
     {names}
+
     {target_units}
+
     {print_input}
+
     {tablefmt}
+
     temp_min_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily minimum temperature.
+
     temp_max_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
+
     temp_mean_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily mean temperature.  If
         None will be estimated by the average of `temp_min_col` and
         `temp_max_col`.
+
     lat: float
         The latitude of the station.  Required if `min_max_time` is
         "sun_loc" or "sun_loc_shift".
+
     lon: float
         The longitude of the station.  Required if `min_max_time` is
         "sun_loc" or "sun_loc_shift".
+
     hourly: str
         File name that contains the hourly time series of temperatures
         to use when `method` is "mean_course_min" or "mean_course_mean"
         or when `max_delta` is True.
+
     max_delta: bool
         Uses maximum delta of hourly values for each month to constrain
         the disaggregated hourly temperature values.  If set to True
@@ -769,23 +858,39 @@ def wind_speed_cli(
         +----------+------------------------------------------------+
 
     {psource_units}
+
     {input_ts}
+
     {columns}
+
     {start_date}
+
     {end_date}
+
     {dropna}
+
     {clean}
+
     {round_index}
+
     {skiprows}
+
     {index_type}
+
     {names}
+
     {target_units}
+
     {print_input}
+
     {tablefmt}
+
     a: float
         Parameter `a` when method is equal to "cosine".
+
     b: float
         Parameter `b` when method is equal to "cosine".
+
     t_shift: float
         Parameter `t_shift` when method is equal to "cosine".
     """
@@ -848,12 +953,15 @@ def allen_cli(
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
         Hemisphere.
+
     temp_min_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily minimum temperature.
+
     temp_max_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
+
     source_units
         If unit is specified for the column as the second field of a ':'
         delimited column name, then the specified units and the
@@ -878,18 +986,31 @@ def allen_cli(
                               2,
                               ["degF", "degF"],
                               input_ts="tmin_tmax_data.csv")
+
     {input_ts}
+
     {start_date}
+
     {end_date}
+
     {dropna}
+
     {clean}
+
     {round_index}
+
     {skiprows}
+
     {index_type}
+
     {names}
+
     {target_units}
+
     {print_input}
+
     {tablefmt}
+
     temp_mean_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily mean temperature.  If
@@ -954,16 +1075,20 @@ def hamon_cli(
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
         Hemisphere.
+
     temp_min_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily minimum temperature.
+
     temp_max_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
+
     k: float
         A scaling factor, defaults to 1.  This is an adjustment for local conditions,
         for example, Lu, 2005 found that k=1.2 was a better fit for the southeastern
         United States.
+
     source_units
         If unit is specified for the column as the second field of a ':'
         delimited column name, then the specified units and the
@@ -988,18 +1113,31 @@ def hamon_cli(
                               2,
                               ["degF", "degF"],
                               input_ts="tmin_tmax_data.csv")
+
     {input_ts}
+
     {start_date}
+
     {end_date}
+
     {dropna}
+
     {clean}
+
     {round_index}
+
     {skiprows}
+
     {index_type}
+
     {names}
+
     {target_units}
+
     {print_input}
+
     {tablefmt}
+
     temp_mean_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily mean temperature.  If
@@ -1070,12 +1208,15 @@ def hargreaves_cli(
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
         Hemisphere.
+
     temp_min_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily minimum temperature.
+
     temp_max_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
+
     source_units
         If unit is specified for the column as the second field of a ':'
         delimited column name, then the specified units and the
@@ -1100,18 +1241,31 @@ def hargreaves_cli(
                                    2,
                                    ["degF", "degF"],
                                    input_ts="tmin_tmax_data.csv")
+
     {input_ts}
+
     {start_date}
+
     {end_date}
+
     {dropna}
+
     {clean}
+
     {round_index}
+
     {skiprows}
+
     {index_type}
+
     {names}
+
     {target_units}
+
     {print_input}
+
     {tablefmt}
+
     temp_mean_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily mean temperature.  If
@@ -1175,23 +1329,25 @@ def oudin_form_cli(
     Average daily temperature can be supplied or if not, calculated by
     (Tmax+Tmin)/2.
 
-    The constants `k1` and `k2` are used in the generic form of the equation to adjust
-    the PET.
+    The constants `k1` and `k2` are used in the generic form of the equation to
+    adjust the PET.
 
-    The defaults for k1 and k2 for this function are from Oudin with k1=100 and k2=5.
+    The defaults for k1 and k2 for this function are from Oudin with k1=100 and
+    k2=5.
 
     Jensen-Haise presented k1=40, and k2=0,
 
     Mcguiness presented k1=68, and k2=5.
 
-    The k2 parameter represents the point in degrees C at which potential evaporation is
-    0.  The k1 parameter is a scaling parameter.
+    The k2 parameter represents the point in degrees C at which potential
+    evaporation is 0.  The k1 parameter is a scaling parameter.
 
     Reference,
-        Ludovic Oudin et al, Which potential evapotranspiration input for a lumped
-        rainfall–runoff model?: Part 2—Towards a simple and efficient potential
-        evapotranspiration model for rainfall–runoff modelling, Journal of Hydrology,
-        Volume 303, Issues 1–4, 1 March 2005, Pages 290-306, ISSN 0022-1694,
+        Ludovic Oudin et al, Which potential evapotranspiration input for
+        a lumped rainfall–runoff model?: Part 2—Towards a simple and efficient
+        potential evapotranspiration model for rainfall–runoff modelling,
+        Journal of Hydrology, Volume 303, Issues 1–4, 1 March 2005, Pages
+        290-306, ISSN 0022-1694,
         http://dx.doi.org/10.1016/j.jhydrol.2004.08.026.
         (http://www.sciencedirect.com/science/article/pii/S0022169404004056)
 
@@ -1201,15 +1357,18 @@ def oudin_form_cli(
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
         Hemisphere.
+
     temp_min_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily minimum temperature.
+
     temp_max_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
+
     source_units
-        If unit is specified for the column as the second field of a ':'
-        delimited column name, then the specified units and the
+        If unit is specified for the column as the second field of a
+        ':' delimited column name, then the specified units and the
         'source_units' must match exactly.
 
         Any unit string compatible with the 'pint' library can be
@@ -1226,23 +1385,32 @@ def oudin_form_cli(
         Python::
 
             from mettoolbox import mettoolbox as mt
-            df = mt.pet.oudin_form(24,
-                                   1,
-                                   2,
-                                   ["degF", "degF"],
-                                   input_ts="tmin_tmax_data.csv")
+            df = mt.pet.oudin_form(24, 1, 2, ["degF", "degF"], input_ts="tmin_tmax_data.csv")
+
     {input_ts}
+
     {start_date}
+
     {end_date}
+
     {dropna}
+
     {clean}
+
     {round_index}
+
     {skiprows}
+
     {index_type}
+
     {names}
+
     {target_units}
+
     {print_input}
+
     {tablefmt}
+
     temp_mean_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily mean temperature.  If
@@ -1279,9 +1447,15 @@ pet.oudin_form.__doc__ = oudin_form_cli.__doc__
 @program.indices.command("spei", formatter_class=RSTHelpFormatter, doctype="numpy")
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def spei_cli(
-    rainfall: Optional[Union[tsutils.FloatGreaterEqualToZero, str]],
-    pet: Optional[Union[tsutils.FloatGreaterEqualToZero, str]],
-    source_units=None,
+    rainfall,
+    pet,
+    source_units,
+    nsmallest=None,
+    nlargest=None,
+    groupby="M",
+    fit_type="lmom",
+    dist_type="gam",
+    scale=1,
     input_ts="-",
     start_date=None,
     end_date=None,
@@ -1292,13 +1466,127 @@ def spei_cli(
     index_type="datetime",
     names=None,
     print_input=False,
+    tablefmt="csv",
 ):
-    """Standard Precipitation/Evaporation Index"""
+    """Standard Precipitation/Evaporation Index.
+
+    Calculates a windows cumulative sum of daily precipitation minus evaporation.
+
+    Parameters
+    ----------
+    rainfall
+        A csv, wdm, hdf5, xlsx file or a pandas DataFrame or Series or
+        an integer column or string name of standard input.
+
+        Represents a daily time-series of precipitation in units specified in
+        `source_units`.
+
+    pet
+        A csv, wdm, hdf5, xlsx file or a pandas DataFrame or Series or
+        an integer column or string name of standard input.
+
+        Represents a daily time-series of evaporation in units specified in
+        `source_units`.
+
+    {source_units}
+
+    nsmallest : int
+        [optional, default is None]
+
+        Return the "n" days with the smallest precipitation minus evaporation
+        index value within the `groupby` pandas offset period.
+
+        Cannot assign both `nsmallest` and `nlargest` keywords.
+
+    nlargest : int
+        [optional, default is None]
+
+        Return the "n" days with the largest precipitation minus evaporation
+        index value within the `groupby` pandas offset period.
+
+        Cannot assign both `nsmallest` and `nlargest` keywords.
+
+    groupby : str
+        Pandas offset period string representing the time over which the
+        `nsmallest` or `nlargest` values would be evaluated.
+
+    fit_type: str ("lmom" or "mle")
+        Specify the type of fit to use for fitting distribution to the
+        precipitation data. Either L-moments (lmom) or Maximum Likelihood
+        Estimation (mle). Note use L-moments when comparing to NCAR's NCL code
+        and R's packages to calculate SPI and SPEI.
+
+    dist_type: str
+        The distribution type to fit using either L-moments (fit_type="lmom")
+        or MLE (fit_type="mle").
+
+        +-----------+---------------------------+-----------+----------+
+        | dist_type | Distribution              | fit_type  | fit_type |
+        |           |                           | lmom      | mle      |
+        +===========+===========================+===========+==========+
+        | gam       | Gamma                     | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | exp       | Exponential               | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | gev       | Generalized Extreme Value | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | gpa       | Generalized Pareto        | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | gum       | Gumbel                    | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | nor       | Normal                    | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | pe3       | Pearson III               | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | wei       | Weibull                   | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | glo       | Generalized Logistic      |           | X        |
+        +-----------+---------------------------+-----------+----------+
+        | gno       | Generalized Normal        |           | X        |
+        +-----------+---------------------------+-----------+----------+
+        | kap       | Kappa                     |           | X        |
+        +-----------+---------------------------+-----------+----------+
+        | wak       | Wakeby                    | X         |          |
+        +-----------+---------------------------+-----------+----------+
+
+    scale: int (default=1)
+        Integer to specify the number of time periods over which the
+        standardized precipitation index is to be calculated. If freq="M" then
+        this is the number of months.
+
+    {input_ts}
+
+    {start_date}
+
+    {end_date}
+
+    {dropna}
+
+    {clean}
+
+    {round_index}
+
+    {skiprows}
+
+    {index_type}
+
+    {names}
+
+    {print_input}
+
+    {tablefmt}
+    """
     tsutils._printiso(
         indices.spei(
             rainfall,
             pet,
-            source_units=source_units,
+            source_units,
+            nsmallest=nsmallest,
+            nlargest=nlargest,
+            groupby=groupby,
+            fit_type=fit_type,
+            dist_type=dist_type,
+            scale=scale,
             input_ts=input_ts,
             start_date=start_date,
             end_date=end_date,
@@ -1323,8 +1611,11 @@ def pe_cli(
     rainfall,
     pet,
     source_units,
-    window=180,
-    min_periods=170,
+    nsmallest=None,
+    nlargest=None,
+    groupby="M",
+    window=30,
+    min_periods=None,
     center=False,
     win_type=None,
     closed=None,
@@ -1352,14 +1643,39 @@ def pe_cli(
 
         Represents a daily time-series of precipitation in units specified in
         `source_units`.
+
     pet
         A csv, wdm, hdf5, xlsx file or a pandas DataFrame or Series or
         an integer column or string name of standard input.
 
         Represents a daily time-series of evaporation in units specified in
         `source_units`.
+
     {source_units}
-    window : int, default 180 days
+
+    nsmallest : int
+        [optional, default is None]
+
+        Return the "n" days with the smallest precipitation minus evaporation
+        index value within the `groupby` pandas offset period.
+
+        Cannot assign both `nsmallest` and `nlargest` keywords.
+
+    nlargest : int
+        [optional, default is None]
+
+        Return the "n" days with the largest precipitation minus evaporation
+        index value within the `groupby` pandas offset period.
+
+        Cannot assign both `nsmallest` and `nlargest` keywords.
+
+    groupby : str
+        Pandas offset period string representing the time over which the
+        `nsmallest` or `nlargest` values would be evaluated.
+
+    window : int
+        [optional, default is 30]
+
         Size of the moving window. This is the number of observations used for
         calculating the statistic. Each window will be a fixed size.
 
@@ -1383,16 +1699,27 @@ def pe_cli(
     closed: str, default None
         Make the interval closed on the ‘right’, ‘left’, ‘both’ or ‘neither’
         endpoints. Defaults to ‘right’.
+
     {input_ts}
+
     {start_date}
+
     {end_date}
+
     {dropna}
+
     {clean}
+
     {round_index}
+
     {index_type}
+
     {names}
+
     {target_units}
+
     {print_input}
+
     {tablefmt}
     """
     tsutils._printiso(
@@ -1400,6 +1727,9 @@ def pe_cli(
             rainfall,
             pet,
             source_units,
+            nsmallest=nsmallest,
+            nlargest=nlargest,
+            groupby=groupby,
             window=window,
             min_periods=min_periods,
             center=center,

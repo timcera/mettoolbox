@@ -72,10 +72,10 @@ def _validate_temperatures(tsd, temp_min_col, temp_max_col):
                     """
                 On the following dates:
 
-        {0},
+        {},
 
-        minimum temperature values in column "{1}" are greater than or
-        equal to the maximum temperature values in column "{2}".""".format(
+        minimum temperature values in column "{}" are greater than or
+        equal to the maximum temperature values in column "{}".""".format(
                         tsd[tsd.tmax < tsd.tmin].index, temp_min_col, temp_max_col
                     )
                 )
@@ -96,10 +96,10 @@ estimated by the average of `temp_min_col` and `temp_max_col`""".format(
                 tsutils.error_wrapper(
                     """ On the following dates:
 
-        {0},
+        {},
 
-        the daily average is either below or equal to the minimum temperature in column {1} or higher or equal to the maximum temperature in column
-    {2}.""".format(
+        the daily average is either below or equal to the minimum temperature in column {} or higher or equal to the maximum temperature in column
+    {}.""".format(
                         tsd[tsd.tmin >= tsd.tmean | tsd.tmax <= tsd.tmean],
                         temp_min_col,
                         temp_max_col,
