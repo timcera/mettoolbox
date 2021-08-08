@@ -4,3 +4,15 @@ include AUTHORS.rst
 include CONTRIBUTING.rst
 include LICENSE.txt
 include README.rst
+include *.rst
+include *.yaml
+recursive-include docs *.bat
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs Makefile
+recursive-include src *.md
+recursive-include src *.py
+recursive-include src *.rst
+recursive-include src *.txt
+recursive-include src *.yaml
+recursive-include src Makefile
