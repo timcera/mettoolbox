@@ -20,7 +20,7 @@ envs=(~/pythons/python-3.6.0  \
       ~/pythons/python-3.7.0  \
       ~/pythons/python-3.8.0)
 
-pytest_opts='--doctest-modules --ignore docsrc --mpl'
+pytest_opts='--doctest-modules --ignore docs --mpl'
 
 for env in ${envs[@]}; do
     echo "${env}"
