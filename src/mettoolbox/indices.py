@@ -8,7 +8,12 @@ from standard_precip.spi import SPI
 from tstoolbox import tsutils
 
 
-def _nlarge_nsmall(pe_data, nlargest, nsmallest, groupby):
+def _nlarge_nsmall(
+    pe_data: pd.DataFrame,
+    nlargest: Optional[tsutils.IntGreaterEqualToOne],
+    nsmallest: Optional[tsutils.IntGreaterEqualToOne],
+    groupby: str,
+):
     if nlargest is None and nsmallest is None:
         return pe_data
 
@@ -42,8 +47,8 @@ def _nlarge_nsmall(pe_data, nlargest, nsmallest, groupby):
 @tsutils.transform_args(source_units=tsutils.make_list)
 @typic.al
 def spei(
-    rainfall: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
-    pet: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
+    rainfall: Union[tsutils.IntGreaterEqualToOne, str, pd.DataFrame],
+    pet: Union[tsutils.IntGreaterEqualToOne, str, pd.DataFrame],
     source_units,
     nsmallest=None,
     nlargest=None,
@@ -100,8 +105,8 @@ def spei(
 @tsutils.transform_args(source_units=tsutils.make_list)
 @typic.al
 def pe(
-    rainfall: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
-    pet: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
+    rainfall: Union[tsutils.IntGreaterEqualToOne, str, pd.DataFrame],
+    pet: Union[tsutils.IntGreaterEqualToOne, str, pd.DataFrame],
     source_units,
     nsmallest=None,
     nlargest=None,

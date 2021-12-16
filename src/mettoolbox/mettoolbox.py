@@ -3,18 +3,14 @@
 import os.path
 import sys
 import warnings
-from typing import Optional, Union
 
-import pandas as pd
-import typic
 from mando import Program
 from mando.rst_text_formatter import RSTHelpFormatter
-from standard_precip.spi import SPI
 from tstoolbox import tsutils
 
-program = Program("mettoolbox", "0.0")
-
 from . import disaggregate, indices, pet
+
+program = Program("mettoolbox", "0.0")
 
 warnings.filterwarnings("ignore")
 
