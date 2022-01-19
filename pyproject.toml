@@ -1,5 +1,24 @@
-[tool]
+
+[tool.check-manifest]
+ignore = [".travis.yml",
+          "docs/_function_autosummary/*"]
+
+
 [tool.commitizen]
 name = "cz_conventional_commits"
 version = "3.11.0"
 tag_format = "v$version"
+version_files = ["VERSION"]
+update_changelog_on_bump = true
+
+
+[build-system]
+requires = [
+    "setuptools",
+    "oldest-supported-numpy",
+]
+build-backend = "setuptools.build_meta"
+
+
+[tool.coverage.run]
+relative_files = true
