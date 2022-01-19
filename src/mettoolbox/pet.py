@@ -40,7 +40,7 @@ Instead you gave {}""".format(
         if nloopvar is None:
             collect.append(None)
         else:
-            collect.append(tsd.ix[:, nloopvar])
+            collect.append(tsd.loc[:, nloopvar])
 
     return collect
 
@@ -84,7 +84,8 @@ def _preprocess(
     )
 
     if source_units is None:
-        # If "source_units" keyword is None must have source_units in column name.
+        # If "source_units" keyword is None must have source_units in column
+        # name.
         source_units = []
         for units in tsd.columns:
             words = units.split(":")
@@ -94,8 +95,8 @@ def _preprocess(
                 raise ValueError(
                     tsutils.error_wrapper(
                         """
-If "source_units" are not supplied as the second ":" delimited field in the column name
-they must be supplied with the "source_units" keyword.  """
+If "source_units" are not supplied as the second ":" delimited field in the
+column name they must be supplied with the "source_units" keyword.  """
                     )
                 )
     else:
@@ -104,8 +105,8 @@ they must be supplied with the "source_units" keyword.  """
         raise ValueError(
             tsutils.error_wrapper(
                 """
-The number of "source_units" terms must match the number of temperature columns.
-                                               """
+The number of "source_units" terms must match the number of temperature
+columns.  """
             )
         )
     interim_target_units = ["degC"] * len(tsd.columns)

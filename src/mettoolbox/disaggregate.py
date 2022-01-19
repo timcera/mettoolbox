@@ -17,13 +17,12 @@ import pandas as pd
 import typic
 from tstoolbox import tstoolbox, tsutils
 
-from .melodist.melodist.humidity import (
-    calculate_month_hour_precip_mean,
-    disaggregate_humidity,
-)
+from .melodist.melodist.humidity import (calculate_month_hour_precip_mean,
+                                         disaggregate_humidity)
 from .melodist.melodist.precipitation import disagg_prec
 from .melodist.melodist.radiation import disaggregate_radiation
-from .melodist.melodist.temperature import disaggregate_temperature, get_shift_by_data
+from .melodist.melodist.temperature import (disaggregate_temperature,
+                                            get_shift_by_data)
 from .melodist.melodist.util.util import get_sun_times
 from .melodist.melodist.wind import disaggregate_wind
 
@@ -287,11 +286,11 @@ def humidity(
     names=None,
     target_units=None,
     print_input=False,
-    hum_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]]=None,
-    hum_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]]=None,
-    hum_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]]=None,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]]=None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]]=None,
+    hum_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    hum_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    hum_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
     a0=None,
     a1=None,
     kr=None,
@@ -776,31 +775,31 @@ The "trap" method requires latitude with the `lat` keyword.  You gave
 
         for index, toss in enumerate(sunr):
             cdate = ntsd.index[index]
-            fdata.ix[
+            fdata.loc[
                 datetime.datetime(cdate.year, cdate.month, cdate.day, int(sunr[index])),
                 :,
             ] = 0.0
-            fdata.ix[
+            fdata.loc[
                 datetime.datetime(
                     cdate.year, cdate.month, cdate.day, int(tr4[index]) + 1
                 ),
                 :,
             ] = 0.0
-            fdata.ix[
+            fdata.loc[
                 datetime.datetime(
                     cdate.year, cdate.month, cdate.day, int(round(tr2[index]))
                 ),
                 :,
             ] = 1.0
-            fdata.ix[
+            fdata.loc[
                 datetime.datetime(
                     cdate.year, cdate.month, cdate.day, int(round(tr3[index]))
                 ),
                 :,
             ] = 1.0
 
-        fdata.ix[0, :] = 0.0
-        fdata.ix[-1, :] = 0.0
+        fdata.iloc[0, :] = 0.0
+        fdata.iloc[-1, :] = 0.0
 
         fdata = fdata.interpolate("linear")
 
@@ -810,7 +809,7 @@ The "trap" method requires latitude with the `lat` keyword.  You gave
 
         fdata = fdata * ndata
 
-        fdata = fdata.ix[:-1, :]
+        fdata = fdata.iloc[:-1, :]
 
     elif method == "fixed":
         # DATA EVAPDIST / 0.000,0.000,0.000,0.000,0.000,0.000,0.019,0.041,
@@ -834,6 +833,6 @@ The "trap" method requires latitude with the `lat` keyword.  You gave
 
         fdata = fdata * ndata
 
-        fdata = fdata.ix[:-1, :]
+        fdata = fdata.iloc[:-1, :]
 
     return tsutils.print_input(print_input, tsd, fdata, None)
