@@ -17,12 +17,13 @@ import pandas as pd
 import typic
 from tstoolbox import tstoolbox, tsutils
 
-from .melodist.melodist.humidity import (calculate_month_hour_precip_mean,
-                                         disaggregate_humidity)
+from .melodist.melodist.humidity import (
+    calculate_month_hour_precip_mean,
+    disaggregate_humidity,
+)
 from .melodist.melodist.precipitation import disagg_prec
 from .melodist.melodist.radiation import disaggregate_radiation
-from .melodist.melodist.temperature import (disaggregate_temperature,
-                                            get_shift_by_data)
+from .melodist.melodist.temperature import disaggregate_temperature, get_shift_by_data
 from .melodist.melodist.util.util import get_sun_times
 from .melodist.melodist.wind import disaggregate_wind
 
@@ -42,12 +43,10 @@ def single_target_units(source_units, target_units, default=None, cnt=1):
     if len(tunits) != cnt:
         raise ValueError(
             tsutils.error_wrapper(
-                """
+                f"""
 Since creating a single disaggregated time-series there can only be
 a single "target_units".  You gave "{target_units}".
-""".format(
-                    **locals()
-                )
+"""
             )
         )
     if len(source_units) == len(target_units):
@@ -121,15 +120,13 @@ keyword `hourly`."""
     if temp_min_col is None or temp_max_col is None:
         raise ValueError(
             tsutils.error_wrapper(
-                """
+                f"""
 For "temperature" disaggregation you need to supply the daily minimum
 column (name or number, data column numbering starts at 1) and the daily
 maximum column (name or number).
 
 Instead `temp_min_col` is {temp_min_col} and `temp_max_col` is
-{temp_max_col}""".format(
-                    **locals()
-                )
+{temp_max_col}"""
             )
         )
 
@@ -192,9 +189,7 @@ the maximum temperature values in column "{}".""".format(
             tsutils.error_wrapper(
                 """
 Since `temp_mean_col` is None, the average daily temperature will be
-estimated by the average of `temp_min_col` and `temp_max_col`""".format(
-                    **locals()
-                )
+estimated by the average of `temp_min_col` and `temp_max_col`"""
             )
         )
         tsd["temp"] = (tsd.tmin + tsd.tmax) / 2.0
@@ -205,14 +200,11 @@ estimated by the average of `temp_min_col` and `temp_max_col`""".format(
                     """
 On the following dates:
 
-{},
+{tsd[tsd.tmin >= tsd.temp | tsd.tmax <= tsd.temp]},
 
-the daily average is either below or equal to the minimum temperature in column {}
-or higher or equal to the maximum temperature in column {}.""".format(
-                        tsd[tsd.tmin >= tsd.temp | tsd.tmax <= tsd.temp],
-                        temp_min_col,
-                        temp_max_col,
-                    )
+the daily average is either below or equal to the minimum temperature in column
+{temp_min_col}
+or higher or equal to the maximum temperature in column {}."""
                 )
             )
 
@@ -229,7 +221,7 @@ or higher or equal to the maximum temperature in column {}.""".format(
         if lat is None or lon is None:
             raise ValueError(
                 tsutils.error_wrapper(
-                    """
+                    f"""
 The `min_max_time` options other than "fix" require calculation of
 sunrise, sun noon, sunset, and day length.  The calculation requires the
 latitude with keyword "lat" and longitude with keyword "lon".
@@ -238,9 +230,7 @@ You gave:
     lat={lat}
 
     lon={lon}
-""".format(
-                        **locals()
-                    )
+"""
                 )
             )
 
@@ -330,7 +320,7 @@ column identified with the keyword `temp_min_col`."""
     ):
         raise ValueError(
             tsutils.error_wrapper(
-                """
+                f"""
 If `method` is "min_max" then:
 
 Minimum daily humidity is a required column identified with the keyword
@@ -344,9 +334,7 @@ keyword `temp_min_col`.  You gave {temp_min_col}.
 
 Maximum daily temperature is a required column identified with the
 keyword `temp_max_col`.  You gave {temp_max_col}.
-""".format(
-                    **locals()
-                )
+"""
             )
         )
 
@@ -481,7 +469,7 @@ def wind_speed(
     if method == "cosine" and (a is None or b is None or t_shift is None):
         raise ValueError(
             tsutils.error_wrapper(
-                """
+                f"""
 For the "cosine" method, requires the `a`, `b`, and `t_shift`
 keywords.  You gave:
 
@@ -490,9 +478,7 @@ a = {a}
 b = {b}
 
 t_shift = {t_shift}
-""".format(
-                    **locals()
-                )
+"""
             )
         )
     tsd = tsutils.common_kwds(
@@ -724,14 +710,11 @@ def evaporation(
     if method == "trap" and lat is None:
         raise ValueError(
             tsutils.error_wrapper(
-                """
+                f"""
 The "trap" method requires latitude with the `lat` keyword.  You gave
-"{lat}". """.format(
-                    **locals()
-                )
+"{lat}". """
             )
         )
-
     tsd = tsutils.common_kwds(
         tsutils.read_iso_ts(
             input_ts, skiprows=skiprows, names=names, index_type=index_type
@@ -762,7 +745,7 @@ The "trap" method requires latitude with the `lat` keyword.  You gave
         ss = np.sin(lrad) * np.sin(ad)
         cs = np.cos(lrad) * np.cos(ad)
         x2 = -ss / cs
-        delt = 7.6394 * (np.pi / 2.0 - np.arctan(x2 / np.square(1 - x2 ** 2)))
+        delt = 7.6394 * (np.pi / 2.0 - np.arctan(x2 / np.square(1 - x2**2)))
         sunr = 12.0 - delt / 2.0
 
         # develop hourly distribution given sunrise,
