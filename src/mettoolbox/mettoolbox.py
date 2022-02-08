@@ -1440,6 +1440,137 @@ def oudin_form_cli(
 pet.oudin_form.__doc__ = oudin_form_cli.__doc__
 
 
+@program.pet.command(
+    "priestly_taylor", formatter_class=RSTHelpFormatter, doctype="numpy"
+)
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def priestly_taylor_cli(
+    lat,
+    lon,
+    tmin_col,
+    tmax_col,
+    srad_col,
+    dayl_col,
+    source_units,
+    rh_col=None,
+    u2_col=None,
+    input_ts="-",
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+):
+    """priestly_taylor PET: f(Tmin, Tmax, Tavg, latitude)
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ----------
+    lat: float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hargreaves 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hargreaves(24,
+                                   1,
+                                   2,
+                                   ["degF", "degF"],
+                                   input_ts="tmin_tmax_data.csv")
+
+    {input_ts}
+
+    {start_date}
+
+    {end_date}
+
+    {dropna}
+
+    {clean}
+
+    {round_index}
+
+    {skiprows}
+
+    {index_type}
+
+    {names}
+
+    {target_units}
+
+    {print_input}
+
+    {tablefmt}
+
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`."""
+    tsutils._printiso(
+        pet.priestly_taylor(
+            lat,
+            lon,
+            tmin_col,
+            tmax_col,
+            srad_col,
+            dayl_col,
+            source_units,
+            rh_col=rh_col,
+            u2_col=u2_col,
+            input_ts=input_ts,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            target_units=target_units,
+            print_input=print_input,
+        ),
+        tablefmt=tablefmt,
+    )
+
+
+pet.priestly_taylor.__doc__ = priestly_taylor_cli.__doc__
+
+
 @program.indices.command("spei", formatter_class=RSTHelpFormatter, doctype="numpy")
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def spei_cli(

@@ -7,9 +7,11 @@ from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
+import pydaymet.pet as daypet
 import typic
 from solarpy import declination
 from tstoolbox import tsutils
+from tstoolbox.tstoolbox import read
 
 from . import meteolib, utils
 
@@ -170,6 +172,16 @@ class FloatLatitude(float):
     """-90 <= float <= 90"""
 
 
+@typic.constrained(ge=-180, le=180)
+class FloatLongitude(float):
+    """-180 <= float <= 180"""
+
+
+@typic.constrained(gt=0)
+class FloatGreaterThanZero(float):
+    """0 < float"""
+
+
 @typic.al
 def hamon(
     lat: FloatLatitude,
@@ -289,7 +301,7 @@ def hargreaves(
         0.408
         * 0.0023
         * newra.ra.values
-        * tsdiff.values ** 0.5
+        * tsdiff.values**0.5
         * (tsd["tmean:degC"].values + 17.8)
     )
     if target_units != source_units:
@@ -409,6 +421,81 @@ def allen(
 
     if target_units != source_units:
         pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
+    return tsutils.return_input(print_input, tsd, pe)
+
+
+def prepare_daymet(
+    tmin_col, tmax_col, srad_col, dayl_col, rh_col, u2_col, source_units, target_units
+):
+
+    read_args = [tmin_col, tmax_col, srad_col, dayl_col]
+    read_kwds = {
+        "source_units": source_units,
+        "names": ["tmin", "tmax", "srad", "dayl"],
+        "target_units": ["degC", "degC", "W/m^2", "s"],
+    }
+    if rh_col is not None:
+        read_args.append(rh_col)
+        read_kwds["names"].append("rh")
+        read_kwds["target_units"].append(None)
+    if u2_col is not None:
+        read_args.append(u2_col)
+        read_kwds["names"].append("u2")
+        read_kwds["target_units"].append("m/s")
+    tsd = read(*read_args, **read_kwds)
+    return tsd
+
+
+@typic.al
+def priestly_taylor(
+    lat: FloatLatitude,
+    lon: FloatLongitude,
+    tmin_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
+    tmax_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
+    srad_col: Optional[Union[FloatGreaterThanZero, str, list]],
+    dayl_col: Optional[Union[FloatGreaterThanZero, str, list]],
+    source_units: Optional[Union[str, list]],
+    rh_col=None,
+    u2_col=None,
+    input_ts="-",
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units="mm",
+    print_input=False,
+):
+    """priestly_taylor"""
+
+    if isinstance(input_ts, (pd.DataFrame, pd.Series)):
+        tsd = input_ts
+    else:
+        tsd = prepare_daymet(
+            tmin_col,
+            tmax_col,
+            srad_col,
+            dayl_col,
+            rh_col,
+            u2_col,
+            source_units,
+            target_units,
+        )
+    rename = {
+        "tmin:degC": "tmin (degrees C)",
+        "tmax:degC": "tmax (degrees C)",
+        "srad:W/m^2": "srad (W/m2)",
+        "dayl:s": "dayl (s)",
+        "rh:": "rh",
+        "u2:m/s": "u2 (m/s)",
+    }
+    tsd = tsd.rename(columns=rename)
+
+    pe = daypet.PETCoords(tsd, (lon, lat))
+    pe = pe.priestley_taylor().iloc[:, -1]
     return tsutils.return_input(print_input, tsd, pe)
 
 
