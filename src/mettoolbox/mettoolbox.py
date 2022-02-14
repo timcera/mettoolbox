@@ -82,33 +82,33 @@ def evaporation_cli(
         sunset called "trap" and a fixed, smooth curve starting at 0700
         (7 am) and stopping at 1900 (7 pm) called "fixed".
 
-    {source_units}
+    ${source_units}
 
-    {input_ts}
+    ${input_ts}
 
-    {columns}
+    ${columns}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {skiprows}
+    ${skiprows}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {target_units}
+    ${target_units}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
 
     lat: float
         The latitude of the station.  Positive specifies the Northern
@@ -261,33 +261,33 @@ def humidity_cli(
         | month_hour_precip_mean    | `precip_col`   |               |
         +---------------------------+----------------+---------------+
 
-    {psource_units}
+    ${psource_units}
 
-    {input_ts}
+    ${input_ts}
 
-    {columns}
+    ${columns}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {skiprows}
+    ${skiprows}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {target_units}
+    ${target_units}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
 
     hum_min_col:
         Column index (data columns start numbering at 1) or column name
@@ -402,33 +402,33 @@ def precipitation_cli(
         |               | of interest.                               |
         +---------------+--------------------------------------------+
 
-    {input_ts}
+    ${input_ts}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {skiprows}
+    ${skiprows}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {psource_units}
+    ${psource_units}
 
-    {target_units}
+    ${target_units}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
 
-    {columns}
+    ${columns}
 
     masterstation_hour_col
         The column number or name that contains the hourly data used as the reference
@@ -520,33 +520,33 @@ def radiation_cli(
         |                 | month) while preserving the daily mean. |
         +-----------------+-----------------------------------------+
 
-    {input_ts}
+    ${input_ts}
 
-    {columns}
+    ${columns}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {skiprows}
+    ${skiprows}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {psource_units}
+    ${psource_units}
 
-    {target_units}
+    ${target_units}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
 
     pot_rad: str
         hourly dataframe including potential radiation
@@ -694,7 +694,7 @@ def temperature_cli(
         |                     | with the `hourly` keyword.           |
         +---------------------+--------------------------------------+
 
-    {psource_units}
+    ${psource_units}
 
     min_max_time: str
         +----------------+------------------------------------------+
@@ -716,29 +716,29 @@ def temperature_cli(
         Allows one to apply a linear interpolation of night time values,
         which proves preferable during polar nights.
 
-    {input_ts}
+    ${input_ts}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {skiprows}
+    ${skiprows}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {target_units}
+    ${target_units}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
 
     temp_min_col: str, int
         The column name or number (data columns start numbering at 1) in
@@ -853,33 +853,33 @@ def wind_speed_cli(
         |          | parameter estimation required).                |
         +----------+------------------------------------------------+
 
-    {psource_units}
+    ${psource_units}
 
-    {input_ts}
+    ${input_ts}
 
-    {columns}
+    ${columns}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {skiprows}
+    ${skiprows}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {target_units}
+    ${target_units}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
 
     a: float
         Parameter `a` when method is equal to "cosine".
@@ -983,29 +983,29 @@ def allen_cli(
                               ["degF", "degF"],
                               input_ts="tmin_tmax_data.csv")
 
-    {input_ts}
+    ${input_ts}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {skiprows}
+    ${skiprows}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {target_units}
+    ${target_units}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
 
     temp_mean_col: str, int
         The column name or number (data columns start numbering at 1) in
@@ -1110,29 +1110,29 @@ def hamon_cli(
                               ["degF", "degF"],
                               input_ts="tmin_tmax_data.csv")
 
-    {input_ts}
+    ${input_ts}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {skiprows}
+    ${skiprows}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {target_units}
+    ${target_units}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
 
     temp_mean_col: str, int
         The column name or number (data columns start numbering at 1) in
@@ -1238,29 +1238,29 @@ def hargreaves_cli(
                                    ["degF", "degF"],
                                    input_ts="tmin_tmax_data.csv")
 
-    {input_ts}
+    ${input_ts}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {skiprows}
+    ${skiprows}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {target_units}
+    ${target_units}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
 
     temp_mean_col: str, int
         The column name or number (data columns start numbering at 1) in
@@ -1383,29 +1383,29 @@ def oudin_form_cli(
             from mettoolbox import mettoolbox as mt
             df = mt.pet.oudin_form(24, 1, 2, ["degF", "degF"], input_ts="tmin_tmax_data.csv")
 
-    {input_ts}
+    ${input_ts}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {skiprows}
+    ${skiprows}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {target_units}
+    ${target_units}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
 
     temp_mean_col: str, int
         The column name or number (data columns start numbering at 1) in
@@ -1512,29 +1512,29 @@ def priestly_taylor_cli(
                                    ["degF", "degF"],
                                    input_ts="tmin_tmax_data.csv")
 
-    {input_ts}
+    ${input_ts}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {skiprows}
+    ${skiprows}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {target_units}
+    ${target_units}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
 
     temp_mean_col: str, int
         The column name or number (data columns start numbering at 1) in
@@ -1615,7 +1615,7 @@ def spei_cli(
         Represents a daily time-series of evaporation in units specified in
         `source_units`.
 
-    {source_units}
+    ${source_units}
 
     nsmallest : int
         [optional, default is None]
@@ -1681,27 +1681,27 @@ def spei_cli(
         standardized precipitation index is to be calculated. If freq="M" then
         this is the number of months.
 
-    {input_ts}
+    ${input_ts}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {skiprows}
+    ${skiprows}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
     """
     tsutils._printiso(
         indices.spei(
@@ -1778,7 +1778,7 @@ def pe_cli(
         Represents a daily time-series of evaporation in units specified in
         `source_units`.
 
-    {source_units}
+    ${source_units}
 
     nsmallest : int
         [optional, default is None]
@@ -1827,27 +1827,27 @@ def pe_cli(
         Make the interval closed on the ‘right’, ‘left’, ‘both’ or ‘neither’
         endpoints. Defaults to ‘right’.
 
-    {input_ts}
+    ${input_ts}
 
-    {start_date}
+    ${start_date}
 
-    {end_date}
+    ${end_date}
 
-    {dropna}
+    ${dropna}
 
-    {clean}
+    ${clean}
 
-    {round_index}
+    ${round_index}
 
-    {index_type}
+    ${index_type}
 
-    {names}
+    ${names}
 
-    {target_units}
+    ${target_units}
 
-    {print_input}
+    ${print_input}
 
-    {tablefmt}
+    ${tablefmt}
     """
     tsutils._printiso(
         indices.pe(
