@@ -1,3 +1,9 @@
+## v3.13.0 (2022-02-14)
+
+### Feat
+
+- **docstrings**: moved docstring to new template form in latest tstoolbox
+
 ## v3.12.0 (2022-02-07)
 
 ### Feat
