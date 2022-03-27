@@ -27,8 +27,6 @@ from .melodist.melodist.temperature import disaggregate_temperature, get_shift_b
 from .melodist.melodist.util.util import get_sun_times
 from .melodist.melodist.wind import disaggregate_wind
 
-warnings.filterwarnings("ignore")
-
 
 @tsutils.transform_args(source_units=tsutils.make_list, target_units=tsutils.make_list)
 @typic.al
@@ -462,10 +460,6 @@ def wind_speed(
     """Disaggregate daily to hourly data."""
     target_units = single_target_units(source_units, target_units, "m/s")
 
-    target_units = target_units[0] * len(source_units)
-
-    pd.options.display.width = 60
-
     if method == "cosine" and (a is None or b is None or t_shift is None):
         raise ValueError(
             tsutils.error_wrapper(
@@ -479,6 +473,16 @@ b = {b}
 
 t_shift = {t_shift}
 """
+            )
+        )
+    if method in ["equal", "random"] and not (
+        a is None or b is None or t_shift is None
+    ):
+        warnings.warn(
+            tsutils.error_wrapper(
+                """
+The a, b, and t_shift options are ignored for the "equal" and "random" methods.
+            """
             )
         )
     tsd = tsutils.common_kwds(
@@ -495,10 +499,15 @@ t_shift = {t_shift}
         clean=clean,
     )
 
+    ndf = pd.DataFrame()
+    for column_name, column_data in tsd.iteritems():
+        df = disaggregate_wind(column_data, method=method, a=a, b=b, t_shift=t_shift)
+        ndf = ndf.join(df, how="outer")
+
     return tsutils.return_input(
         print_input,
         tsd,
-        pd.DataFrame(disaggregate_wind(tsd, method=method, a=a, b=b, t_shift=t_shift)),
+        ndf,
     )
 
 
