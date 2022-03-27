@@ -1,3 +1,9 @@
+## v3.13.1 (2022-03-27)
+
+### Fix
+
+- **disaggregate_wind**: fixed random and cosine methods in disaggregation of wind
+
 ## v3.13.0 (2022-02-14)
 
 ### Feat
