@@ -170,15 +170,13 @@ Instead `temp_min_col` is {temp_min_col} and `temp_max_col` is
     if any((tsd.tmax <= tsd.tmin).dropna()):
         raise ValueError(
             tsutils.error_wrapper(
-                """
+                f"""
 On the following dates:
 
-{},
+{tsd[tsd.tmax <= tsd.tmin].index},
 
-minimum temperature values in column "{}" are greater than or equal to
-the maximum temperature values in column "{}".""".format(
-                    tsd[tsd.tmax <= tsd.tmin].index, temp_min_col, temp_max_col
-                )
+minimum temperature values in column "{temp_min_col}" are greater than or equal to
+the maximum temperature values in column "{temp_max_col}"."""
             )
         )
 
@@ -246,7 +244,7 @@ You gave:
         )
     )
 
-    ntsd.columns = ["temperature:{}:disagg".format(target_units[0])]
+    ntsd.columns = [f"temperature:{target_units[0]}:disagg"]
 
     return tsutils.return_input(print_input, tsd, ntsd)
 

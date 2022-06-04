@@ -8,6 +8,7 @@ from typing import Optional, Union
 import numpy as np
 import pandas as pd
 import pydaymet.pet as daypet
+import pyet
 import typic
 from solarpy import declination
 from tstoolbox import tsutils
@@ -22,13 +23,11 @@ def _columns(tsd, req_column_list=[], optional_column_list=[]):
     if None in req_column_list:
         raise ValueError(
             tsutils.error_wrapper(
-                """
+                f"""
 You need to supply the column (name or number, data column numbering
-starts at 1) for {} time-series.
+starts at 1) for {len(req_column_list)} time-series.
 
-Instead you gave {}""".format(
-                    len(req_column_list), req_column_list
-                )
+Instead you gave {req_column_list}"""
             )
         )
 
@@ -45,6 +44,52 @@ Instead you gave {}""".format(
             collect.append(tsd.loc[:, nloopvar])
 
     return collect
+
+
+def _temp_read(
+    temp_min_col,
+    temp_max_col,
+    temp_mean_col,
+    source_units,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+):
+    if temp_mean_col is None:
+        tsd = tsutils.common_kwds(
+            input_tsd=[temp_min_col, temp_max_col],
+            names=["tmin", "tmax"],
+            source_units=source_units,
+            target_units=["degC", "degC"],
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+        )
+        tsd["tmean:degC"] = (tsd["tmin:degC"] + tsd["tmax:degC"]) / 2
+    else:
+        tsd = tsutils.common_kwds(
+            input_tsd=[temp_min_col, temp_max_col, temp_max_col],
+            names=["tmin", "tmax", "tmean"],
+            source_units=source_units,
+            target_units=["degC", "degC", "degC"],
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+        )
+    return tsd
 
 
 def _preprocess(
@@ -71,7 +116,6 @@ def _preprocess(
         temp_min_required=temp_min_required,
         temp_max_required=temp_max_required,
     )
-
     tsd = tsutils.common_kwds(
         input_ts,
         skiprows=skiprows,
@@ -185,12 +229,11 @@ class FloatGreaterThanZero(float):
 @typic.al
 def hamon(
     lat: FloatLatitude,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
+    source_units,
     temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
     k: float = 1,
-    source_units=None,
-    input_ts="-",
     start_date=None,
     end_date=None,
     dropna="no",
@@ -203,39 +246,22 @@ def hamon(
     print_input=False,
 ):
     """hamon"""
-    temp_min_required = True
-    temp_max_required = True
-    tsd = _preprocess(
-        input_ts,
+    tsd = _temp_read(
         temp_min_col,
         temp_max_col,
         temp_mean_col,
-        temp_min_required,
-        temp_max_required,
-        skiprows,
-        names,
-        index_type,
-        start_date,
-        end_date,
-        round_index,
-        dropna,
-        clean,
         source_units,
+        start_date=start_date,
+        end_date=end_date,
+        dropna=dropna,
+        clean=clean,
+        round_index=round_index,
+        skiprows=skiprows,
+        index_type=index_type,
+        names=names,
     )
-
-    decl = [declination(i) for i in tsd.index.to_pydatetime()]
-
-    w = np.arccos(-np.tan(decl) * np.tan(lat))
-
-    es = meteolib.es_calc(tsd.tmean)
-
-    N = 24 * w / np.pi
-
-    # Create new dataframe with tsd.index as index in
-    # order to get all of the time components correct.
-    pe = pd.DataFrame(0.0, index=tsd.index, columns=["pet_hamon:mm"])
-    pe["pet_hamon:mm"] = k * 29.8 * N * es / (273.3 + tsd.tmean)
-    pe.loc[tsd.tmean <= 0, "pet_hamon:mm"] = 0.0
+    pe = pyet.temperature.hamon(tsd["tmean:degC"].rolling(30).mean(), lat)
+    pe.columns = ["pe_hamon:mm"]
 
     if target_units != source_units:
         pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
@@ -249,7 +275,6 @@ def hargreaves(
     temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
     source_units: Optional[Union[str, list]],
     temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    input_ts="-",
     start_date=None,
     end_date=None,
     dropna="no",
@@ -268,29 +293,23 @@ def hargreaves(
     #
     # If temp_min_col, temp_max_col, or temp_mean_col do not have a "," then
     # they are integer column numbers or string column names in "input_ts".
-    from tstoolbox.tstoolbox import read
 
-    if temp_mean_col is None:
-        tsd = read(
-            temp_min_col,
-            temp_max_col,
-            names=["tmin", "tmax"],
-            source_units=source_units,
-            target_units=["degC", "degC"],
-        )
-        tsd["tmean:degC"] = (tsd["tmin:degC"] + tsd["tmax:degC"]) / 2
-    else:
-        tsd = read(
-            temp_min_col,
-            temp_max_col,
-            temp_max_col,
-            names=["tmin", "tmax", "tmean"],
-            source_units=source_units,
-            target_units=["degC", "degC", "degC"],
-        )
+    tsd = _temp_read(
+        temp_min_col,
+        temp_max_col,
+        temp_mean_col,
+        source_units,
+        start_date=start_date,
+        end_date=end_date,
+        dropna=dropna,
+        clean=clean,
+        round_index=round_index,
+        skiprows=skiprows,
+        index_type=index_type,
+        names=names,
+    )
 
     newra = utils.radiation(tsd, lat)
-
     tsdiff = tsd["tmax:degC"] - tsd["tmin:degC"]
 
     # Create new dataframe with tsd.index as index in
@@ -318,7 +337,6 @@ def oudin_form(
     k1=100,
     k2=5,
     source_units=None,
-    input_ts="-",
     start_date=None,
     end_date=None,
     dropna="no",
@@ -331,24 +349,19 @@ def oudin_form(
     print_input=False,
 ):
     """oudin form"""
-    temp_min_required = False
-    temp_max_required = False
-    tsd = _preprocess(
-        input_ts,
+    tsd = _temp_read(
         temp_min_col,
         temp_max_col,
         temp_mean_col,
-        temp_min_required,
-        temp_max_required,
-        skiprows,
-        names,
-        index_type,
-        start_date,
-        end_date,
-        round_index,
-        dropna,
-        clean,
         source_units,
+        start_date=start_date,
+        end_date=end_date,
+        dropna=dropna,
+        clean=clean,
+        round_index=round_index,
+        skiprows=skiprows,
+        index_type=index_type,
+        names=names,
     )
 
     newra = utils.radiation(tsd, lat)
@@ -360,8 +373,8 @@ def oudin_form(
     gamma = 2.45  # the latent heat flux (MJ kg−1)
     rho = 1000.0  # density of water (kg m-3)
 
-    pe.loc[tsd.tmean > k2, "pet_oudin:mm"] = (
-        newra.ra / (gamma * rho) * (tsd.tmean + k2) / k1 * 1000
+    pe.loc[tsd["tmean"] > k2, "pet_oudin:mm"] = (
+        newra.ra / (gamma * rho) * (tsd["tmean"] + k2) / k1 * 1000
     )
 
     if target_units != source_units:
@@ -374,9 +387,8 @@ def allen(
     lat: FloatLatitude,
     temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
     temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
+    source_units: Optional[Union[str, list]],
     temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    source_units=None,
-    input_ts="-",
     start_date=None,
     end_date=None,
     dropna="no",
@@ -389,24 +401,19 @@ def allen(
     print_input=False,
 ):
     """Allen"""
-    temp_min_required = False
-    temp_max_required = False
-    tsd = _preprocess(
-        input_ts,
+    tsd = _temp_read(
         temp_min_col,
         temp_max_col,
         temp_mean_col,
-        temp_min_required,
-        temp_max_required,
-        skiprows,
-        names,
-        index_type,
-        start_date,
-        end_date,
-        round_index,
-        dropna,
-        clean,
         source_units,
+        start_date=start_date,
+        end_date=end_date,
+        dropna=dropna,
+        clean=clean,
+        round_index=round_index,
+        skiprows=skiprows,
+        index_type=index_type,
+        names=names,
     )
 
     newra = utils.radiation(tsd, lat)
@@ -416,7 +423,11 @@ def allen(
     pe = pd.DataFrame(0.0, index=tsd.index, columns=["pet_allen:mm"])
 
     pe["pet_allen:mm"] = (
-        0.408 * 0.0029 * newra.ra * (tsd.tmax - tsd.tmin) ** 0.4 * (tsd.tmean + 20)
+        0.408
+        * 0.0029
+        * newra.ra
+        * (tsd["tmax:degC"] - tsd["tmin:degC"]) ** 0.4
+        * (tsd["tmean:degC"] + 20)
     )
 
     if target_units != source_units:
@@ -499,11 +510,54 @@ def priestly_taylor(
     return tsutils.return_input(print_input, tsd, pe)
 
 
-def reference():
+@typic.al
+def penman_monteith(
+    lat: FloatLatitude,
+    lon: FloatLongitude,
+    tmin_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
+    tmax_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
+    srad_col: Optional[Union[FloatGreaterThanZero, str, list]],
+    dayl_col: Optional[Union[FloatGreaterThanZero, str, list]],
+    source_units: Optional[Union[str, list]],
+    rh_col=None,
+    u2_col=None,
+    input_ts="-",
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units="mm",
+    print_input=False,
+):
     """reference penman-monteith"""
-    print("reference")
 
+    if isinstance(input_ts, (pd.DataFrame, pd.Series)):
+        tsd = input_ts
+    else:
+        tsd = prepare_daymet(
+            tmin_col,
+            tmax_col,
+            srad_col,
+            dayl_col,
+            rh_col,
+            u2_col,
+            source_units,
+            target_units,
+        )
+    rename = {
+        "tmin:degC": "tmin (degrees C)",
+        "tmax:degC": "tmax (degrees C)",
+        "srad:W/m^2": "srad (W/m2)",
+        "dayl:s": "dayl (s)",
+        "rh:": "rh",
+        "u2:m/s": "u2 (m/s)",
+    }
+    tsd = tsd.rename(columns=rename)
 
-def potential():
-    """potential"""
-    print("potential")
+    pe = daypet.PETCoords(tsd, (lon, lat))
+    pe = pe.penman_monteith().iloc[:, -1]
+    return tsutils.return_input(print_input, tsd, pe)

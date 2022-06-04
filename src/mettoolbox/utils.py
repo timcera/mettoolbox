@@ -85,16 +85,12 @@ estimated by the average of `temp_min_col` and `temp_max_col`"""
         if (tsd.tmin >= tsd.tmean).any() or (tsd.tmax <= tsd.tmean).any():
             raise ValueError(
                 tsutils.error_wrapper(
-                    """ On the following dates:
+                    f""" On the following dates:
 
-        {},
+        {tsd[tsd.tmin >= tsd.tmean | tsd.tmax <= tsd.tmean]},
 
-        the daily average is either below or equal to the minimum temperature in column {} or higher or equal to the maximum temperature in column
-    {}.""".format(
-                        tsd[tsd.tmin >= tsd.tmean | tsd.tmax <= tsd.tmean],
-                        temp_min_col,
-                        temp_max_col,
-                    )
+        the daily average is either below or equal to the minimum temperature in column {temp_min_col} or higher or equal to the maximum temperature in column
+    {temp_max_col}."""
                 )
             )
     return tsd
