@@ -35,7 +35,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest pytest-cov
         python -m pip install coveralls[toml]
-        python -m pip install -e .
+        python setup.py develop
 
     - name: Test with pytest
       run: |
