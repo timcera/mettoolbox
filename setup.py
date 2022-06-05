@@ -25,6 +25,7 @@ install_requires = [
     "solarpy",
     "standard-precip",
     "pydaymet",
+    "pyet",
 ]
 
 extras_require = {
