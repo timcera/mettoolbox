@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import, division, print_function
 
 import warnings
 from typing import Optional, Union
@@ -458,7 +457,7 @@ def prepare_daymet(
 
 
 @typic.al
-def priestly_taylor(
+def priestley_taylor(
     lat: FloatLatitude,
     lon: FloatLongitude,
     tmin_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
@@ -480,7 +479,7 @@ def priestly_taylor(
     target_units="mm",
     print_input=False,
 ):
-    """priestly_taylor"""
+    """priestley_taylor"""
 
     if isinstance(input_ts, (pd.DataFrame, pd.Series)):
         tsd = input_ts

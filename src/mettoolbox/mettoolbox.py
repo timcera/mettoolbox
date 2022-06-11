@@ -1425,10 +1425,10 @@ pet.oudin_form.__doc__ = oudin_form_cli.__doc__
 
 
 @program.pet.command(
-    "priestly_taylor", formatter_class=RSTHelpFormatter, doctype="numpy"
+    "priestley_taylor", formatter_class=RSTHelpFormatter, doctype="numpy"
 )
 @tsutils.doc(_LOCAL_DOCSTRINGS)
-def priestly_taylor_cli(
+def priestley_taylor_cli(
     lat,
     lon,
     tmin_col,
@@ -1450,7 +1450,7 @@ def priestly_taylor_cli(
     print_input=False,
     tablefmt="csv",
 ):
-    """priestly_taylor PET: f(Tmin, Tmax, Tavg, latitude)
+    """priestley_taylor PET: f(Tmin, Tmax, Tavg, latitude)
 
     Average daily temperature can be supplied or if not, calculated by
     (Tmax+Tmin)/2.
@@ -1525,7 +1525,7 @@ def priestly_taylor_cli(
         None will be estimated by the average of `temp_min_col` and
         `temp_max_col`."""
     tsutils._printiso(
-        pet.priestly_taylor(
+        pet.priestley_taylor(
             lat,
             lon,
             tmin_col,
@@ -1551,7 +1551,7 @@ def priestly_taylor_cli(
     )
 
 
-pet.priestly_taylor.__doc__ = priestly_taylor_cli.__doc__
+pet.priestley_taylor.__doc__ = priestley_taylor_cli.__doc__
 
 
 @program.pet.command(
