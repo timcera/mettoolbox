@@ -47,7 +47,6 @@ jobs:
         parallel: true
         flag-name: Unit Test
 
-
   coveralls_finish:
     needs: test
     runs-on: ubuntu-latest
