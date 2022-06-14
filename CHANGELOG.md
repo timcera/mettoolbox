@@ -1,3 +1,15 @@
+## v3.13.2 (2022-06-14)
+
+### Refactor
+
+- removed __future__
+- moved to f strings
+
+### Fix
+
+- correctly spelled priestley
+- need pyet
+
 ## v3.13.1 (2022-03-27)
 
 ### Fix
