@@ -1322,10 +1322,8 @@ def oudin_form_cli(
 
     Mcguiness presented k1=68, and k2=5.
 
-    The k2 parameter represents the point in degrees C at which potential
-    evaporation is 0.  The k1 parameter is a scaling parameter.
+    Reference::
 
-    Reference,
         Ludovic Oudin et al, Which potential evapotranspiration input for
         a lumped rainfall–runoff model?: Part 2—Towards a simple and efficient
         potential evapotranspiration model for rainfall–runoff modelling,
@@ -1348,6 +1346,29 @@ def oudin_form_cli(
     temp_max_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
+
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+
+    k1:
+        [optional, default to 100]
+
+        The `k1` value is used to calibrate the equation to different
+        conditions.
+
+        The k1 parameter is a scaling parameter.
+
+    k2:
+        [optional, default to 5]
+
+        The `k2` value is used to calibrate the equation to different
+        conditions.
+
+        The k2 parameter represents the point in degrees C at which potential
+        evaporation is 0.
 
     source_units
         If unit is specified for the column as the second field of a
@@ -1391,12 +1412,8 @@ def oudin_form_cli(
     ${print_input}
 
     ${tablefmt}
+    """
 
-    temp_mean_col: str, int
-        The column name or number (data columns start numbering at 1) in
-        the input data that represents the daily mean temperature.  If
-        None will be estimated by the average of `temp_min_col` and
-        `temp_max_col`."""
     tsutils._printiso(
         pet.oudin_form(
             lat,
