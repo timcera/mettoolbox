@@ -45,16 +45,7 @@ jobs:
         python -m pytest --cov
 
     - name: Coveralls
-      uses: AndreMiras/coveralls-python-action@develop
-      with:
-        parallel: true
-        flag-name: Unit Test
-
-  coveralls_finish:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Coveralls Python
-      uses: AndreMiras/coveralls-python-action@develop
-      with:
-        parallel-finished: true
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+          coveralls --service=github
