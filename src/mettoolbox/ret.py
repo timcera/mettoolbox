@@ -34,7 +34,7 @@ def et0_pm(
     lat=None,
 ):
     """Penman-Monteith reference evaporation."""
-    tsd = tsutils.common_kwds(
+    return tsutils.common_kwds(
         tsutils.read_iso_ts(
             input_ts, skiprows=skiprows, names=names, index_type=index_type
         ),
@@ -47,5 +47,3 @@ def et0_pm(
         target_units=target_units,
         clean=clean,
     )
-
-    return tsd

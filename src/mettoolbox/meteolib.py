@@ -117,9 +117,7 @@ def cp_calc(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array([]
 
     # calculate vapour pressures
     eact = ea_calc(airtemp, rh)
-    # Calculate cp
-    cp = 0.24 * 4185.5 * (1 + 0.8 * (0.622 * eact / (airpress - eact)))
-    return cp  # in J/kg/K
+    return 0.24 * 4185.5 * (1 + 0.8 * (0.622 * eact / (airpress - eact)))
 
 
 def Delta_calc(airtemp=scipy.array([])):
@@ -160,9 +158,7 @@ def Delta_calc(airtemp=scipy.array([])):
     # calculate saturation vapour pressure at temperature
     es = es_calc(airtemp)  # in kPa
 
-    # Calculate Delta
-    Delta = es * 4098.0 / ((airtemp + 237.3) ** 2) * 1000
-    return Delta  # in Pa/K
+    return es * 4098.0 / ((airtemp + 237.3) ** 2) * 1000
 
 
 def ea_calc(airtemp=scipy.array([]), rh=scipy.array([])):
@@ -195,9 +191,7 @@ def ea_calc(airtemp=scipy.array([]), rh=scipy.array([])):
     # Calculate saturation vapour pressures
     es = es_calc(airtemp) * 10  # kPa convert to hPa
 
-    # Calculate actual vapour pressure
-    eact = rh / 100.0 * es
-    return eact  # in Pa
+    return rh / 100.0 * es
 
 
 def es_calc(airtemp):
@@ -300,9 +294,7 @@ def gamma_calc(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array
     # Calculate cp and Lambda values
     cp = cp_calc(airtemp, rh, airpress)
     L = L_calc(airtemp)
-    # Calculate gamma
-    gamma = cp * airpress / (0.622 * L)
-    return gamma  # in Pa\K
+    return cp * airpress / (0.622 * L)
 
 
 def L_calc(airtemp=scipy.array([])):
@@ -333,9 +325,7 @@ def L_calc(airtemp=scipy.array([])):
     # Test input array/value
     airtemp = _arraytest(airtemp)
 
-    # Calculate lambda
-    L = 4185.5 * (751.78 - 0.5655 * (airtemp + 273.15))
-    return L  # in J/kg
+    return 4185.5 * (751.78 - 0.5655 * (airtemp + 273.15))
 
 
 def pottemp(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array([])):
@@ -368,9 +358,7 @@ def pottemp(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array([]
 
     # Determine cp
     cp = cp_calc(airtemp, rh, airpress)
-    # Determine theta
-    theta = (airtemp + 273.15) * pow((100000.0 / airpress), (287.0 / cp)) - 273.15
-    return theta  # in degrees celsius
+    return (airtemp + 273.15) * pow((100000.0 / airpress), (287.0 / cp)) - 273.15
 
 
 def rho_calc(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array([])):
@@ -407,14 +395,12 @@ def rho_calc(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array([
 
     # Calculate actual vapour pressure
     eact = ea_calc(airtemp, rh)
-    # Calculate density of air rho
-    rho = (
+    return (
         1.201
         * (290.0 * (airpress - 0.378 * eact))
         / (1000.0 * (airtemp + 273.15))
         / 100.0
     )
-    return rho  # in kg/m3
 
 
 def sun_NR(doy=scipy.array([]), lat=float):
@@ -517,9 +503,7 @@ def vpd_calc(airtemp=scipy.array([]), rh=scipy.array([])):
     # Calculate saturation vapour pressures
     es = es_calc(airtemp) * 10  # kPa convert to hPa
     eact = ea_calc(airtemp, rh)
-    # Calculate vapour pressure deficit
-    vpd = es - eact
-    return vpd  # in hPa
+    return es - eact
 
 
 def windvec(u=scipy.array([]), D=scipy.array([])):
@@ -555,7 +539,7 @@ def windvec(u=scipy.array([]), D=scipy.array([])):
     ve = 0.0  # define east component of wind speed
     vn = 0.0  # define north component of wind speed
     D = D * math.pi / 180.0  # convert wind direction degrees to radians
-    for i in range(0, len(u)):
+    for i in range(len(u)):
         ve = ve + u[i] * math.sin(D[i])  # calculate sum east speed components
         vn = vn + u[i] * math.cos(D[i])  # calculate sum north speed components
     ve = -ve / len(u)  # determine average east speed component
@@ -567,10 +551,7 @@ def windvec(u=scipy.array([]), D=scipy.array([])):
     if vdir < 180:
         Dv = vdir + 180.0
     else:
-        if vdir > 180.0:
-            Dv = vdir - 180
-        else:
-            Dv = vdir
+        Dv = vdir - 180 if vdir > 180.0 else vdir
     return uv, Dv  # uv in m/s, Dv in dgerees from North
 
 

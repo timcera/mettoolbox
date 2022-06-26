@@ -193,7 +193,7 @@ def et0_pm(
     lat=None,
 ):
     """Penman-Monteith evaporation."""
-    tsd = tsutils.common_kwds(
+    return tsutils.common_kwds(
         tsutils.read_iso_ts(
             input_ts, skiprows=skiprows, names=names, index_type=index_type
         ),
@@ -206,8 +206,6 @@ def et0_pm(
         target_units=target_units,
         clean=clean,
     )
-
-    return tsd
 
 
 @typic.constrained(ge=-90, le=90)
@@ -452,8 +450,7 @@ def prepare_daymet(
         read_args.append(u2_col)
         read_kwds["names"].append("u2")
         read_kwds["target_units"].append("m/s")
-    tsd = read(*read_args, **read_kwds)
-    return tsd
+    return read(*read_args, **read_kwds)
 
 
 @typic.al

@@ -81,18 +81,17 @@ estimated by the average of `temp_min_col` and `temp_max_col`"""
             )
         )
         tsd["tmean"] = (tsd.tmin + tsd.tmax) / 2.0
-    else:
-        if (tsd.tmin >= tsd.tmean).any() or (tsd.tmax <= tsd.tmean).any():
-            raise ValueError(
-                tsutils.error_wrapper(
-                    f""" On the following dates:
+    elif (tsd.tmin >= tsd.tmean).any() or (tsd.tmax <= tsd.tmean).any():
+        raise ValueError(
+            tsutils.error_wrapper(
+                f""" On the following dates:
 
         {tsd[tsd.tmin >= tsd.tmean | tsd.tmax <= tsd.tmean]},
 
         the daily average is either below or equal to the minimum temperature in column {temp_min_col} or higher or equal to the maximum temperature in column
     {temp_max_col}."""
-                )
             )
+        )
     return tsd
 
 
@@ -116,5 +115,4 @@ def radiation(tsd, lat):
         * (s * np.sin(lrad) * np.sin(dec) + np.cos(lrad) * np.cos(dec) * np.sin(s))
     )
 
-    newra = pd.DataFrame(ra, index=tsd.index, columns=["ra"])
-    return newra
+    return pd.DataFrame(ra, index=tsd.index, columns=["ra"])
