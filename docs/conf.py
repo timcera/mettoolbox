@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# complexity documentation build configuration file, created by
-# sphinx-quickstart on Tue Jul  9 22:26:36 2013.
+# Tim Cera documentation build configuration file, created by
+# sphinx-quickstart on Fri Jul 26 21:59:32 2013.
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #
@@ -33,13 +33,11 @@ sys.path.append(parent)
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.doctest",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.todo",
-    "sphinx.ext.coverage",
-    "sphinx.ext.pngmath",
-    "sphinx.ext.mathjax",
     "sphinx.ext.autosummary",
+    "sphinx.ext.imgmath",
+    "sphinxcontrib.programoutput",
+    "sphinx.ext.napoleon",
+    "nbsphinx",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -55,8 +53,8 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"mettoolbox"
-copyright = u"2014, Tim Cera"
+project = "mettoolbox"
+copyright = "2014, Tim Cera"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -79,7 +77,17 @@ today_fmt = "%Y-%m-%d"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ["_build"]
+exclude_patterns = [
+    "_build",
+    "_templates",
+    "**/.tox/**",
+    "**/.git/**",
+    "**/tests/**",
+    "**/dist/**",
+    "**/.ipynb_checkpoints/**",
+    "**README_SkillMetrics.rst",
+    "**/melodist/docs/source/**",
+]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 # default_role = None
@@ -199,7 +207,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ("index", "mettoolbox.tex", u"mettoolbox Documentation", u"Tim Cera", "manual")
+    ("index", "mettoolbox.tex", "mettoolbox Documentation", "Tim Cera", "manual")
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -227,7 +235,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [("index", "mettoolbox", u"mettoolbox Documentation", [u"Tim Cera"], 1)]
+man_pages = [("index", "mettoolbox", "mettoolbox Documentation", ["Tim Cera"], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -242,8 +250,8 @@ texinfo_documents = [
     (
         "index",
         "mettoolbox",
-        u"mettoolbox Documentation",
-        u"Tim Cera",
+        "mettoolbox Documentation",
+        "Tim Cera",
         "mettoolbox",
         "One line description of project.",
         "Miscellaneous",
@@ -263,10 +271,10 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u"mettoolbox"
-epub_author = u"Tim Cera, P.E."
-epub_publisher = u"Tim Cera, P.E."
-epub_copyright = u"2013, Tim Cera, P.E."
+epub_title = "mettoolbox"
+epub_author = "Tim Cera, P.E."
+epub_publisher = "Tim Cera, P.E."
+epub_copyright = "2013, Tim Cera, P.E."
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.

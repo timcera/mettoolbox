@@ -3,8 +3,6 @@
 Python API Function Summary
 ===========================
 
-.. currentmodule:: mettoolbox
-
 .. autosummary::
     :toctree: _function_autosummary
 
