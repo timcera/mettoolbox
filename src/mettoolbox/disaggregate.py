@@ -23,7 +23,10 @@ from .melodist.melodist.humidity import (
 from .melodist.melodist.precipitation import disagg_prec
 from .melodist.melodist.radiation import disaggregate_radiation
 from .melodist.melodist.temperature import disaggregate_temperature, get_shift_by_data
-from .melodist.melodist.util.util import get_sun_times, calculate_mean_daily_course_by_month
+from .melodist.melodist.util.util import (
+    calculate_mean_daily_course_by_month,
+    get_sun_times,
+)
 from .melodist.melodist.wind import disaggregate_wind
 
 
@@ -98,7 +101,12 @@ keyword `hourly`."""
 
     if method in ["mean_course_min", "mean_course_mean"] or max_delta:
         hourly = tstoolbox.read(hourly)
-        mean_course = calculate_mean_daily_course_by_month(hourly.squeeze(), normalize=True)
+        mean_course = calculate_mean_daily_course_by_month(
+            hourly.squeeze(), normalize=True
+        )
+    else:
+        mean_course = None
+
     if max_delta:
         max_delta = get_shift_by_data(hourly, lon, lat, round(lon / 15.0))
     else:
