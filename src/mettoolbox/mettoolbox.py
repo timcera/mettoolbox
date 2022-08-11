@@ -8,7 +8,7 @@ from mando import Program
 from mando.rst_text_formatter import RSTHelpFormatter
 from tstoolbox import tsutils
 
-from . import disaggregate, indices, pet
+from . import disaggregate, indices, pet, ret
 
 program = Program("mettoolbox", "0.0")
 
@@ -16,6 +16,7 @@ warnings.filterwarnings("ignore")
 
 program.add_subprog("disaggregate")
 program.add_subprog("pet")
+program.add_subprog("ret")
 program.add_subprog("indices")
 
 _LOCAL_DOCSTRINGS = tsutils.docstrings
@@ -1571,7 +1572,7 @@ def priestley_taylor_cli(
 pet.priestley_taylor.__doc__ = priestley_taylor_cli.__doc__
 
 
-@program.pet.command(
+@program.ret.command(
     "penman_monteith", formatter_class=RSTHelpFormatter, doctype="numpy"
 )
 @tsutils.doc(_LOCAL_DOCSTRINGS)
@@ -1672,7 +1673,7 @@ def penman_monteith_cli(
         None will be estimated by the average of `temp_min_col` and
         `temp_max_col`."""
     tsutils._printiso(
-        pet.penman_monteith(
+        ret.penman_monteith(
             lat,
             lon,
             tmin_col,
@@ -1698,7 +1699,7 @@ def penman_monteith_cli(
     )
 
 
-pet.penman_monteith.__doc__ = penman_monteith_cli.__doc__
+ret.penman_monteith.__doc__ = penman_monteith_cli.__doc__
 
 
 @program.indices.command("spei", formatter_class=RSTHelpFormatter, doctype="numpy")

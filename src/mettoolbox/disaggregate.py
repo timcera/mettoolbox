@@ -52,16 +52,6 @@ a single "target_units".  You gave "{target_units}".
     return [target_units[0]] * len(source_units)
 
 
-@typic.constrained(ge=-90, le=90)
-class FloatLatitude(float):
-    """-90 <= float <= 90"""
-
-
-@typic.constrained(ge=-180, le=180)
-class FloatLongitude(float):
-    """-180 <= float <= 180"""
-
-
 @typic.al
 def temperature(
     method: Literal[
@@ -85,8 +75,8 @@ def temperature(
     temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
     temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
     temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    lat: Optional[FloatLatitude] = None,
-    lon: Optional[FloatLongitude] = None,
+    lat: Optional[tsutils.FloatLatitude] = None,
+    lon: Optional[tsutils.FloatLongitude] = None,
     hourly: Optional[Union[str, pd.Series]] = None,
 ):
     """Disaggregate daily temperature to hourly temperature."""
@@ -706,7 +696,7 @@ def evaporation(
     names=None,
     target_units=None,
     print_input=False,
-    lat: Optional[FloatLatitude] = None,
+    lat: Optional[tsutils.FloatLatitude] = None,
 ):
     """Disaggregate daily to hourly data."""
     target_units = single_target_units(source_units, target_units)

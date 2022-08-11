@@ -210,24 +210,9 @@ def et0_pm(
     return tsd
 
 
-@typic.constrained(ge=-90, le=90)
-class FloatLatitude(float):
-    """-90 <= float <= 90"""
-
-
-@typic.constrained(ge=-180, le=180)
-class FloatLongitude(float):
-    """-180 <= float <= 180"""
-
-
-@typic.constrained(gt=0)
-class FloatGreaterThanZero(float):
-    """0 < float"""
-
-
 @typic.al
 def hamon(
-    lat: FloatLatitude,
+    lat: tsutils.FloatLatitude,
     source_units,
     temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
     temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
@@ -259,7 +244,7 @@ def hamon(
         index_type=index_type,
         names=names,
     )
-    pe = pyet.temperature.hamon(tsd["tmean:degC"].rolling(30).mean(), lat)
+    pe = pyet.temperature.hamon(tsd["tmean:degC"], lat)
     pe.columns = ["pe_hamon:mm"]
 
     if target_units != source_units:
@@ -268,8 +253,135 @@ def hamon(
 
 
 @typic.al
+def blaney_criddle(
+    p,
+    source_units,
+    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    k: float = 0.85,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+):
+    """blaney_criddle"""
+    tsd = _temp_read(
+        temp_min_col,
+        temp_max_col,
+        temp_mean_col,
+        source_units,
+        start_date=start_date,
+        end_date=end_date,
+        dropna=dropna,
+        clean=clean,
+        round_index=round_index,
+        skiprows=skiprows,
+        index_type=index_type,
+        names=names,
+    )
+    pe = pyet.temperature.blaney_criddle(tsd["tmean:degC"], p, k)
+    pe.columns = ["pe_blaney_criddle:mm"]
+
+    if target_units != source_units:
+        pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
+    return tsutils.return_input(print_input, tsd, pe)
+
+
+@typic.al
+def romanenko(
+    rh,
+    source_units,
+    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    k: float = 4.5,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+):
+    """romanenko"""
+    tsd = _temp_read(
+        temp_min_col,
+        temp_max_col,
+        temp_mean_col,
+        source_units,
+        start_date=start_date,
+        end_date=end_date,
+        dropna=dropna,
+        clean=clean,
+        round_index=round_index,
+        skiprows=skiprows,
+        index_type=index_type,
+        names=names,
+    )
+    pe = pyet.temperature.romanenko(tsd["tmean:degC"], p, k)
+    pe.columns = ["pe_romanenko:mm"]
+
+    if target_units != source_units:
+        pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
+    return tsutils.return_input(print_input, tsd, pe)
+
+
+@typic.al
+def linacre(
+    lat,
+    elevation,
+    source_units,
+    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    tdew=None,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+):
+    """linacre"""
+    tsd = _temp_read(
+        temp_min_col,
+        temp_max_col,
+        temp_mean_col,
+        source_units,
+        start_date=start_date,
+        end_date=end_date,
+        dropna=dropna,
+        clean=clean,
+        round_index=round_index,
+        skiprows=skiprows,
+        index_type=index_type,
+        names=names,
+    )
+    pe = pyet.temperature.linacre(tsd["tmean:degC"], p, k)
+    pe.columns = ["pe_linacre:mm"]
+
+    if target_units != source_units:
+        pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
+    return tsutils.return_input(print_input, tsd, pe)
+
+
+@typic.al
 def hargreaves(
-    lat: FloatLatitude,
+    lat: tsutils.FloatLatitude,
     temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
     temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
     source_units: Optional[Union[str, list]],
@@ -329,7 +441,7 @@ def hargreaves(
 
 @typic.al
 def oudin_form(
-    lat: FloatLatitude,
+    lat: tsutils.FloatLatitude,
     temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
     temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
     temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
@@ -383,7 +495,7 @@ def oudin_form(
 
 @typic.al
 def allen(
-    lat: FloatLatitude,
+    lat: tsutils.FloatLatitude,
     temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
     temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
     source_units: Optional[Union[str, list]],
@@ -458,12 +570,12 @@ def prepare_daymet(
 
 @typic.al
 def priestley_taylor(
-    lat: FloatLatitude,
-    lon: FloatLongitude,
+    lat: tsutils.FloatLatitude,
+    lon: tsutils.FloatLongitude,
     tmin_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
     tmax_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
-    srad_col: Optional[Union[FloatGreaterThanZero, str, list]],
-    dayl_col: Optional[Union[FloatGreaterThanZero, str, list]],
+    srad_col: Optional[Union[tsutils.FloatGreaterThanZero, str, list]],
+    dayl_col: Optional[Union[tsutils.FloatGreaterThanZero, str, list]],
     source_units: Optional[Union[str, list]],
     rh_col=None,
     u2_col=None,
@@ -511,12 +623,12 @@ def priestley_taylor(
 
 @typic.al
 def penman_monteith(
-    lat: FloatLatitude,
-    lon: FloatLongitude,
+    lat: tsutils.FloatLatitude,
+    lon: tsutils.FloatLongitude,
     tmin_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
     tmax_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
-    srad_col: Optional[Union[FloatGreaterThanZero, str, list]],
-    dayl_col: Optional[Union[FloatGreaterThanZero, str, list]],
+    srad_col: Optional[Union[tsutils.FloatGreaterThanZero, str, list]],
+    dayl_col: Optional[Union[tsutils.FloatGreaterThanZero, str, list]],
     source_units: Optional[Union[str, list]],
     rh_col=None,
     u2_col=None,

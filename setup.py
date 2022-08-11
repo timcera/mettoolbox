@@ -24,7 +24,7 @@ install_requires = [
     # List your project dependencies here.
     # For more details, see:
     # http://packages.python.org/distribute/setuptools.html#declaring-dependencies
-    "tstoolbox > 103.16.1",
+    "tstoolbox > 103.18.4",
     "solarpy",
     "standard-precip",
     "pydaymet",
