@@ -23,7 +23,7 @@ from .melodist.melodist.humidity import (
 from .melodist.melodist.precipitation import disagg_prec
 from .melodist.melodist.radiation import disaggregate_radiation
 from .melodist.melodist.temperature import disaggregate_temperature, get_shift_by_data
-from .melodist.melodist.util.util import get_sun_times
+from .melodist.melodist.util.util import get_sun_times, calculate_mean_daily_course_by_month
 from .melodist.melodist.wind import disaggregate_wind
 
 
@@ -85,7 +85,7 @@ def temperature(
     pd.options.display.width = 60
 
     if (
-        method in ["mean_course_min", "mean_course_mean"] or max_delta is True
+        method in ["mean_course_min", "mean_course_mean"] or max_delta
     ) and hourly is None:
         raise ValueError(
             tsutils.error_wrapper(
@@ -96,10 +96,10 @@ keyword `hourly`."""
             )
         )
 
-    if method in ["mean_course_min", "mean_course_mean"] or max_delta is True:
+    if method in ["mean_course_min", "mean_course_mean"] or max_delta:
         hourly = tstoolbox.read(hourly)
-
-    if max_delta is True:
+        mean_course = calculate_mean_daily_course_by_month(hourly.squeeze(), normalize=True)
+    if max_delta:
         max_delta = get_shift_by_data(hourly, lon, lat, round(lon / 15.0))
     else:
         max_delta = None
@@ -117,19 +117,15 @@ Instead `temp_min_col` is {temp_min_col} and `temp_max_col` is
             )
         )
 
-    columns = []
     try:
         temp_min_col = int(temp_min_col)
     except TypeError:
         pass
-    columns.append(temp_min_col)
-
     try:
         temp_max_col = int(temp_max_col)
     except TypeError:
         pass
-    columns.append(temp_max_col)
-
+    columns = [temp_min_col, temp_max_col]
     if temp_mean_col is not None:
         try:
             temp_mean_col = int(temp_mean_col)
@@ -202,11 +198,10 @@ or higher or equal to the maximum temperature in column {}."""
         sun_times.sunnoon = 12
         sun_times.sunset = 19
         sun_times.daylength = 12
-    else:
-        if lat is None or lon is None:
-            raise ValueError(
-                tsutils.error_wrapper(
-                    f"""
+    elif lat is None or lon is None:
+        raise ValueError(
+            tsutils.error_wrapper(
+                f"""
 The `min_max_time` options other than "fix" require calculation of
 sunrise, sun noon, sunset, and day length.  The calculation requires the
 latitude with keyword "lat" and longitude with keyword "lon".
@@ -216,9 +211,10 @@ You gave:
 
     lon={lon}
 """
-                )
             )
+        )
 
+    else:
         sun_times = get_sun_times(tsd.index, float(lon), float(lat), round(lon / 15.0))
 
     ntsd = pd.DataFrame(
@@ -228,7 +224,7 @@ You gave:
             min_max_time=min_max_time,
             mod_nighttime=mod_nighttime,
             max_delta=max_delta,
-            mean_course=hourly,
+            mean_course=mean_course,
             sun_times=sun_times,
         )
     )
