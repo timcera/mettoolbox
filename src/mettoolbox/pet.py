@@ -589,7 +589,6 @@ def priestley_taylor(
     print_input=False,
 ):
     """priestley_taylor"""
-
     if isinstance(input_ts, (pd.DataFrame, pd.Series)):
         tsd = input_ts
     else:
@@ -642,7 +641,6 @@ def penman_monteith(
     print_input=False,
 ):
     """reference penman-monteith"""
-
     if isinstance(input_ts, (pd.DataFrame, pd.Series)):
         tsd = input_ts
     else:
