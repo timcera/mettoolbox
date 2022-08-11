@@ -690,7 +690,6 @@ def gash79(Pg=scipy.array([]), ER=float, S=float, St=float, p=float, pt=float):
             if Pg[i] > PGsat and Pg[i] < St / pt:
                 Ecan = (((1 - p - pt) * PGsat) - S) + (ER * (Pg[i] - PGsat)) + S
                 Etrunk = 0.0
-                Ei[i]
             if Pg[i] > PGsat and Pg[i] > (St / pt):
                 Ecan = (
                     (((1 - p - pt) * PGsat) - S)
