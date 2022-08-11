@@ -20,7 +20,6 @@ from .melodist.melodist.humidity import (
     calculate_month_hour_precip_mean,
     disaggregate_humidity,
 )
-from .melodist.melodist.precipitation import disagg_prec
 from .melodist.melodist.radiation import disaggregate_radiation
 from .melodist.melodist.temperature import disaggregate_temperature, get_shift_by_data
 from .melodist.melodist.util.util import (
