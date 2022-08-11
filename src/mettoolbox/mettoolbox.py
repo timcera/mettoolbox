@@ -1414,7 +1414,6 @@ def oudin_form_cli(
 
     ${tablefmt}
     """
-
     tsutils._printiso(
         pet.oudin_form(
             lat,

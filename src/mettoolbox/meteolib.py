@@ -60,7 +60,6 @@ def _arraytest(*args):
         'This is a string'
 
     """
-
     rargs = []
     for a in args:
         if isinstance(a, (list, tuple)):
@@ -111,7 +110,6 @@ def cp_calc(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array([]
         array([ 1005.13411289,  1006.84399787,  1010.83623841])
 
     """
-
     # Test input array/value
     airtemp, rh, airpress = _arraytest(airtemp, rh, airpress)
 
@@ -153,7 +151,6 @@ def Delta_calc(airtemp=scipy.array([])):
         array([ 144.6658414 ,  188.62504569])
 
     """
-
     # Test input array/value
     airtemp = _arraytest(airtemp)
 
@@ -188,7 +185,6 @@ def ea_calc(airtemp=scipy.array([]), rh=scipy.array([])):
         1900.0946514729308
 
     """
-
     # Test input array/value
     airtemp, rh = _arraytest(airtemp, rh)
 
@@ -293,7 +289,6 @@ def gamma_calc(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array
         array([ 65.25518798,  66.65695779,  68.24239285])
 
     """
-
     # Test input array/value
     airtemp, rh, airpress = _arraytest(airtemp, rh, airpress)
 
@@ -329,7 +324,6 @@ def L_calc(airtemp=scipy.array([])):
         array([ 2476387.3842125,  2452718.3817125,  2429049.3792125])
 
     """
-
     # Test input array/value
     airtemp = _arraytest(airtemp)
 
@@ -401,7 +395,6 @@ def rho_calc(airtemp=scipy.array([]), rh=scipy.array([]), airpress=scipy.array([
         1.2431927125520903
 
     """
-
     # Test input array/value
     airtemp, rh, airpress = _arraytest(airtemp, rh, airpress)
 
@@ -454,7 +447,6 @@ def sun_NR(doy=scipy.array([]), lat=float):
         (array([ 13.31552077,  15.87073276,   9.54607624]), array([ 29354803.66244921,  39422316.42084264,  12619144.54566777]))
 
     """
-
     # Test input array/value
     doy, lat = _arraytest(doy, lat)
 
@@ -510,7 +502,6 @@ def vpd_calc(airtemp=scipy.array([]), rh=scipy.array([])):
         array([ 1168.54009896,     0.        ])
 
     """
-
     # Test input array/value
     airtemp, rh = _arraytest(airtemp, rh)
 
@@ -548,7 +539,6 @@ def windvec(u=scipy.array([]), D=scipy.array([])):
         array([ 353.2118882])
 
     """
-
     # Test input array/value
     u, D = _arraytest(u, D)
 

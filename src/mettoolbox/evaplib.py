@@ -121,7 +121,6 @@ def ra(z=float, z0=float, d=float, u=scipy.array([])):
         array([ 8.09465748,  4.04732874,  2.69821916])
 
     """
-
     # Test input array/value
     u = meteolib._arraytest(u)
 
@@ -195,7 +194,6 @@ def E0(
         6.00814764682986
 
     """
-
     # Test input array/value
     airtemp, rh, airpress, Rs, Rext, u = meteolib._arraytest(
         airtemp, rh, airpress, Rs, Rext, u
@@ -276,7 +274,6 @@ def ET0pm(
         4.7235349721073039
 
     """
-
     # Test input array/value
     airtemp, rh, airpress, Rs, Rext, u = meteolib._arraytest(
         airtemp, rh, airpress, Rs, Rext, u
@@ -358,7 +355,6 @@ def Em(
         4.503830479197991
 
     """
-
     # Test input array/value
     airtemp, rh, airpress, Rs = meteolib._arraytest(airtemp, rh, airpress, Rs)
 
@@ -417,7 +413,6 @@ def Ept(
         6.349456116128078
 
     """
-
     # Test input array/value
     airtemp, rh, airpress, Rn, G = meteolib._arraytest(airtemp, rh, airpress, Rn, G)
 
@@ -478,7 +473,6 @@ def Epm(
         3.243341146049407
 
     """
-
     # Test input array/value
     airtemp, rh, airpress, Rn, G, ra, rs = meteolib._arraytest(
         airtemp, rh, airpress, Rn, G, ra, rs
@@ -567,7 +561,6 @@ def tvardry(
         >>> tvardry(1.25,1035.0,25.3,0.25,3.0,d=displ_len,C2=30)
         34.10507908798597
     """
-
     # Test input array/value
     rho, cp, T, sigma_t = meteolib._arraytest(rho, cp, T, sigma_t)
 

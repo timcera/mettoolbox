@@ -63,7 +63,6 @@ def penman_monteith(
     print_input=False,
 ):
     """reference penman-monteith"""
-
     if isinstance(input_ts, (pd.DataFrame, pd.Series)):
         tsd = input_ts
     else:
