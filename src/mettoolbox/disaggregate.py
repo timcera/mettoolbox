@@ -87,18 +87,24 @@ def temperature(
     pd.options.display.width = 60
 
     if (
-        method in ["mean_course_min", "mean_course_mean"] or max_delta
+        method in ["mean_course_min_max", "mean_course_mean"]
+        or min_max_time == "sun_loc_shift"
+        or max_delta
     ) and hourly is None:
         raise ValueError(
             tsutils.error_wrapper(
                 """
 The methods "mean_course_min", "mean_course_mean", or if `max_delta` is
-True, require a HOURLY temperature values in the CSV file specified by the
-keyword `hourly`."""
+True, or if `min_max_time` is "sun_loc_shift" require a HOURLY temperature 
+values in the CSV file specified by the keyword `hourly`."""
             )
         )
 
-    if method in ["mean_course_min", "mean_course_mean"] or max_delta:
+    if (
+        method in ["mean_course_min_max", "mean_course_mean"]
+        or min_max_time == "sun_loc_shift"
+        or max_delta
+    ):
         hourly = tstoolbox.read(hourly)
         mean_course = calculate_mean_daily_course_by_month(
             hourly.squeeze(), normalize=True
@@ -106,8 +112,8 @@ keyword `hourly`."""
     else:
         mean_course = None
 
-    if max_delta:
-        max_delta = get_shift_by_data(hourly, lon, lat, round(lon / 15.0))
+    if min_max_time == "sun_loc_shift" or max_delta:
+        max_delta = get_shift_by_data(hourly.squeeze(), lon, lat, round(lon / 15.0))
     else:
         max_delta = None
 
