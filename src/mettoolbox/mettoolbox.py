@@ -3,6 +3,7 @@
 import os.path
 import sys
 import warnings
+from typing import List, Optional, Union
 
 from mando import Program
 from mando.rst_text_formatter import RSTHelpFormatter
@@ -1038,6 +1039,152 @@ def allen_cli(
 pet.allen.__doc__ = allen_cli.__doc__
 
 
+@program.pet.command(
+    "blaney_criddle", formatter_class=RSTHelpFormatter, doctype="numpy"
+)
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def blaney_criddle_cli(
+    bright_hours_col,
+    source_units: Optional[Union[str, list]],
+    temp_mean_col=None,
+    temp_min_col=None,
+    temp_max_col=None,
+    k=0.85,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    names=None,
+    target_units="mm",
+    print_input=False,
+):
+    """Evaporation calculated according to [blaney_1952]_.
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ----------
+    lat: float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+
+    k: float
+        A scaling factor, defaults to 1.  This is an adjustment for local conditions,
+        for example, Lu, 2005 found that k=1.2 was a better fit for the southeastern
+        United States.
+
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hamon 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hamon(24,
+                              1,
+                              2,
+                              ["degF", "degF"],
+                              input_ts="tmin_tmax_data.csv")
+
+    ${start_date}
+
+    ${end_date}
+
+    ${dropna}
+
+    ${clean}
+
+    ${round_index}
+
+    ${skiprows}
+
+    ${index_type}
+
+    ${names}
+
+    ${target_units}
+
+    ${print_input}
+
+    ${tablefmt}
+
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+
+
+    Returns
+    -------
+    pandas.Series containing the calculated evaporation.
+
+    Examples
+    --------
+    >>> et_blaney_criddle = blaney_criddle(tmean)
+
+    Notes
+    -----
+    Based on equation 6 in [xu_2001]_.
+
+    .. math:: PE=kp(0.46 * T_a + 8.13)
+
+    References
+    ----------
+    .. [blaney_1952] Blaney, H. F. (1952). Determining water requirements in
+       irrigated areas from climatological and irrigation data.
+    .. [xu_2001] Xu, C. Y., & Singh, V. P. (2001). Evaluation and
+       generalization of temperature‐based methods for calculating evaporation.
+       Hydrological processes, 15(2), 305-319.
+    """
+    tsutils._printiso(
+        pet.blaney_criddle(
+            bright_hours_col=bright_hours_col,
+            source_units=source_units,
+            temp_mean_col=temp_mean_col,
+            temp_min_col=temp_min_col,
+            temp_max_col=temp_max_col,
+            k=k,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            names=names,
+            target_units=target_units,
+            print_input=print_input,
+        )
+    )
+
+
+pet.blaney_criddle.__doc__ = blaney_criddle_cli.__doc__
+
+
 @program.pet.command("hamon", formatter_class=RSTHelpFormatter, doctype="numpy")
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def hamon_cli(
@@ -1137,11 +1284,35 @@ def hamon_cli(
         None will be estimated by the average of `temp_min_col` and
         `temp_max_col`.
 
+    Returns
+    -------
+    pandas.Series containing the calculated evaporation.
+
+    Examples
+    --------
+    >>> et_hamon = hamon(tmean, lat)
+
+    Notes
+    -----
+    Following [hamon_1961]_ and [oudin_2005]_.
+
+    .. math:: PE = (\\frac{DL}{12})^2 exp(\\frac{T_a}{16})
+
     References
     ----------
-    Lu et al. (2005). A comparison of six potential evaportranspiration methods for
-    regional use in the southeastern United States. Journal of the American Water
-    Resources Association, 41, 621- 633."""
+    .. [hamon_1961] Hamon, W. R. (1963). Estimating potential
+       evapotranspiration. Transactions of the American Society of Civil
+       Engineers, 128(1), 324-338.
+    .. [oudin_2005] Oudin, L., Hervieu, F., Michel, C., Perrin, C.,
+       Andréassian, V., Anctil, F., & Loumagne, C. (2005). Which potential
+       evapotranspiration input for a lumped rainfall–runoff model?:
+       Part 2—Towards a simple and efficient potential evapotranspiration model
+       for rainfall–runoff modelling. Journal of hydrology, 303(1-4), 290-306.
+    .. [lu_2005] Lu et al. (2005). A comparison of six potential
+       evapotranspiration methods for regional use in the southeastern United
+       States. Journal of the American Water Resources Association, 41, 621-
+       633.
+    """
     tsutils._printiso(
         pet.hamon(
             lat,
@@ -1283,6 +1454,151 @@ def hargreaves_cli(
 
 
 pet.hargreaves.__doc__ = hargreaves_cli.__doc__
+
+
+@program.pet.command("linacre", formatter_class=RSTHelpFormatter, doctype="numpy")
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def linacre_cli(
+    lat,
+    elevation,
+    source_units,
+    temp_mean_col=None,
+    temp_min_col=None,
+    temp_max_col=None,
+    tdew_col=None,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+):
+    """Evaporation calculated according to [linacre_1977]_.
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ----------
+    lat: float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+
+    elevation: float
+        The elevation of the station in meters.
+
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hargreaves 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hargreaves(24,
+                                   1,
+                                   2,
+                                   ["degF", "degF"],
+                                   input_ts="tmin_tmax_data.csv")
+
+    ${start_date}
+
+    ${end_date}
+
+    ${dropna}
+
+    ${clean}
+
+    ${round_index}
+
+    ${skiprows}
+
+    ${index_type}
+
+    ${names}
+
+    ${target_units}
+
+    ${print_input}
+
+    ${tablefmt}
+
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+
+    Returns
+    -------
+    pandas.Series containing the calculated evaporation.
+
+    Examples
+    --------
+    >>> et_linacre = linacre(tmean, elevation, lat)
+
+    Notes
+    -----
+    Based on equation 5 in [xu_2001]_.
+
+    .. math:: PE = \\frac{\\frac{500 T_m}{(100-A)}+15 (T_a-T_d)}{80-T_a}
+
+    References
+    -----
+    .. [linacre_1977] Linacre, E. T. (1977). A simple formula for estimating
+       evaporation rates in various climates, using temperature data alone.
+       Agricultural meteorology, 18(6), 409-424.
+    """
+    tsutils._printiso(
+        pet.linacre(
+            lat,
+            elevation,
+            source_units=source_units,
+            temp_min_col=temp_min_col,
+            temp_max_col=temp_max_col,
+            temp_mean_col=temp_mean_col,
+            tdew_col=tdew_col,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            index_type=index_type,
+            names=names,
+            target_units=target_units,
+            print_input=print_input,
+        ),
+        tablefmt=tablefmt,
+    )
+
+
+pet.linacre.__doc__ = linacre_cli.__doc__
 
 
 @program.pet.command("oudin_form", formatter_class=RSTHelpFormatter, doctype="numpy")
@@ -1572,6 +1888,148 @@ def priestley_taylor_cli(
 
 
 pet.priestley_taylor.__doc__ = priestley_taylor_cli.__doc__
+
+
+@program.pet.command("romanenko", formatter_class=RSTHelpFormatter, doctype="numpy")
+@tsutils.doc(_LOCAL_DOCSTRINGS)
+def romanenko_cli(
+    source_units,
+    temp_mean_col=None,
+    temp_min_col=None,
+    temp_max_col=None,
+    rh_col=None,
+    k=4.5,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    names=None,
+    target_units=None,
+    print_input=False,
+    tablefmt="csv",
+):
+    """Evaporation calculated according to [romanenko_1961]_.
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ----------
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+
+    rh_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily average relative humidity.
+
+    k: float
+        A scaling factor, defaults to 1.  This is an adjustment for local
+        conditions, for example, Lu, 2005 found that k=1.2 was a better fit for
+        the southeastern United States.
+
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hamon 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hamon(24,
+                              1,
+                              2,
+                              ["degF", "degF"],
+                              input_ts="tmin_tmax_data.csv")
+
+    ${start_date}
+
+    ${end_date}
+
+    ${dropna}
+
+    ${clean}
+
+    ${round_index}
+
+    ${skiprows}
+
+    ${index_type}
+
+    ${names}
+
+    ${target_units}
+
+    ${print_input}
+
+    ${tablefmt}
+
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+
+    Returns
+    -------
+    pandas.Series containing the calculated evaporation.
+
+    Examples
+    --------
+    >>> et_romanenko = romanenko(tmean, rh)
+
+    Notes
+    -----
+    Based on equation 11 in [xu_2001]_.
+
+    .. math:: PE=4.5(1 + (\\frac{T_a}{25})^2 (1  \\frac{e_a}{e_s})
+
+    References
+    ----------
+    .. [romanenko_1961] Romanenko, V. A. (1961). Computation of the autumn soil
+       moisture using a universal relationship for a large area. Proc. of
+       Ukrainian Hydrometeorological Research Institute, 3, 12-25.
+    """
+    tsutils._printiso(
+        pet.romanenko(
+            source_units,
+            temp_mean_col=temp_mean_col,
+            temp_min_col=temp_min_col,
+            temp_max_col=temp_max_col,
+            rh_col=rh_col,
+            k=k,
+            start_date=start_date,
+            end_date=end_date,
+            dropna=dropna,
+            clean=clean,
+            round_index=round_index,
+            skiprows=skiprows,
+            names=names,
+            target_units=target_units,
+            print_input=print_input,
+            tablefmt=tablefmt,
+        )
+    )
+
+
+pet.romanenko.__doc__ = romanenko_cli.__doc__
 
 
 @program.ret.command(

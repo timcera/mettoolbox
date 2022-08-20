@@ -3,14 +3,17 @@
 
 import warnings
 from typing import Optional, Union
+
 import pandas as pd
 import pydaymet.pet as daypet
 import pyet
 import typic
+from numpy import exp
 from tstoolbox import tsutils
 from tstoolbox.tstoolbox import read
 
 from . import utils
+from .meteo_utils import calc_ea, calc_es, daylight_hours
 
 warnings.filterwarnings("ignore")
 
@@ -54,7 +57,6 @@ def _temp_read(
     round_index=None,
     skiprows=None,
     index_type="datetime",
-    names=None,
 ):
     if temp_mean_col is None:
         tsd = tsutils.common_kwds(
@@ -208,25 +210,72 @@ def et0_pm(
 
 
 @typic.al
+def blaney_criddle(
+    bright_hours_col,
+    source_units: Optional[Union[str, list]],
+    temp_mean_col=None,
+    temp_min_col=None,
+    temp_max_col=None,
+    k=0.85,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    names=None,
+    target_units="mm",
+    print_input=False,
+):
+    """Evaporation calculated according to [blaney_1952]_."""
+    tsd = _temp_read(
+        temp_min_col,
+        temp_max_col,
+        temp_mean_col,
+        source_units,
+        start_date=start_date,
+        end_date=end_date,
+        dropna=dropna,
+        clean=clean,
+        round_index=round_index,
+        skiprows=skiprows,
+        names=names,
+    )
+    bright_hours = tsutils.common_kwds(
+        bright_hours_col,
+        start_date=start_date,
+        end_date=end_date,
+        round_index=round_index,
+        dropna=dropna,
+        clean=clean,
+    )
+
+    pet = k * bright_hours * (0.46 * tsd["tmean:degC"] + 8.13)
+    pet.columns = ["pet_blaney_criddle:mm"]
+
+    if target_units != source_units:
+        pet = tsutils.common_kwds(pet, source_units="mm", target_units=target_units)
+    return tsutils.return_input(print_input, tsd, pet)
+
+
+@typic.al
 def hamon(
     lat: tsutils.FloatLatitude,
-    source_units,
-    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    k: float = 1,
+    source_units: Optional[Union[str, list]],
+    temp_mean_col=None,
+    temp_min_col=None,
+    temp_max_col=None,
     start_date=None,
     end_date=None,
     dropna="no",
     clean=False,
     round_index=None,
     skiprows=None,
-    index_type="datetime",
     names=None,
     target_units=None,
     print_input=False,
 ):
-    """hamon"""
+    """Evaporation calculated according to [hamon_1961]_."""
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
@@ -238,79 +287,37 @@ def hamon(
         clean=clean,
         round_index=round_index,
         skiprows=skiprows,
-        index_type=index_type,
         names=names,
     )
-    pe = pyet.temperature.hamon(tsd["tmean:degC"], lat)
-    pe.columns = ["pe_hamon:mm"]
+
+    daylh = daylight_hours(tsd.index, lat)
+
+    pet = (daylh / 12) ** 2 * exp(tsd["tmean:degC"] / 16)
+    pet.columns = ["pet_hamon:mm"]
 
     if target_units != source_units:
-        pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
-    return tsutils.return_input(print_input, tsd, pe)
+        pet = tsutils.common_kwds(pet, source_units="mm", target_units=target_units)
+    return tsutils.return_input(print_input, tsd, pet)
 
 
-@typic.al
-def blaney_criddle(
-    p,
-    source_units,
-    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    k: float = 0.85,
-    start_date=None,
-    end_date=None,
-    dropna="no",
-    clean=False,
-    round_index=None,
-    skiprows=None,
-    index_type="datetime",
-    names=None,
-    target_units=None,
-    print_input=False,
-):
-    """blaney_criddle"""
-    tsd = _temp_read(
-        temp_min_col,
-        temp_max_col,
-        temp_mean_col,
-        source_units,
-        start_date=start_date,
-        end_date=end_date,
-        dropna=dropna,
-        clean=clean,
-        round_index=round_index,
-        skiprows=skiprows,
-        index_type=index_type,
-        names=names,
-    )
-    pe = pyet.temperature.blaney_criddle(tsd["tmean:degC"], p, k)
-    pe.columns = ["pe_blaney_criddle:mm"]
-
-    if target_units != source_units:
-        pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
-    return tsutils.return_input(print_input, tsd, pe)
-
-
-@typic.al
 def romanenko(
-    rh,
-    source_units,
-    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    k: float = 4.5,
+    source_units: Optional[Union[str, list]],
+    temp_mean_col=None,
+    temp_min_col=None,
+    temp_max_col=None,
+    rh_col=None,
+    k=4.5,
     start_date=None,
     end_date=None,
     dropna="no",
     clean=False,
     round_index=None,
     skiprows=None,
-    index_type="datetime",
     names=None,
     target_units=None,
     print_input=False,
 ):
-    """romanenko"""
+    """Evaporation calculated according to [romanenko_1961]_."""
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
@@ -322,38 +329,47 @@ def romanenko(
         clean=clean,
         round_index=round_index,
         skiprows=skiprows,
-        index_type=index_type,
         names=names,
     )
-    pe = pyet.temperature.romanenko(tsd["tmean:degC"], p, k)
-    pe.columns = ["pe_romanenko:mm"]
+    rh_col = tsutils.common_kwds(
+        rh_col,
+        start_date=start_date,
+        end_date=end_date,
+        round_index=round_index,
+        dropna=dropna,
+        clean=clean,
+    )
+
+    ea = calc_ea(tmean=tsd["tmean:degC"], rh=rh_col)
+    es = calc_es(tmean=tsd["tmean:degC"])
+
+    pet = k * (1 + tsd["tmean:degC"] / 25) ** 2 * (1 - ea / es)
+    pet.columns = ["pet_romanenko:mm"]
 
     if target_units != source_units:
-        pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
-    return tsutils.return_input(print_input, tsd, pe)
+        pet = tsutils.common_kwds(pet, source_units="mm", target_units=target_units)
+    return tsutils.return_input(print_input, tsd, pet)
 
 
-@typic.al
 def linacre(
-    lat,
+    lat: tsutils.FloatLatitude,
     elevation,
-    source_units,
-    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
-    tdew=None,
+    source_units: Optional[Union[str, list]],
+    temp_mean_col=None,
+    temp_min_col=None,
+    temp_max_col=None,
+    tdew_col=None,
     start_date=None,
     end_date=None,
     dropna="no",
     clean=False,
     round_index=None,
     skiprows=None,
-    index_type="datetime",
     names=None,
     target_units=None,
     print_input=False,
 ):
-    """linacre"""
+    """Evaporation calculated according to [linacre_1977]_."""
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
@@ -365,15 +381,33 @@ def linacre(
         clean=clean,
         round_index=round_index,
         skiprows=skiprows,
-        index_type=index_type,
         names=names,
     )
-    pe = pyet.temperature.linacre(tsd["tmean:degC"], p, k)
-    pe.columns = ["pe_linacre:mm"]
+    tdew_col = tsutils.common_kwds(
+        tdew_col,
+        start_date=start_date,
+        end_date=end_date,
+        round_index=round_index,
+        dropna=dropna,
+        clean=clean,
+    )
+
+    if tdew_col is None:
+        tdew_col = (
+            0.52 * tsd["tmin:degC"]
+            + 0.6 * tsd["tmax:degC"]
+            - 0.009 * tsd["tmax:degC"] ** 2
+            - 2
+        )
+    tm = tsd["tmean:degC"] + 0.006 * elevation
+    pet = (500 * tm / (100 - lat) + 15 * (tsd["tmean:degC"] - tdew_col)) / (
+        80 - tsd["tmean:degC"]
+    )
+    pet.columns = ["pet_linacre:mm"]
 
     if target_units != source_units:
-        pe = tsutils.common_kwds(pe, source_units="mm", target_units=target_units)
-    return tsutils.return_input(print_input, tsd, pe)
+        pet = tsutils.common_kwds(pet, source_units="mm", target_units=target_units)
+    return tsutils.return_input(print_input, tsd, pet)
 
 
 @typic.al
