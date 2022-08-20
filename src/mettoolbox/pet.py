@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+from numpy import exp
 import warnings
 from typing import Optional, Union
 
@@ -13,7 +14,11 @@ from tstoolbox import tsutils
 from tstoolbox.tstoolbox import read
 
 from . import utils
+<<<<<<< Updated upstream
 from .meteo_utils import calc_ea, calc_es, daylight_hours
+=======
+from .meteo_utils import daylight_hours, calc_ea, calc_es
+>>>>>>> Stashed changes
 
 warnings.filterwarnings("ignore")
 

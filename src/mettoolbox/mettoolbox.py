@@ -8,6 +8,7 @@ from typing import List, Optional, Union
 from mando import Program
 from mando.rst_text_formatter import RSTHelpFormatter
 from tstoolbox import tsutils
+from typing import List, Optional, Union
 
 from . import disaggregate, indices, pet, ret
 
