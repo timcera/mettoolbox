@@ -702,15 +702,18 @@ def temperature_cli(
         | `min_max_time` | Description                              |
         +================+==========================================+
         | fix            | The diurnal course of temperature is     |
-        |                | fixed without any seasonal variations.   |
+        |                | fixed without any seasonal variations for|
+        |                | sine method                              |
         +----------------+------------------------------------------+
         | sun_loc        | The diurnal course of temperature is     |
         |                | modelled based on sunrise, noon and      |
-        |                | sunset calculations.                     |
+        |                | sunset calculations for sine method.     |
         +----------------+------------------------------------------+
         | sun_loc_shift  | This option activates empirical          |
         |                | corrections of the ideal course modelled |
-        |                | by sun_loc                               |
+        |                | by sun_loc for sine method. Hourly CSV   |
+        |                | filename specifiedwith the `hourly`      |
+        |                | keyword.                                 |
         +----------------+------------------------------------------+
 
     mod_nighttime: bool
