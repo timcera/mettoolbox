@@ -275,10 +275,12 @@ def humidity(
     hum_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
     temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
     temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    precip_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
     a0=None,
     a1=None,
     kr=None,
     hourly_temp=None,
+    hourly_precip_hum=None,
     preserve_daily_mean=None,
 ):
     """Disaggregate daily humidity to hourly humidity data."""
@@ -290,6 +292,15 @@ def humidity(
                 """
 If `method` is "equal" then the mean daily humidity is a required column
 identified with the keyword `hum_mean_col`"""
+            )
+        )
+
+    if method == "month_hour_precip_mean" and precip_col is None:
+        raise ValueError(
+            tsutils.error_wrapper(
+                """
+If `method` is "month_hour_precip_mean" then the daily precip is a required column
+identified with the keyword `precip_col`"""
             )
         )
 
@@ -358,7 +369,6 @@ If `method` is "linear_dewpoint_variation" then kr must be given"""
             "dewpoint_regression",
             "linear_dewpoint_variation",
             "min_max",
-            "month_hour_precip_mean",
         ]
         and hourly_temp is None
     ):
@@ -372,6 +382,64 @@ required identified by the filename in keyword `hourly_temp`."""
         )
 
     pd.options.display.width = 60
+
+    columns = []
+    if method == "equal":
+        try:
+            hum_mean_col = int(hum_mean_col)
+        except TypeError:
+            pass
+        columns.append(hum_mean_col)
+
+    if method == "min_max":
+        try:
+            temp_min_col = int(temp_min_col)
+        except TypeError:
+            pass
+        columns.append(temp_min_col)
+        try:
+            temp_max_col = int(temp_max_col)
+        except TypeError:
+            pass
+        columns.append(temp_max_col)
+        try:
+            hum_min_col = int(hum_min_col)
+        except TypeError:
+            pass
+        columns.append(hum_min_col)
+        try:
+            hum_max_col = int(hum_max_col)
+        except TypeError:
+            pass
+        columns.append(hum_max_col)
+
+    if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
+        try:
+            temp_min_col = int(temp_min_col)
+        except TypeError:
+            pass
+        columns.append(temp_min_col)
+
+    if method == "month_hour_precip_mean":
+        try:
+            precip_col = int(precip_col)
+        except TypeError:
+            pass
+        columns.append(precip_col)
+
+    if preserve_daily_mean is not None:
+        if method in [
+            "minimal",
+            "dewpoint_regression",
+            "linear_dewpoint_variation",
+            "min_max",
+            "month_hour_precip_mean",
+        ]:
+            try:
+                hum_mean_col = int(preserve_daily_mean)
+            except TypeError:
+                pass
+            columns.append(hum_mean_col)
 
     tsd = tsutils.common_kwds(
         tsutils.read_iso_ts(
@@ -388,36 +456,42 @@ required identified by the filename in keyword `hourly_temp`."""
     )
 
     if method == "equal":
-        tsd["hum"] = tsd["hum_mean_col"]
-
-    if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
-        tsd["tmin"] = tsd["temp_min_col"]
-
-    if method == "min_max":
-        tsd["hum_min"] = tsd["hum_min_col"]
-        tsd["hum_max"] = tsd["hum_max_col"]
-        tsd["tmin"] = tsd["temp_min_col"]
-        tsd["tmax"] = tsd["temp_max_col"]
+        tsd.columns = ["hum"]
 
     if preserve_daily_mean is not None:
-        tsd["hum"] = tsd[preserve_daily_mean]
+        if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
+            tsd.columns = ["tmin", "hum"]
+        if method == "month_hour_precip_mean":
+            tsd.columns = ["precip", "hum"]
+        if method == "min_max":
+            tsd.columns = ["tmin", "tmax", "hum_min", "hum_max", "hum"]
         preserve_daily_mean = True
+    else:
+        if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
+            tsd.columns = ["tmin"]
+        if method == "month_hour_precip_mean":
+            tsd.columns = ["precip"]
+        if method == "min_max":
+            tsd.columns = ["tmin", "tmax", "hum_min", "hum_max"]
 
     if method in [
         "minimal",
         "dewpoint_regression",
         "linear_dewpoint_variation",
         "min_max",
-        "month_hour_precip_mean",
     ]:
         hourly_temp = tstoolbox.read(hourly_temp)
+        hourly_temp = hourly_temp.astype(float).squeeze()
 
     if method == "month_hour_precip_mean":
-        month_hour_precip_mean = calculate_month_hour_precip_mean(hourly_temp)
+        hourly_precip_hum = tstoolbox.read(hourly_precip_hum)
+        month_hour_precip_mean = calculate_month_hour_precip_mean(hourly_precip_hum)
+    else:
+        month_hour_precip_mean = "None"
 
     ntsd = pd.DataFrame(
         disaggregate_humidity(
-            tsd,
+            tsd.astype(float),
             method=method,
             temp=hourly_temp,
             a0=a0,
