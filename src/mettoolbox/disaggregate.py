@@ -427,19 +427,18 @@ required identified by the filename in keyword `hourly_temp`."""
             pass
         columns.append(precip_col)
 
-    if preserve_daily_mean is not None:
-        if method in [
-            "minimal",
-            "dewpoint_regression",
-            "linear_dewpoint_variation",
-            "min_max",
-            "month_hour_precip_mean",
-        ]:
-            try:
-                hum_mean_col = int(preserve_daily_mean)
-            except TypeError:
-                pass
-            columns.append(hum_mean_col)
+    if preserve_daily_mean is not None and method in [
+        "minimal",
+        "dewpoint_regression",
+        "linear_dewpoint_variation",
+        "min_max",
+        "month_hour_precip_mean",
+    ]:
+        try:
+            hum_mean_col = int(preserve_daily_mean)
+        except TypeError:
+            pass
+        columns.append(hum_mean_col)
 
     tsd = tsutils.common_kwds(
         tsutils.read_iso_ts(
