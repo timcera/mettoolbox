@@ -5,7 +5,7 @@ from typing import Optional, Union
 import pandas as pd
 import typic
 from standard_precip.spi import SPI
-from tstoolbox import tsutils
+from toolbox_utils import tsutils
 
 
 def _nlarge_nsmall(
