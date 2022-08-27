@@ -162,6 +162,9 @@ def humidity_cli(
     target_units=None,
     print_input=False,
     tablefmt="csv",
+    precip_col=None,
+    temp_min_col=None,
+    temp_max_col=None,
     hum_min_col=None,
     hum_max_col=None,
     hum_mean_col=None,
@@ -169,6 +172,7 @@ def humidity_cli(
     a1=None,
     kr=None,
     hourly_temp=None,
+    hourly_precip_hum=None,
     preserve_daily_mean=None,
 ):
     """Disaggregate daily relative humidity to hourly humidity.
@@ -189,6 +193,19 @@ def humidity_cli(
     |              | Default is None and if None will be         |
     |              | calculated as average of `hum_tmin_col` and |
     |              | `hum_tmax_col`.                             |
+    +--------------+---------------------------------------------+
+    | temp_min_col | Required column name or number representing |
+    |              | the minimum daily temperature for `minimal`,|
+    |              | `dewpoint regression`, `linear dewpoint     |
+    |              | variation`, and `min_max` methods.          |
+    +--------------+---------------------------------------------+
+    | temp_max_col | Required column name or number representing |
+    |              | the maximum daily temperature for min_max   |
+    |              | method.                                     |
+    +--------------+---------------------------------------------+
+    | precip_col   | Required column name or number representing |
+    |              | the total precipitation for                 |
+    |              | month_hour_precip_mean method.              |
     +--------------+---------------------------------------------+
 
     Parameters
@@ -291,6 +308,18 @@ def humidity_cli(
 
     ${tablefmt}
 
+    precip_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily precipitation.
+
+    temp_min_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily minimum temperature.
+
+    temp_max_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily maximum temperature.
+
     hum_min_col:
         Column index (data columns start numbering at 1) or column name
         from the input data that contains the daily minimum humidity.
@@ -319,6 +348,10 @@ def humidity_cli(
         Filename of a CSV file that contains an hourly time series of
         temperatures.
 
+    hourly_precip_hum: str
+        Filename of a CSV file that contains an hourly time series of
+        precipitation and humidity.
+
     preserve_daily_mean: str
         Column name or index (data columns start at 1) that identifies
         the observed daily mean humidity.  If not None will correct the
@@ -341,12 +374,16 @@ def humidity_cli(
             source_units=source_units,
             target_units=target_units,
             print_input=print_input,
+            precip_col=hum_min_col,
+            temp_min_col=hum_min_col,
+            temp_max_col=hum_max_col,
             hum_min_col=hum_min_col,
             hum_max_col=hum_max_col,
             hum_mean_col=hum_mean_col,
             a0=a0,
             a1=a1,
             kr=kr,
+            hourly_precip_hum=hourly_precip_hum,
             hourly_temp=hourly_temp,
             preserve_daily_mean=preserve_daily_mean,
         ),
