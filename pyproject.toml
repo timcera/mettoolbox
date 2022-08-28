@@ -61,7 +61,6 @@ dev = [
     "blacken-docs",
     "velin",
     "isort",
-    "pyroma",
     "pyupgrade",
     "commitizen",
     ]
