@@ -2,10 +2,11 @@
 
 import warnings
 from typing import Optional, Union
+
 import pandas as pd
 import pydaymet.pet as daypet
 import typic
-from tstoolbox import tsutils
+from toolbox_utils import tsutils
 from tstoolbox.tstoolbox import read
 
 warnings.filterwarnings("ignore")

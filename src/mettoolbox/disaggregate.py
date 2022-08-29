@@ -14,7 +14,8 @@ import warnings
 import numpy as np
 import pandas as pd
 import typic
-from tstoolbox import tstoolbox, tsutils
+from toolbox_utils import tsutils
+from tstoolbox import tstoolbox
 
 from .melodist.melodist.humidity import (
     calculate_month_hour_precip_mean,
@@ -95,7 +96,7 @@ def temperature(
             tsutils.error_wrapper(
                 """
 The methods "mean_course_min", "mean_course_mean", or if `max_delta` is
-True, or if `min_max_time` is "sun_loc_shift" require a HOURLY temperature 
+True, or if `min_max_time` is "sun_loc_shift" require a HOURLY temperature
 values in the CSV file specified by the keyword `hourly`."""
             )
         )
@@ -710,17 +711,18 @@ def precipitation(
     pd.options.display.width = 60
 
     tsd = tsutils.common_kwds(
-        tsutils.read_iso_ts(
-            input_ts, skiprows=skiprows, names=names, index_type=index_type
-        ),
+        input_tsd=tsutils.make_list(input_ts),
+        skiprows=skiprows,
+        index_type=index_type,
         start_date=start_date,
         end_date=end_date,
-        pick=columns,
         round_index=round_index,
+        names=names,
         dropna=dropna,
+        clean=clean,
         source_units=source_units,
         target_units=target_units,
-        clean=clean,
+        usecols=columns,
     )
 
     if method == "masterstation":
@@ -731,10 +733,25 @@ def precipitation(
             # If masterstations_hour_col is a column number:
             masterstation_hour_col = int(masterstation_hour_col) - 1
 
-        masterstation_hour_col = tsd.columns[masterstation_hour_col]
+        try:
+            mhour = tsd[masterstation_hour_col].to_frame()
+        except:
+            mhour = tsutils.common_kwds(
+                input_tsd=tsutils.make_list(input_ts),
+                skiprows=skiprows,
+                index_type=index_type,
+                start_date=start_date,
+                end_date=end_date,
+                round_index=round_index,
+                names=names,
+                dropna=dropna,
+                clean=clean,
+                source_units=source_units,
+                target_units=target_units,
+                usecols=columns,
+            )
 
         # Should only be one hourly column in the input.
-        mhour = tsd[masterstation_hour_col].to_frame()
         dsum = mhour.groupby(pd.Grouper(freq="D")).sum().asfreq("H", method="ffill")
         master = mhour.join(dsum, rsuffix="sum")
         mask = master.iloc[:, 0] > 0.0

@@ -1,3 +1,89 @@
+[project]
+name = "mettoolbox"
+dynamic = ["readme", "version"]
+description="mettoolbox is set of command line and Python tools for the analysis and reporting of meteorological data."
+requires-python = ">=3.7.1"
+dependencies = [
+    "toolbox_utils < 1.0.0",
+    "cltoolbox",
+    "solarpy",
+    "standard-precip",
+    "pydaymet",
+    "pyet",
+    ]
+license = {file = "LICENSE.txt"}
+authors = [
+    {name = "Tim Cera", email = "tim@cerazone.net"}
+    ]
+classifiers = [
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Science/Research",
+        "Intended Audience :: End Users/Desktop",
+        "Intended Audience :: Developers",
+        "Environment :: Console",
+        "License :: OSI Approved :: BSD License",
+        "Natural Language :: English",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Topic :: Scientific/Engineering :: Information Analysis",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+    ]
+keywords = ["time-series",
+            "cli-app",
+            "meteorology",
+            "evaporation",
+            "precipitation",
+            "climate",
+            "weather",
+            "climate-data",
+            "climate-data-analysis",
+            "climate-data-analysis-tools",
+            "temperature",
+            "humidity",
+            "wind",
+            ]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "cleanpy",
+    "twine",
+    "pytest",
+    "coverage",
+    "flake8",
+    "pytest-cov",
+    "pytest-mpl",
+    "pre-commit",
+    "black-nbconvert",
+    "blacken-docs",
+    "velin",
+    "isort",
+    "pyroma",
+    "pyupgrade",
+    "commitizen",
+    ]
+
+[project.scripts]
+mettoolbox = "mettoolbox.mettoolbox:main"
+
+[project_urls]
+documentation = "https://timcera.bitbucket.io/mettoolbox/docs/index.html#mettoolbox-documentation"
+github = "https://github.com/timcera/mettoolbox"
+bitbucket = "https://bitbucket.org/timcera/mettoolbox/src/main/"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+readme = {file = "README.rst"}
+version = {file = "VERSION"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["examples*", "tools*", "docs*", "mettoolbox.tests*"]
 
 [tool.check-manifest]
 ignore = [".travis.yml",
