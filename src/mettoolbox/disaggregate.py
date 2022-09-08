@@ -429,19 +429,18 @@ required identified by the filename in keyword `hourly_temp`."""
             pass
         columns.append(precip_col)
 
-    if preserve_daily_mean is not None:
-        if method in [
-            "minimal",
-            "dewpoint_regression",
-            "linear_dewpoint_variation",
-            "min_max",
-            "month_hour_precip_mean",
-        ]:
-            try:
-                hum_mean_col = int(preserve_daily_mean)
-            except TypeError:
-                pass
-            columns.append(hum_mean_col)
+    if preserve_daily_mean is not None and method in [
+        "minimal",
+        "dewpoint_regression",
+        "linear_dewpoint_variation",
+        "min_max",
+        "month_hour_precip_mean",
+    ]:
+        try:
+            hum_mean_col = int(preserve_daily_mean)
+        except TypeError:
+            pass
+        columns.append(hum_mean_col)
 
     tsd = tsutils.common_kwds(
         tsutils.read_iso_ts(
@@ -463,19 +462,19 @@ required identified by the filename in keyword `hourly_temp`."""
     if preserve_daily_mean is not None:
         if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
             tsd.columns = ["tmin", "hum"]
-        if method == "month_hour_precip_mean":
-            tsd.columns = ["precip", "hum"]
         if method == "min_max":
             tsd.columns = ["tmin", "tmax", "hum_min", "hum_max", "hum"]
+        elif method == "month_hour_precip_mean":
+            tsd.columns = ["precip", "hum"]
         preserve_daily_mean = True
     else:
         if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
             tsd.columns = ["tmin"]
-        if method == "month_hour_precip_mean":
-            tsd.columns = ["precip"]
         if method == "min_max":
             tsd.columns = ["tmin", "tmax", "hum_min", "hum_max"]
 
+        elif method == "month_hour_precip_mean":
+            tsd.columns = ["precip"]
     if method in [
         "minimal",
         "dewpoint_regression",
@@ -690,19 +689,18 @@ required identified by the filename in keyword `hourly_temp`."""
             pass
         columns.append(precip_col)
 
-    if preserve_daily_mean is not None:
-        if method in [
-            "minimal",
-            "dewpoint_regression",
-            "linear_dewpoint_variation",
-            "min_max",
-            "month_hour_precip_mean",
-        ]:
-            try:
-                hum_mean_col = int(preserve_daily_mean)
-            except TypeError:
-                pass
-            columns.append(hum_mean_col)
+    if preserve_daily_mean is not None and method in [
+        "minimal",
+        "dewpoint_regression",
+        "linear_dewpoint_variation",
+        "min_max",
+        "month_hour_precip_mean",
+    ]:
+        try:
+            hum_mean_col = int(preserve_daily_mean)
+        except TypeError:
+            pass
+        columns.append(hum_mean_col)
 
     tsd = tsutils.common_kwds(
         tsutils.read_iso_ts(
@@ -724,19 +722,19 @@ required identified by the filename in keyword `hourly_temp`."""
     if preserve_daily_mean is not None:
         if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
             tsd.columns = ["tmin", "hum"]
-        if method == "month_hour_precip_mean":
-            tsd.columns = ["precip", "hum"]
         if method == "min_max":
             tsd.columns = ["tmin", "tmax", "hum_min", "hum_max", "hum"]
+        elif method == "month_hour_precip_mean":
+            tsd.columns = ["precip", "hum"]
         preserve_daily_mean = True
     else:
         if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
             tsd.columns = ["tmin"]
-        if method == "month_hour_precip_mean":
-            tsd.columns = ["precip"]
         if method == "min_max":
             tsd.columns = ["tmin", "tmax", "hum_min", "hum_max"]
 
+        elif method == "month_hour_precip_mean":
+            tsd.columns = ["precip"]
     hourly_temp = tstoolbox.read(hourly_temp)
     hourly_temp = hourly_temp.astype(float).squeeze()
 
