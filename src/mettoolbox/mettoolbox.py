@@ -393,11 +393,10 @@ def humidity_cli(
 
 disaggregate.humidity.__doc__ = humidity_cli.__doc__
 
-@program.disaggregate.command(
-    "tdew", formatter_class=RSTHelpFormatter, doctype="numpy"
-)
+
+@program.disaggregate.command("tdew", formatter_class=RSTHelpFormatter, doctype="numpy")
 @tsutils.doc(_LOCAL_DOCSTRINGS)
-def tdew_cli(
+def dewpoint_temperature_cli(
     method,
     source_units,
     input_ts="-",
@@ -625,9 +624,9 @@ def tdew_cli(
             source_units=source_units,
             target_units=target_units,
             print_input=print_input,
-            precip_col=hum_min_col,
-            temp_min_col=hum_min_col,
-            temp_max_col=hum_max_col,
+            precip_col=precip_col,
+            temp_min_col=temp_min_col,
+            temp_max_col=temp_max_col,
             hum_min_col=hum_min_col,
             hum_max_col=hum_max_col,
             hum_mean_col=hum_mean_col,
@@ -642,7 +641,7 @@ def tdew_cli(
     )
 
 
-disaggregate.tdew.__doc__ = tdew_cli.__doc__
+disaggregate.dewpoint_temperature.__doc__ = dewpoint_temperature_cli.__doc__
 
 
 @program.disaggregate.command(

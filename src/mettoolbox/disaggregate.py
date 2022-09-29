@@ -17,11 +17,11 @@ import typic
 from toolbox_utils import tsutils
 from tstoolbox import tstoolbox
 
+from . import tdew as tdew_melo
 from .melodist.melodist.humidity import (
     calculate_month_hour_precip_mean,
     disaggregate_humidity,
 )
-from . import tdew as tdew_melo
 from .melodist.melodist.radiation import disaggregate_radiation
 from .melodist.melodist.temperature import disaggregate_temperature, get_shift_by_data
 from .melodist.melodist.util.util import (
@@ -45,9 +45,9 @@ def single_target_units(source_units, target_units, default=None, cnt=1):
         raise ValueError(
             tsutils.error_wrapper(
                 f"""
-Since creating a single disaggregated time-series there can only be
-a single "target_units".  You gave "{target_units}".
-"""
+                Since creating a single disaggregated time-series there can
+                only be a single "target_units".  You gave "{target_units}".
+                """
             )
         )
     if len(source_units) == len(target_units):
@@ -96,9 +96,11 @@ def temperature(
         raise ValueError(
             tsutils.error_wrapper(
                 """
-The methods "mean_course_min", "mean_course_mean", or if `max_delta` is
-True, or if `min_max_time` is "sun_loc_shift" require a HOURLY temperature
-values in the CSV file specified by the keyword `hourly`."""
+                The methods "mean_course_min", "mean_course_mean", or if
+                `max_delta` is True, or if `min_max_time` is "sun_loc_shift"
+                require a HOURLY temperature values in the CSV file specified
+                by the keyword `hourly`.
+                """
             )
         )
 
@@ -123,12 +125,13 @@ values in the CSV file specified by the keyword `hourly`."""
         raise ValueError(
             tsutils.error_wrapper(
                 f"""
-For "temperature" disaggregation you need to supply the daily minimum
-column (name or number, data column numbering starts at 1) and the daily
-maximum column (name or number).
+                For "temperature" disaggregation you need to supply the daily
+                minimum column (name or number, data column numbering starts at
+                1) and the daily maximum column (name or number).
 
-Instead `temp_min_col` is {temp_min_col} and `temp_max_col` is
-{temp_max_col}"""
+                Instead `temp_min_col` is {temp_min_col} and `temp_max_col` is
+                {temp_max_col}
+                """
             )
         )
 
@@ -171,12 +174,14 @@ Instead `temp_min_col` is {temp_min_col} and `temp_max_col` is
         raise ValueError(
             tsutils.error_wrapper(
                 f"""
-On the following dates:
+                On the following dates:
 
-{tsd[tsd.tmax <= tsd.tmin].index},
+                {tsd[tsd.tmax <= tsd.tmin].index},
 
-minimum temperature values in column "{temp_min_col}" are greater than or equal to
-the maximum temperature values in column "{temp_max_col}"."""
+                minimum temperature values in column "{temp_min_col}" are
+                greater than or equal to the maximum temperature values in
+                column "{temp_max_col}".
+                """
             )
         )
 
@@ -184,8 +189,10 @@ the maximum temperature values in column "{temp_max_col}"."""
         warnings.warn(
             tsutils.error_wrapper(
                 """
-Since `temp_mean_col` is None, the average daily temperature will be
-estimated by the average of `temp_min_col` and `temp_max_col`"""
+                Since `temp_mean_col` is None, the average daily temperature
+                will be estimated by the average of `temp_min_col` and
+                `temp_max_col`
+                """
             )
         )
         tsd["temp"] = (tsd.tmin + tsd.tmax) / 2.0
@@ -193,14 +200,15 @@ estimated by the average of `temp_min_col` and `temp_max_col`"""
         if any((tsd.tmin >= tsd.temp).dropna()) or any((tsd.tmax <= tsd.temp).dropna()):
             raise ValueError(
                 tsutils.error_wrapper(
+                    f"""
+                    On the following dates:
+
+                    {tsd[tsd.tmin >= tsd.temp | tsd.tmax <= tsd.temp]},
+
+                    the daily average is either below or equal to the minimum
+                    temperature in column {temp_min_col} or higher or equal to
+                    the maximum temperature in column {temp_max_col}.
                     """
-On the following dates:
-
-{tsd[tsd.tmin >= tsd.temp | tsd.tmax <= tsd.temp]},
-
-the daily average is either below or equal to the minimum temperature in column
-{temp_min_col}
-or higher or equal to the maximum temperature in column {}."""
                 )
             )
 
@@ -217,15 +225,17 @@ or higher or equal to the maximum temperature in column {}."""
         raise ValueError(
             tsutils.error_wrapper(
                 f"""
-The `min_max_time` options other than "fix" require calculation of
-sunrise, sun noon, sunset, and day length.  The calculation requires the
-latitude with keyword "lat" and longitude with keyword "lon".
-You gave:
+                The `min_max_time` options other than "fix" require calculation
+                of sunrise, sun noon, sunset, and day length.  The calculation
+                requires the latitude with keyword "lat" and longitude with
+                keyword "lon".
 
-    lat={lat}
+                You gave:
 
-    lon={lon}
-"""
+                lat={lat}
+
+                lon={lon}
+                """
             )
         )
 
@@ -249,8 +259,7 @@ You gave:
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@typic.al
-def humidity(
+def prepare_hum_tdew(
     method: Literal[
         "equal",
         "minimal",
@@ -271,7 +280,6 @@ def humidity(
     index_type="datetime",
     names=None,
     target_units=None,
-    print_input=False,
     hum_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
     hum_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
     hum_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
@@ -292,8 +300,9 @@ def humidity(
         raise ValueError(
             tsutils.error_wrapper(
                 """
-If `method` is "equal" then the mean daily humidity is a required column
-identified with the keyword `hum_mean_col`"""
+                If `method` is "equal" then the mean daily humidity is
+                a required column identified with the keyword `hum_mean_col`
+                """
             )
         )
 
@@ -301,8 +310,10 @@ identified with the keyword `hum_mean_col`"""
         raise ValueError(
             tsutils.error_wrapper(
                 """
-If `method` is "month_hour_precip_mean" then the daily precip is a required column
-identified with the keyword `precip_col`"""
+                If `method` is "month_hour_precip_mean" then the daily precip
+                is a required column identified with the keyword
+                `precip_col`
+                """
             )
         )
 
@@ -313,9 +324,11 @@ identified with the keyword `precip_col`"""
         raise ValueError(
             tsutils.error_wrapper(
                 """
-If `method` is "minimal", "dewpoint_regression", or
-"linear_dewpoint_variation" then the minimum daily temperature is a required
-column identified with the keyword `temp_min_col`."""
+                If `method` is "minimal", "dewpoint_regression", or
+                "linear_dewpoint_variation" then the minimum daily temperature
+                is a required column identified with the keyword
+                `temp_min_col`.
+                """
             )
         )
 
@@ -328,20 +341,20 @@ column identified with the keyword `temp_min_col`."""
         raise ValueError(
             tsutils.error_wrapper(
                 f"""
-If `method` is "min_max" then:
+                If `method` is "min_max" then:
 
-Minimum daily humidity is a required column identified with the keyword
-`hum_min_col`.  You gave {hum_min_col}.
+                Minimum daily humidity is a required column identified with the
+                keyword `hum_min_col`.  You gave {hum_min_col}.
 
-Maximum daily humidity is a required column identified with the keyword
-`hum_max_col`.  You gave {hum_max_col}.
+                Maximum daily humidity is a required column identified with the
+                keyword `hum_max_col`.  You gave {hum_max_col}.
 
-Minimum daily temperature is a required column identified with the
-keyword `temp_min_col`.  You gave {temp_min_col}.
+                Minimum daily temperature is a required column identified with
+                the keyword `temp_min_col`.  You gave {temp_min_col}.
 
-Maximum daily temperature is a required column identified with the
-keyword `temp_max_col`.  You gave {temp_max_col}.
-"""
+                Maximum daily temperature is a required column identified with
+                the keyword `temp_max_col`.  You gave {temp_max_col}.
+                """
             )
         )
 
@@ -351,8 +364,9 @@ keyword `temp_max_col`.  You gave {temp_max_col}.
         raise ValueError(
             tsutils.error_wrapper(
                 """
-If `method` is "dewpoint_regression" or "linear_dewpoint_variation" then
-a0 and a1 must be given."""
+                If `method` is "dewpoint_regression" or
+                "linear_dewpoint_variation" then a0 and a1 must be given.
+                """
             )
         )
 
@@ -360,7 +374,9 @@ a0 and a1 must be given."""
         raise ValueError(
             tsutils.error_wrapper(
                 """
-If `method` is "linear_dewpoint_variation" then kr must be given"""
+                If `method` is "linear_dewpoint_variation" then kr must be
+                given
+                """
             )
         )
 
@@ -377,9 +393,11 @@ If `method` is "linear_dewpoint_variation" then kr must be given"""
         raise ValueError(
             tsutils.error_wrapper(
                 """
-If `method` is "minimal", "dewpoint_regression",
-"linear_dewpoint_variation", or "min_max" then hourly temperature is
-required identified by the filename in keyword `hourly_temp`."""
+                If `method` is "minimal", "dewpoint_regression",
+                "linear_dewpoint_variation", or "min_max" then hourly
+                temperature is required identified by the filename in keyword
+                `hourly_temp`.
+                """
             )
         )
 
@@ -490,26 +508,11 @@ required identified by the filename in keyword `hourly_temp`."""
     else:
         month_hour_precip_mean = "None"
 
-    ntsd = pd.DataFrame(
-        disaggregate_humidity(
-            tsd.astype(float),
-            method=method,
-            temp=hourly_temp,
-            a0=a0,
-            a1=a1,
-            kr=kr,
-            preserve_daily_mean=preserve_daily_mean,
-            month_hour_precip_mean=month_hour_precip_mean,
-        )
-    )
-
-    ntsd.columns = ["humidity:{0}:disagg"]
-
-    return tsutils.return_input(print_input, tsd, ntsd)
+    return tsd, hourly_temp, month_hour_precip_mean
 
 
 @typic.al
-def tdew(
+def humidity(
     method: Literal[
         "equal",
         "minimal",
@@ -545,204 +548,123 @@ def tdew(
     preserve_daily_mean=None,
 ):
     """Disaggregate daily humidity to hourly humidity data."""
-    #target_units = single_target_units(source_units, target_units, "")
-    target_units = single_target_units(source_units, target_units, "degK")
+    target_units = single_target_units(source_units, target_units, "")
 
-    if method == "equal" and hum_mean_col is None:
-        raise ValueError(
-            tsutils.error_wrapper(
-                """
-If `method` is "equal" then the mean daily humidity is a required column
-identified with the keyword `hum_mean_col`"""
-            )
+    tsd, hourly_temp, month_hour_precip_mean = prepare_hum_tdew(
+        method,
+        source_units,
+        input_ts=input_ts,
+        columns=columns,
+        start_date=start_date,
+        end_date=end_date,
+        dropna=dropna,
+        clean=clean,
+        round_index=round_index,
+        skiprows=skiprows,
+        index_type=index_type,
+        names=names,
+        target_units=target_units,
+        print_input=print_input,
+        hum_min_col=hum_min_col,
+        hum_max_col=hum_max_col,
+        hum_mean_col=hum_mean_col,
+        temp_min_col=temp_min_col,
+        temp_max_col=temp_max_col,
+        precip_col=precip_col,
+        a0=a0,
+        a1=a1,
+        kr=kr,
+        hourly_temp=hourly_temp,
+        hourly_precip_hum=hourly_precip_hum,
+        preserve_daily_mean=preserve_daily_mean,
+    )
+
+    ntsd = pd.DataFrame(
+        disaggregate_humidity(
+            tsd.astype(float),
+            method=method,
+            temp=hourly_temp,
+            a0=a0,
+            a1=a1,
+            kr=kr,
+            preserve_daily_mean=preserve_daily_mean,
+            month_hour_precip_mean=month_hour_precip_mean,
         )
+    )
 
-    if method == "month_hour_precip_mean" and precip_col is None:
-        raise ValueError(
-            tsutils.error_wrapper(
-                """
-If `method` is "month_hour_precip_mean" then the daily precip is a required column
-identified with the keyword `precip_col`"""
-            )
-        )
+    ntsd.columns = ["humidity:{0}:disagg"]
 
-    if (
-        method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]
-        and temp_min_col is None
-    ):
-        raise ValueError(
-            tsutils.error_wrapper(
-                """
-If `method` is "minimal", "dewpoint_regression", or
-"linear_dewpoint_variation" then the minimum daily temperature is a required
-column identified with the keyword `temp_min_col`."""
-            )
-        )
+    return tsutils.return_input(print_input, tsd, ntsd)
 
-    if method == "min_max" and (
-        hum_min_col is None
-        or hum_max_col is None
-        or temp_min_col is None
-        or temp_max_col is None
-    ):
-        raise ValueError(
-            tsutils.error_wrapper(
-                f"""
-If `method` is "min_max" then:
 
-Minimum daily humidity is a required column identified with the keyword
-`hum_min_col`.  You gave {hum_min_col}.
-
-Maximum daily humidity is a required column identified with the keyword
-`hum_max_col`.  You gave {hum_max_col}.
-
-Minimum daily temperature is a required column identified with the
-keyword `temp_min_col`.  You gave {temp_min_col}.
-
-Maximum daily temperature is a required column identified with the
-keyword `temp_max_col`.  You gave {temp_max_col}.
-"""
-            )
-        )
-
-    if method in ["dewpoint_regression", "linear_dewpoint_variation"] and (
-        a0 is None or a1 is None
-    ):
-        raise ValueError(
-            tsutils.error_wrapper(
-                """
-If `method` is "dewpoint_regression" or "linear_dewpoint_variation" then
-a0 and a1 must be given."""
-            )
-        )
-
-    if method == "linear_dewpoint_variation" and kr is None:
-        raise ValueError(
-            tsutils.error_wrapper(
-                """
-If `method` is "linear_dewpoint_variation" then kr must be given"""
-            )
-        )
-
-    if (
-        method
-        in [
-            "minimal",
-            "dewpoint_regression",
-            "linear_dewpoint_variation",
-            "min_max",
-        ]
-        and hourly_temp is None
-    ):
-        raise ValueError(
-            tsutils.error_wrapper(
-                """
-If `method` is "minimal", "dewpoint_regression",
-"linear_dewpoint_variation", or "min_max" then hourly temperature is
-required identified by the filename in keyword `hourly_temp`."""
-            )
-        )
-
-    pd.options.display.width = 60
-
-    columns = []
-    if method == "equal":
-        try:
-            hum_mean_col = int(hum_mean_col)
-        except TypeError:
-            pass
-        columns.append(hum_mean_col)
-
-    if method == "min_max":
-        try:
-            temp_min_col = int(temp_min_col)
-        except TypeError:
-            pass
-        columns.append(temp_min_col)
-        try:
-            temp_max_col = int(temp_max_col)
-        except TypeError:
-            pass
-        columns.append(temp_max_col)
-        try:
-            hum_min_col = int(hum_min_col)
-        except TypeError:
-            pass
-        columns.append(hum_min_col)
-        try:
-            hum_max_col = int(hum_max_col)
-        except TypeError:
-            pass
-        columns.append(hum_max_col)
-
-    if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
-        try:
-            temp_min_col = int(temp_min_col)
-        except TypeError:
-            pass
-        columns.append(temp_min_col)
-
-    if method == "month_hour_precip_mean":
-        try:
-            precip_col = int(precip_col)
-        except TypeError:
-            pass
-        columns.append(precip_col)
-
-    if preserve_daily_mean is not None and method in [
+@typic.al
+def dewpoint_temperature(
+    method: Literal[
+        "equal",
         "minimal",
         "dewpoint_regression",
         "linear_dewpoint_variation",
         "min_max",
         "month_hour_precip_mean",
-    ]:
-        try:
-            hum_mean_col = int(preserve_daily_mean)
-        except TypeError:
-            pass
-        columns.append(hum_mean_col)
+    ],
+    source_units,
+    input_ts="-",
+    columns=None,
+    start_date=None,
+    end_date=None,
+    dropna="no",
+    clean=False,
+    round_index=None,
+    skiprows=None,
+    index_type="datetime",
+    names=None,
+    target_units=None,
+    print_input=False,
+    hum_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    hum_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    hum_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    precip_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    a0=None,
+    a1=None,
+    kr=None,
+    hourly_temp=None,
+    hourly_precip_hum=None,
+    preserve_daily_mean=None,
+):
+    """Disaggregate daily humidity to hourly humidity data."""
+    # target_units = single_target_units(source_units, target_units, "")
+    target_units = single_target_units(source_units, target_units, "degK")
 
-    tsd = tsutils.common_kwds(
-        tsutils.read_iso_ts(
-            input_ts, skiprows=skiprows, names=names, index_type=index_type
-        ),
+    tsd, hourly_temp, month_hour_precip_mean = prepare_hum_tdew(
+        method,
+        source_units,
+        input_ts=input_ts,
+        columns=columns,
         start_date=start_date,
         end_date=end_date,
-        pick=columns,
-        round_index=round_index,
         dropna=dropna,
-        source_units=source_units,
-        target_units=target_units,
         clean=clean,
+        round_index=round_index,
+        skiprows=skiprows,
+        index_type=index_type,
+        names=names,
+        target_units=target_units,
+        print_input=print_input,
+        hum_min_col=hum_min_col,
+        hum_max_col=hum_max_col,
+        hum_mean_col=hum_mean_col,
+        temp_min_col=temp_min_col,
+        temp_max_col=temp_max_col,
+        precip_col=precip_col,
+        a0=a0,
+        a1=a1,
+        kr=kr,
+        hourly_temp=hourly_temp,
+        hourly_precip_hum=hourly_precip_hum,
+        preserve_daily_mean=preserve_daily_mean,
     )
-
-    if method == "equal":
-        tsd.columns = ["hum"]
-
-    if preserve_daily_mean is not None:
-        if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
-            tsd.columns = ["tmin", "hum"]
-        if method == "min_max":
-            tsd.columns = ["tmin", "tmax", "hum_min", "hum_max", "hum"]
-        elif method == "month_hour_precip_mean":
-            tsd.columns = ["precip", "hum"]
-        preserve_daily_mean = True
-    else:
-        if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
-            tsd.columns = ["tmin"]
-        if method == "min_max":
-            tsd.columns = ["tmin", "tmax", "hum_min", "hum_max"]
-
-        elif method == "month_hour_precip_mean":
-            tsd.columns = ["precip"]
-    hourly_temp = tstoolbox.read(hourly_temp)
-    hourly_temp = hourly_temp.astype(float).squeeze()
-
-    if method == "month_hour_precip_mean":
-        hourly_precip_hum = tstoolbox.read(hourly_precip_hum)
-        month_hour_precip_mean = calculate_month_hour_precip_mean(hourly_precip_hum)
-    else:
-        month_hour_precip_mean = "None"
 
     ntsd = pd.DataFrame(
         tdew_melo.disaggregate_tdew(
@@ -757,8 +679,10 @@ required identified by the filename in keyword `hourly_temp`."""
         )
     )
 
-    ntsd.columns = ["tdew:degK:disagg"]
-    ntsd_units = tsutils._normalize_units(ntsd,source_units='degK',target_units=target_units[0])
+    ntsd.columns = ["dewpoint_temp:degK:disagg"]
+    ntsd_units = tsutils._normalize_units(
+        ntsd, source_units="degK", target_units=target_units[0]
+    )
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
@@ -789,15 +713,15 @@ def wind_speed(
         raise ValueError(
             tsutils.error_wrapper(
                 f"""
-For the "cosine" method, requires the `a`, `b`, and `t_shift`
-keywords.  You gave:
+                For the "cosine" method, requires the `a`, `b`, and `t_shift`
+                keywords.  You gave:
 
-a = {a}
+                a = {a}
 
-b = {b}
+                b = {b}
 
-t_shift = {t_shift}
-"""
+                t_shift = {t_shift}
+                """
             )
         )
     if method in ["equal", "random"] and not (
@@ -806,8 +730,9 @@ t_shift = {t_shift}
         warnings.warn(
             tsutils.error_wrapper(
                 """
-The a, b, and t_shift options are ignored for the "equal" and "random" methods.
-            """
+                The a, b, and t_shift options are ignored for the "equal" and
+                "random" methods.
+                """
             )
         )
     tsd = tsutils.common_kwds(
@@ -873,8 +798,8 @@ def radiation(
         raise ValueError(
             tsutils.error_wrapper(
                 """
-If method is "mean_course" need to supply CSV filename of hourly
-radiation by the `hourly_rad` keyword."""
+                If method is "mean_course" need to supply CSV filename of
+                hourly radiation by the `hourly_rad` keyword."""
             )
         )
 
@@ -882,9 +807,10 @@ radiation by the `hourly_rad` keyword."""
         raise ValueError(
             tsutils.error_wrapper(
                 """
-If method is "pot_rad" or "mean_course" need to supply the daily global
-short wave radiation as column name or index with keyword
-`glob_swr_col`"""
+                If method is "pot_rad" or "mean_course" need to supply the
+                daily global short wave radiation as column name or index with
+                keyword `glob_swr_col`
+                """
             )
         )
 
@@ -892,8 +818,9 @@ short wave radiation as column name or index with keyword
         raise ValueError(
             tsutils.error_wrapper(
                 """
-If method is "pot_rad_via_bc" need to supply the keywords `bristcamp_a`
-and `bristcamp_c`."""
+                If method is "pot_rad_via_bc" need to supply the keywords
+                `bristcamp_a` and `bristcamp_c`.
+                """
             )
         )
 
@@ -1061,8 +988,9 @@ def evaporation(
         raise ValueError(
             tsutils.error_wrapper(
                 f"""
-The "trap" method requires latitude with the `lat` keyword.  You gave
-"{lat}". """
+                The "trap" method requires latitude with the `lat` keyword.
+                You gave "{lat}".
+                """
             )
         )
     tsd = tsutils.common_kwds(

@@ -11,7 +11,7 @@ dependencies = [
     "pydaymet",
     "pyet",
     ]
-license = {file = "LICENSE.txt"}
+license = {text = "BSD-3-Clause"}
 authors = [
     {name = "Tim Cera", email = "tim@cerazone.net"}
     ]
@@ -27,6 +27,7 @@ classifiers = [
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
         "Topic :: Scientific/Engineering :: Information Analysis",
         "Topic :: Scientific/Engineering",
         "Topic :: Software Development :: Libraries :: Python Modules",
@@ -74,6 +75,7 @@ github = "https://github.com/timcera/mettoolbox"
 bitbucket = "https://bitbucket.org/timcera/mettoolbox/src/main/"
 
 [tool.setuptools]
+license-files = ["LICENSE.txt"]
 include-package-data = true
 
 [tool.setuptools.dynamic]
@@ -100,6 +102,7 @@ update_changelog_on_bump = true
 [build-system]
 requires = [
     "setuptools",
+    "wheel",
     "oldest-supported-numpy",
 ]
 build-backend = "setuptools.build_meta"

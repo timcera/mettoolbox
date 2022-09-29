@@ -50,7 +50,7 @@ def disaggregate_tdew(
     month_hour_precip_mean=None,
     preserve_daily_mean=False,
 ):
-    """general function for humidity disaggregation
+    """general function for dewpoint temperature disaggregation
 
     Args:
         daily_data: daily values
@@ -102,10 +102,10 @@ def disaggregate_tdew(
             # be (T_dp,day)_(d+1) - (T_dp,day)_d instead of the other way around)
             tdew += temp.index.hour / 24.0 * (tdew_nextday - tdew) + tdew_delta
 
-        tdew_disagg = tdew        
+        tdew_disagg = tdew
         sat_vap_press_tdew = vapor_pressure(tdew, 100)
         sat_vap_press_t = vapor_pressure(temp, 100)
-        
+
         hum_disagg = pd.Series(
             index=temp.index, data=100 * sat_vap_press_tdew / sat_vap_press_t
         )
