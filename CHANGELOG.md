@@ -1,3 +1,22 @@
+## v3.14.0 (2022-09-28)
+
+### Refactor
+
+- finish pyproject.toml
+- replace tstoolbox.tsutils with toolbox_utils.tsutils
+- apply stash
+- apply stash
+
+### Feat
+
+- added blaney-criddle and other evaporation techniques
+- bad commit bad mulitple new evaporation functions and fixes and documentation
+
+### Fix
+
+- fixed bugs in temperature disaggregation methods mean_course_min_max and sun_loc_shift
+- **mean_course**: fixed mean_course to use the calculate_mean_daily_course_by_month function
+
 ## v3.13.2 (2022-06-14)
 
 ### Refactor
