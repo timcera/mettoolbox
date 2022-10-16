@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Functions for calculation of potential and actual evaporation
 from meteorological data.

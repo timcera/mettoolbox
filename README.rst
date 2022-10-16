@@ -42,16 +42,19 @@ Usage - Command Line
 --------------------
 Just run 'mettoolbox --help' to get a list of subcommands::
 
-    usage: mettoolbox [-h] [-v] {disaggregate,pet} ...
+    usage: mettoolbox [-h] [-v] {disaggregate,pet,ret,indices,about} ...
 
     positional arguments:
-      {disaggregate,pet}
-        disaggregate      disaggregate subcommand
-        pet               pet subcommand
+      {disaggregate,pet,ret,indices,about}
+        disaggregate        disaggregate subcommand
+        pet                 pet subcommand
+        ret                 ret subcommand
+        indices             indices subcommand
+        about               Display version number and system information.
 
     optional arguments:
-      -h, --help          show this help message and exit
-      -v, --version       show program's version number and exit
+      -h, --help            show this help message and exit
+      -v, --version         show program's version number and exit
 
 Usage - Python
 --------------

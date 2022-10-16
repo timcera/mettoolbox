@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """The meteo_utils module contains utility functions for meteorological data
 
 """

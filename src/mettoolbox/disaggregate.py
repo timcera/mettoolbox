@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from typing import Optional, Union
 
 try:
@@ -13,7 +10,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
-import typic
+from pydantic import PositiveInt, confloat, validate_arguments
 from toolbox_utils import tsutils
 from tstoolbox import tstoolbox
 
@@ -32,7 +29,7 @@ from .melodist.melodist.wind import disaggregate_wind
 
 
 @tsutils.transform_args(source_units=tsutils.make_list, target_units=tsutils.make_list)
-@typic.al
+@validate_arguments
 def single_target_units(source_units, target_units, default=None, cnt=1):
     if default is None:
         return source_units
@@ -56,7 +53,7 @@ def single_target_units(source_units, target_units, default=None, cnt=1):
     return [target_units[0]] * len(source_units)
 
 
-@typic.al
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def temperature(
     method: Literal[
         "sine_min_max", "sine_mean", "sine", "mean_course_min_max", "mean_course_mean"
@@ -76,11 +73,11 @@ def temperature(
     print_input=False,
     target_units=None,
     max_delta: bool = False,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    lat: Optional[tsutils.FloatLatitude] = None,
-    lon: Optional[tsutils.FloatLongitude] = None,
+    temp_min_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    temp_max_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    temp_mean_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    lat: Optional[confloat(ge=-90, le=90)] = None,
+    lon: Optional[confloat(ge=-180, le=180)] = None,
     hourly: Optional[Union[str, pd.Series]] = None,
 ):
     """Disaggregate daily temperature to hourly temperature."""
@@ -259,6 +256,7 @@ def temperature(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def prepare_hum_tdew(
     method: Literal[
         "equal",
@@ -280,12 +278,12 @@ def prepare_hum_tdew(
     index_type="datetime",
     names=None,
     target_units=None,
-    hum_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    hum_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    hum_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    precip_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    hum_min_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    hum_max_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    hum_mean_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    temp_min_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    temp_max_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    precip_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
     a0=None,
     a1=None,
     kr=None,
@@ -511,7 +509,7 @@ def prepare_hum_tdew(
     return tsd, hourly_temp, month_hour_precip_mean
 
 
-@typic.al
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def humidity(
     method: Literal[
         "equal",
@@ -534,12 +532,12 @@ def humidity(
     names=None,
     target_units=None,
     print_input=False,
-    hum_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    hum_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    hum_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    precip_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    hum_min_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    hum_max_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    hum_mean_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    temp_min_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    temp_max_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    precip_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
     a0=None,
     a1=None,
     kr=None,
@@ -597,7 +595,7 @@ def humidity(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@typic.al
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def dewpoint_temperature(
     method: Literal[
         "equal",
@@ -620,12 +618,12 @@ def dewpoint_temperature(
     names=None,
     target_units=None,
     print_input=False,
-    hum_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    hum_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    hum_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
-    precip_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, pd.Series]] = None,
+    hum_min_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    hum_max_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    hum_mean_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    temp_min_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    temp_max_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    precip_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
     a0=None,
     a1=None,
     kr=None,
@@ -686,7 +684,7 @@ def dewpoint_temperature(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@typic.al
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def wind_speed(
     method: Literal["equal", "cosine", "random"],
     source_units,
@@ -761,7 +759,7 @@ def wind_speed(
     )
 
 
-@typic.al
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def radiation(
     method: Literal["pot_rad", "pot_rad_via_ssd", "pot_rad_via_bc", "mean_course"],
     source_units,
@@ -868,7 +866,7 @@ def radiation(
     )
 
 
-@typic.al
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def precipitation(
     method: Literal["equal", "cascade", "masterstation"],
     source_units,
@@ -884,7 +882,7 @@ def precipitation(
     target_units=None,
     print_input=False,
     columns=None,
-    masterstation_hour_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    masterstation_hour_col: Optional[Union[PositiveInt, str]] = None,
 ):
     """Disaggregate daily to hourly data."""
     target_units = single_target_units(source_units, target_units, "mm")
@@ -961,7 +959,7 @@ def precipitation(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@typic.al
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def evaporation(
     method: Literal["trap", "fixed"],
     source_units,
@@ -977,7 +975,7 @@ def evaporation(
     names=None,
     target_units=None,
     print_input=False,
-    lat: Optional[tsutils.FloatLatitude] = None,
+    lat: Optional[confloat(ge=-90, le=90)] = None,
 ):
     """Disaggregate daily to hourly data."""
     target_units = single_target_units(source_units, target_units)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Tim Cera documentation build configuration file, created by
 # sphinx-quickstart on Fri Jul 26 21:59:32 2013.
@@ -61,7 +60,7 @@ copyright = "2014, Tim Cera"
 # built documents.
 #
 # The short X.Y version.
-version = open("../VERSION", "r").readline().strip()
+version = open("../VERSION").readline().strip()
 # The full version, including alpha/beta/rc tags.
 release = version
 

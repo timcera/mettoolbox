@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-
 import warnings
 from typing import Optional, Union
 
 import pandas as pd
 import pydaymet.pet as daypet
-import typic
+from pydantic import PositiveInt, confloat, validate_arguments
 from toolbox_utils import tsutils
 from tstoolbox.tstoolbox import read
 
@@ -34,14 +32,14 @@ def prepare_daymet(
     return tsd
 
 
-@typic.al
+@validate_arguments
 def penman_monteith(
-    lat: tsutils.FloatLatitude,
-    lon: tsutils.FloatLongitude,
-    tmin_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
-    tmax_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
-    srad_col: Optional[Union[tsutils.FloatGreaterThanZero, str, list]],
-    dayl_col: Optional[Union[tsutils.FloatGreaterThanZero, str, list]],
+    lat: confloat(ge=-90, le=90),
+    lon: confloat(ge=-180, le=180),
+    tmin_col: Optional[Union[PositiveInt, str, list]],
+    tmax_col: Optional[Union[PositiveInt, str, list]],
+    srad_col: Optional[Union[PositiveInt, str, list]],
+    dayl_col: Optional[Union[PositiveInt, str, list]],
     source_units: Optional[Union[str, list]],
     rh_col=None,
     u2_col=None,

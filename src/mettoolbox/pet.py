@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import warnings
 from typing import Optional, Union
 
 import pandas as pd
 import pydaymet.pet as daypet
-import typic
 from numpy import exp
+from pydantic import PositiveInt, confloat, validate_arguments
 from toolbox_utils import tsutils
 from tstoolbox.tstoolbox import read
 
@@ -207,7 +205,7 @@ def et0_pm(
     return tsd
 
 
-@typic.al
+@validate_arguments
 def blaney_criddle(
     bright_hours_col,
     source_units: Optional[Union[str, list]],
@@ -256,9 +254,9 @@ def blaney_criddle(
     return tsutils.return_input(print_input, tsd, pet)
 
 
-@typic.al
+@validate_arguments
 def hamon(
-    lat: tsutils.FloatLatitude,
+    lat: confloat(ge=-90, le=90),
     source_units: Optional[Union[str, list]],
     temp_mean_col=None,
     temp_min_col=None,
@@ -350,7 +348,7 @@ def romanenko(
 
 
 def linacre(
-    lat: tsutils.FloatLatitude,
+    lat: confloat(ge=-90, le=90),
     elevation,
     source_units: Optional[Union[str, list]],
     temp_mean_col=None,
@@ -408,13 +406,13 @@ def linacre(
     return tsutils.return_input(print_input, tsd, pet)
 
 
-@typic.al
+@validate_arguments
 def hargreaves(
-    lat: tsutils.FloatLatitude,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
+    lat: confloat(ge=-90, le=90),
+    temp_min_col: Optional[Union[PositiveInt, str, list]],
+    temp_max_col: Optional[Union[PositiveInt, str, list]],
     source_units: Optional[Union[str, list]],
-    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_mean_col: Optional[Union[PositiveInt, str]] = None,
     start_date=None,
     end_date=None,
     dropna="no",
@@ -468,12 +466,12 @@ def hargreaves(
     return tsutils.return_input(print_input, tsd, pe)
 
 
-@typic.al
+@validate_arguments
 def oudin_form(
-    lat: tsutils.FloatLatitude,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
-    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    lat: confloat(ge=-90, le=90),
+    temp_min_col: Optional[Union[PositiveInt, str]],
+    temp_max_col: Optional[Union[PositiveInt, str]],
+    temp_mean_col: Optional[Union[PositiveInt, str]] = None,
     k1=100,
     k2=5,
     source_units=None,
@@ -522,13 +520,13 @@ def oudin_form(
     return tsutils.return_input(print_input, tsd, pe)
 
 
-@typic.al
+@validate_arguments
 def allen(
-    lat: tsutils.FloatLatitude,
-    temp_min_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
-    temp_max_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]],
+    lat: confloat(ge=-90, le=90),
+    temp_min_col: Optional[Union[PositiveInt, str]],
+    temp_max_col: Optional[Union[PositiveInt, str]],
     source_units: Optional[Union[str, list]],
-    temp_mean_col: Optional[Union[tsutils.IntGreaterEqualToOne, str]] = None,
+    temp_mean_col: Optional[Union[PositiveInt, str]] = None,
     start_date=None,
     end_date=None,
     dropna="no",
@@ -597,14 +595,14 @@ def prepare_daymet(
     return tsd
 
 
-@typic.al
+@validate_arguments
 def priestley_taylor(
-    lat: tsutils.FloatLatitude,
-    lon: tsutils.FloatLongitude,
-    tmin_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
-    tmax_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
-    srad_col: Optional[Union[tsutils.FloatGreaterThanZero, str, list]],
-    dayl_col: Optional[Union[tsutils.FloatGreaterThanZero, str, list]],
+    lat: confloat(ge=-90, le=90),
+    lon: confloat(ge=-180, le=180),
+    tmin_col: Optional[Union[PositiveInt, str, list]],
+    tmax_col: Optional[Union[PositiveInt, str, list]],
+    srad_col: Optional[Union[PositiveInt, str, list]],
+    dayl_col: Optional[Union[PositiveInt, str, list]],
     source_units: Optional[Union[str, list]],
     rh_col=None,
     u2_col=None,
@@ -649,14 +647,14 @@ def priestley_taylor(
     return tsutils.return_input(print_input, tsd, pe)
 
 
-@typic.al
+@validate_arguments
 def penman_monteith(
-    lat: tsutils.FloatLatitude,
-    lon: tsutils.FloatLongitude,
-    tmin_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
-    tmax_col: Optional[Union[tsutils.IntGreaterEqualToOne, str, list]],
-    srad_col: Optional[Union[tsutils.FloatGreaterThanZero, str, list]],
-    dayl_col: Optional[Union[tsutils.FloatGreaterThanZero, str, list]],
+    lat: confloat(ge=-90, le=90),
+    lon: confloat(ge=-180, le=180),
+    tmin_col: Optional[Union[PositiveInt, str, list]],
+    tmax_col: Optional[Union[PositiveInt, str, list]],
+    srad_col: Optional[Union[PositiveInt, str, list]],
+    dayl_col: Optional[Union[PositiveInt, str, list]],
     source_units: Optional[Union[str, list]],
     rh_col=None,
     u2_col=None,

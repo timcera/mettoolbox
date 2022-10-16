@@ -1,17 +1,15 @@
-# -*- coding: utf-8 -*-
-
 from typing import Optional, Union
 
 import pandas as pd
-import typic
+from pydantic import PositiveInt, validate_arguments
 from standard_precip.spi import SPI
 from toolbox_utils import tsutils
 
 
 def _nlarge_nsmall(
     pe_data: pd.DataFrame,
-    nlargest: Optional[tsutils.IntGreaterEqualToOne],
-    nsmallest: Optional[tsutils.IntGreaterEqualToOne],
+    nlargest: Optional[PositiveInt],
+    nsmallest: Optional[PositiveInt],
     groupby: str,
 ):
     if nlargest is None and nsmallest is None:
@@ -45,10 +43,10 @@ def _nlarge_nsmall(
 
 
 @tsutils.transform_args(source_units=tsutils.make_list)
-@typic.al
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def spei(
-    rainfall: Union[tsutils.IntGreaterEqualToOne, str, pd.DataFrame],
-    pet: Union[tsutils.IntGreaterEqualToOne, str, pd.DataFrame],
+    rainfall: Union[PositiveInt, str, pd.DataFrame],
+    pet: Union[PositiveInt, str, pd.DataFrame],
     source_units,
     nsmallest=None,
     nlargest=None,
@@ -103,10 +101,10 @@ def spei(
 
 
 @tsutils.transform_args(source_units=tsutils.make_list)
-@typic.al
+@validate_arguments(config=dict(arbitrary_types_allowed=True))
 def pe(
-    rainfall: Union[tsutils.IntGreaterEqualToOne, str, pd.DataFrame],
-    pet: Union[tsutils.IntGreaterEqualToOne, str, pd.DataFrame],
+    rainfall: Union[PositiveInt, str, pd.DataFrame],
+    pet: Union[PositiveInt, str, pd.DataFrame],
     source_units,
     nsmallest=None,
     nlargest=None,

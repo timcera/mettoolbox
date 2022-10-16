@@ -1,10 +1,18 @@
+[build-system]
+requires = [
+    "setuptools",
+    "wheel",
+    "oldest-supported-numpy",
+]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "mettoolbox"
 dynamic = ["readme", "version"]
-description="mettoolbox is set of command line and Python tools for the analysis and reporting of meteorological data."
+description = "mettoolbox is set of command line and Python tools for the analysis and reporting of meteorological data."
 requires-python = ">=3.7.1"
 dependencies = [
-    "toolbox_utils < 1.0.0",
+    "toolbox_utils >= 1.0.0, < 2.0.0",
     "cltoolbox",
     "solarpy",
     "standard-precip",
@@ -27,7 +35,7 @@ classifiers = [
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.10",
         "Topic :: Scientific/Engineering :: Information Analysis",
         "Topic :: Scientific/Engineering",
         "Topic :: Software Development :: Libraries :: Python Modules",
@@ -69,10 +77,26 @@ dev = [
 [project.scripts]
 mettoolbox = "mettoolbox.mettoolbox:main"
 
-[project_urls]
+[project.urls]
 documentation = "https://timcera.bitbucket.io/mettoolbox/docs/index.html#mettoolbox-documentation"
 github = "https://github.com/timcera/mettoolbox"
 bitbucket = "https://bitbucket.org/timcera/mettoolbox/src/main/"
+
+[tool]
+
+[tool.check-manifest]
+ignore = [".travis.yml",
+          "docs/_function_autosummary/*"]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "3.14.0"
+tag_format = "v$version"
+version_files = ["VERSION"]
+update_changelog_on_bump = true
+
+[tool.coverage.run]
+relative_files = true
 
 [tool.setuptools]
 license-files = ["LICENSE.txt"]
@@ -85,28 +109,3 @@ version = {file = "VERSION"}
 [tool.setuptools.packages.find]
 where = ["src"]
 exclude = ["examples*", "tools*", "docs*", "mettoolbox.tests*"]
-
-[tool.check-manifest]
-ignore = [".travis.yml",
-          "docs/_function_autosummary/*"]
-
-
-[tool.commitizen]
-name = "cz_conventional_commits"
-version = "3.14.0"
-tag_format = "v$version"
-version_files = ["VERSION"]
-update_changelog_on_bump = true
-
-
-[build-system]
-requires = [
-    "setuptools",
-    "wheel",
-    "oldest-supported-numpy",
-]
-build-backend = "setuptools.build_meta"
-
-
-[tool.coverage.run]
-relative_files = true
