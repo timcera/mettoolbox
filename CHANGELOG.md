@@ -1,3 +1,13 @@
+## v4.0.0 (2022-10-16)
+
+### BREAKING CHANGE
+
+- moving typic to pydantic
+
+### Fix
+
+- move from typic to pydantic
+
 ## v3.14.0 (2022-09-28)
 
 ### Refactor
