@@ -1,3 +1,9 @@
+## v4.0.1 (2022-11-05)
+
+### Fix
+
+- remove the final instance of mando
+
 ## v4.0.0 (2022-10-16)
 
 ### BREAKING CHANGE
