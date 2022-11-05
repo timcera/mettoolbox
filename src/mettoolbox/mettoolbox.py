@@ -48,9 +48,7 @@ def about():
     tsutils.about(__name__)
 
 
-@program.disaggregate.command(
-    "evaporation", formatter_class=RSTHelpFormatter, doctype="numpy"
-)
+@program.disaggregate.command("evaporation", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def evaporation_cli(
     method,
@@ -140,9 +138,7 @@ def evaporation_cli(
 disaggregate.evaporation.__doc__ = evaporation_cli.__doc__
 
 
-@program.disaggregate.command(
-    "humidity", formatter_class=RSTHelpFormatter, doctype="numpy"
-)
+@program.disaggregate.command("humidity", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def humidity_cli(
     method,
@@ -392,9 +388,7 @@ def humidity_cli(
 disaggregate.humidity.__doc__ = humidity_cli.__doc__
 
 
-@program.disaggregate.command(
-    "dewpoint_temperature", formatter_class=RSTHelpFormatter, doctype="numpy"
-)
+@program.disaggregate.command("dewpoint_temperature", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def dewpoint_temperature_cli(
     method,
@@ -644,9 +638,7 @@ def dewpoint_temperature_cli(
 disaggregate.dewpoint_temperature.__doc__ = dewpoint_temperature_cli.__doc__
 
 
-@program.disaggregate.command(
-    "precipitation", formatter_class=RSTHelpFormatter, doctype="numpy"
-)
+@program.disaggregate.command("precipitation", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def precipitation_cli(
     method,
@@ -748,9 +740,7 @@ def precipitation_cli(
 disaggregate.precipitation.__doc__ = precipitation_cli.__doc__
 
 
-@program.disaggregate.command(
-    "radiation", formatter_class=RSTHelpFormatter, doctype="numpy"
-)
+@program.disaggregate.command("radiation", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def radiation_cli(
     method,
@@ -897,9 +887,7 @@ def radiation_cli(
 disaggregate.radiation.__doc__ = radiation_cli.__doc__
 
 
-@program.disaggregate.command(
-    "temperature", formatter_class=RSTHelpFormatter, doctype="numpy"
-)
+@program.disaggregate.command("temperature", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def temperature_cli(
     method,
@@ -1097,9 +1085,7 @@ def temperature_cli(
 disaggregate.temperature.__doc__ = temperature_cli.__doc__
 
 
-@program.disaggregate.command(
-    "wind_speed", formatter_class=RSTHelpFormatter, doctype="numpy"
-)
+@program.disaggregate.command("wind_speed", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def wind_speed_cli(
     method,
@@ -1209,7 +1195,7 @@ def wind_speed_cli(
 disaggregate.wind_speed.__doc__ = wind_speed_cli.__doc__
 
 
-@program.pet.command("allen", formatter_class=RSTHelpFormatter, doctype="numpy")
+@program.pet.command("allen", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def allen_cli(
     lat,
@@ -1326,9 +1312,7 @@ def allen_cli(
 pet.allen.__doc__ = allen_cli.__doc__
 
 
-@program.pet.command(
-    "blaney_criddle", formatter_class=RSTHelpFormatter, doctype="numpy"
-)
+@program.pet.command("blaney_criddle", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def blaney_criddle_cli(
     bright_hours_col,
@@ -1472,7 +1456,7 @@ def blaney_criddle_cli(
 pet.blaney_criddle.__doc__ = blaney_criddle_cli.__doc__
 
 
-@program.pet.command("hamon", formatter_class=RSTHelpFormatter, doctype="numpy")
+@program.pet.command("hamon", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def hamon_cli(
     lat,
@@ -1626,7 +1610,7 @@ def hamon_cli(
 pet.hamon.__doc__ = hamon_cli.__doc__
 
 
-@program.pet.command("hargreaves", formatter_class=RSTHelpFormatter, doctype="numpy")
+@program.pet.command("hargreaves", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def hargreaves_cli(
     lat,
@@ -1743,7 +1727,7 @@ def hargreaves_cli(
 pet.hargreaves.__doc__ = hargreaves_cli.__doc__
 
 
-@program.pet.command("linacre", formatter_class=RSTHelpFormatter, doctype="numpy")
+@program.pet.command("linacre", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def linacre_cli(
     lat,
@@ -1888,7 +1872,7 @@ def linacre_cli(
 pet.linacre.__doc__ = linacre_cli.__doc__
 
 
-@program.pet.command("oudin_form", formatter_class=RSTHelpFormatter, doctype="numpy")
+@program.pet.command("oudin_form", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def oudin_form_cli(
     lat,
@@ -2047,9 +2031,7 @@ def oudin_form_cli(
 pet.oudin_form.__doc__ = oudin_form_cli.__doc__
 
 
-@program.pet.command(
-    "priestley_taylor", formatter_class=RSTHelpFormatter, doctype="numpy"
-)
+@program.pet.command("priestley_taylor", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def priestley_taylor_cli(
     lat,
@@ -2177,7 +2159,7 @@ def priestley_taylor_cli(
 pet.priestley_taylor.__doc__ = priestley_taylor_cli.__doc__
 
 
-@program.pet.command("romanenko", formatter_class=RSTHelpFormatter, doctype="numpy")
+@program.pet.command("romanenko", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def romanenko_cli(
     source_units,
@@ -2319,9 +2301,7 @@ def romanenko_cli(
 pet.romanenko.__doc__ = romanenko_cli.__doc__
 
 
-@program.ret.command(
-    "penman_monteith", formatter_class=RSTHelpFormatter, doctype="numpy"
-)
+@program.ret.command("penman_monteith", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def penman_monteith_cli(
     lat,
@@ -2449,7 +2429,7 @@ def penman_monteith_cli(
 ret.penman_monteith.__doc__ = penman_monteith_cli.__doc__
 
 
-@program.indices.command("spei", formatter_class=RSTHelpFormatter, doctype="numpy")
+@program.indices.command("spei", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def spei_cli(
     rainfall,
@@ -2610,7 +2590,7 @@ def spei_cli(
 indices.spei.__doc__ = spei_cli.__doc__
 
 
-@program.indices.command("pe", formatter_class=RSTHelpFormatter, doctype="numpy")
+@program.indices.command("pe", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def pe_cli(
     rainfall,
