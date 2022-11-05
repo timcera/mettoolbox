@@ -1,18 +1,14 @@
-from typing import Optional, Union
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
-
 import datetime
 import warnings
+from contextlib import suppress
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
 from pydantic import PositiveInt, confloat, validate_arguments
 from toolbox_utils import tsutils
 from tstoolbox import tstoolbox
+from typing_extensions import Literal
 
 from . import tdew as tdew_melo
 from .melodist.melodist.humidity import (
@@ -86,7 +82,7 @@ def temperature(
     pd.options.display.width = 60
 
     if (
-        method in ["mean_course_min_max", "mean_course_mean"]
+        method in ("mean_course_min_max", "mean_course_mean")
         or min_max_time == "sun_loc_shift"
         or max_delta
     ) and hourly is None:
@@ -102,7 +98,7 @@ def temperature(
         )
 
     if (
-        method in ["mean_course_min_max", "mean_course_mean"]
+        method in ("mean_course_min_max", "mean_course_mean")
         or min_max_time == "sun_loc_shift"
         or max_delta
     ):
@@ -132,20 +128,15 @@ def temperature(
             )
         )
 
-    try:
+    with suppress(TypeError):
         temp_min_col = int(temp_min_col)
-    except TypeError:
-        pass
-    try:
+    with suppress(TypeError):
         temp_max_col = int(temp_max_col)
-    except TypeError:
-        pass
+
     columns = [temp_min_col, temp_max_col]
     if temp_mean_col is not None:
-        try:
+        with suppress(TypeError):
             temp_mean_col = int(temp_mean_col)
-        except TypeError:
-            pass
         columns.append(temp_mean_col)
 
     tsd = tsutils.common_kwds(
@@ -163,9 +154,9 @@ def temperature(
     )
 
     if len(tsd.columns) == 3:
-        tsd.columns = ["tmin", "tmax", "temp"]
+        tsd.columns = ("tmin", "tmax", "temp")
     else:
-        tsd.columns = ["tmin", "tmax"]
+        tsd.columns = ("tmin", "tmax")
 
     if any((tsd.tmax <= tsd.tmin).dropna()):
         raise ValueError(
@@ -212,7 +203,7 @@ def temperature(
     if min_max_time == "fix":
         # Not dependent on sun, just average values.
         sun_times = pd.DataFrame(
-            index=[1], columns=["sunrise", "sunnoon", "sunset", "daylength"]
+            index=[1], columns=("sunrise", "sunnoon", "sunset", "daylength")
         )
         sun_times.sunrise = 7
         sun_times.sunnoon = 12
@@ -316,7 +307,7 @@ def prepare_hum_tdew(
         )
 
     if (
-        method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]
+        method in ("minimal", "dewpoint_regression", "linear_dewpoint_variation")
         and temp_min_col is None
     ):
         raise ValueError(
@@ -356,7 +347,7 @@ def prepare_hum_tdew(
             )
         )
 
-    if method in ["dewpoint_regression", "linear_dewpoint_variation"] and (
+    if method in ("dewpoint_regression", "linear_dewpoint_variation") and (
         a0 is None or a1 is None
     ):
         raise ValueError(
@@ -380,12 +371,12 @@ def prepare_hum_tdew(
 
     if (
         method
-        in [
+        in (
             "minimal",
             "dewpoint_regression",
             "linear_dewpoint_variation",
             "min_max",
-        ]
+        )
         and hourly_temp is None
     ):
         raise ValueError(
@@ -403,59 +394,43 @@ def prepare_hum_tdew(
 
     columns = []
     if method == "equal":
-        try:
+        with suppress(TypeError):
             hum_mean_col = int(hum_mean_col)
-        except TypeError:
-            pass
         columns.append(hum_mean_col)
 
     if method == "min_max":
-        try:
+        with suppress(TypeError):
             temp_min_col = int(temp_min_col)
-        except TypeError:
-            pass
         columns.append(temp_min_col)
-        try:
+        with suppress(TypeError):
             temp_max_col = int(temp_max_col)
-        except TypeError:
-            pass
         columns.append(temp_max_col)
-        try:
+        with suppress(TypeError):
             hum_min_col = int(hum_min_col)
-        except TypeError:
-            pass
         columns.append(hum_min_col)
-        try:
+        with suppress(TypeError):
             hum_max_col = int(hum_max_col)
-        except TypeError:
-            pass
         columns.append(hum_max_col)
 
-    if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
-        try:
+    if method in ("minimal", "dewpoint_regression", "linear_dewpoint_variation"):
+        with suppress(TypeError):
             temp_min_col = int(temp_min_col)
-        except TypeError:
-            pass
         columns.append(temp_min_col)
 
     if method == "month_hour_precip_mean":
-        try:
+        with suppress(TypeError):
             precip_col = int(precip_col)
-        except TypeError:
-            pass
         columns.append(precip_col)
 
-    if preserve_daily_mean is not None and method in [
+    if preserve_daily_mean is not None and method in (
         "minimal",
         "dewpoint_regression",
         "linear_dewpoint_variation",
         "min_max",
         "month_hour_precip_mean",
-    ]:
-        try:
+    ):
+        with suppress(TypeError):
             hum_mean_col = int(preserve_daily_mean)
-        except TypeError:
-            pass
         columns.append(hum_mean_col)
 
     tsd = tsutils.common_kwds(
@@ -476,27 +451,27 @@ def prepare_hum_tdew(
         tsd.columns = ["hum"]
 
     if preserve_daily_mean is not None:
-        if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
-            tsd.columns = ["tmin", "hum"]
+        if method in ("minimal", "dewpoint_regression", "linear_dewpoint_variation"):
+            tsd.columns = ("tmin", "hum")
         if method == "min_max":
-            tsd.columns = ["tmin", "tmax", "hum_min", "hum_max", "hum"]
+            tsd.columns = ("tmin", "tmax", "hum_min", "hum_max", "hum")
         elif method == "month_hour_precip_mean":
-            tsd.columns = ["precip", "hum"]
+            tsd.columns = ("precip", "hum")
         preserve_daily_mean = True
     else:
-        if method in ["minimal", "dewpoint_regression", "linear_dewpoint_variation"]:
-            tsd.columns = ["tmin"]
+        if method in ("minimal", "dewpoint_regression", "linear_dewpoint_variation"):
+            tsd.columns = "tmin"
         if method == "min_max":
-            tsd.columns = ["tmin", "tmax", "hum_min", "hum_max"]
+            tsd.columns = ("tmin", "tmax", "hum_min", "hum_max")
 
         elif method == "month_hour_precip_mean":
-            tsd.columns = ["precip"]
-    if method in [
+            tsd.columns = "precip"
+    if method in (
         "minimal",
         "dewpoint_regression",
         "linear_dewpoint_variation",
         "min_max",
-    ]:
+    ):
         hourly_temp = tstoolbox.read(hourly_temp)
         hourly_temp = hourly_temp.astype(float).squeeze()
 
@@ -649,7 +624,6 @@ def dewpoint_temperature(
         index_type=index_type,
         names=names,
         target_units=target_units,
-        print_input=print_input,
         hum_min_col=hum_min_col,
         hum_max_col=hum_max_col,
         hum_mean_col=hum_mean_col,
@@ -722,7 +696,7 @@ def wind_speed(
                 """
             )
         )
-    if method in ["equal", "random"] and not (
+    if method in ("equal", "random") and not (
         a is None or b is None or t_shift is None
     ):
         warnings.warn(
@@ -801,7 +775,7 @@ def radiation(
             )
         )
 
-    if method in ["pot_rad", "mean_course"] and glob_swr_col is None:
+    if method in ("pot_rad", "mean_course") and glob_swr_col is None:
         raise ValueError(
             tsutils.error_wrapper(
                 """
@@ -836,11 +810,9 @@ def radiation(
         clean=clean,
     )
 
-    if method in ["pot_rad", "mean_course"]:
-        try:
+    if method in ("pot_rad", "mean_course"):
+        with suppress(ValueError):
             glob_swr_col = glob_swr_col - 1
-        except ValueError:
-            pass
         tsd["glob"] = tsd[glob_swr_col]
 
     sun_times = None

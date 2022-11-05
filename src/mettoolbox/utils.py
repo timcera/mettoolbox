@@ -1,3 +1,5 @@
+"""Utility functions for the `mettoolbox` package."""
+
 import warnings
 
 import numpy as np
@@ -30,26 +32,31 @@ def _check_temperature_cols(
         raise ValueError(
             tsutils.error_wrapper(
                 """
-            This evaporation method requires the minimum daily temperature column to be specified with "temp_min_col"."""
+                This evaporation method requires the minimum daily temperature
+                column to be specified with "temp_min_col".
+                """
             )
         )
     if temp_max_col is None and temp_max_required is True:
         raise ValueError(
             tsutils.error_wrapper(
                 """
-            This evaporation method requires the maximum daily temperature column to be specified with "temp_max_col"."""
+                This evaporation method requires the maximum daily temperature
+                column to be specified with "temp_max_col".
+                """
             )
         )
     if temp_min_col is None or temp_max_col is None:
         raise ValueError(
             tsutils.error_wrapper(
                 f"""
-            If you do not pass a mean daily temperature column in "temp_mean_col"
-            you must give both minimum and maximum daily temperatures using
-            "temp_min_col" and "temp_max_col".
+                If you do not pass a mean daily temperature column in
+                "temp_mean_col" you must give both minimum and maximum daily
+                temperatures using "temp_min_col" and "temp_max_col".
 
-    You gave {temp_min_col} for "temp_min_col" and
-             {temp_max_col} for "temp_max_col". """
+                You gave {temp_min_col} for "temp_min_col" and {temp_max_col}
+                for "temp_max_col".
+                """
             )
         )
     return _check_cols(
@@ -63,20 +70,24 @@ def _validate_temperatures(tsd, temp_min_col, temp_max_col):
             raise ValueError(
                 tsutils.error_wrapper(
                     f"""
-                On the following dates:
+                    On the following dates:
 
-        {tsd[tsd.tmax < tsd.tmin].index},
+                    {tsd[tsd.tmax < tsd.tmin].index},
 
-        minimum temperature values in column "{temp_min_col}" are greater than
-        or equal to the maximum temperature values in column
-        "{temp_max_col}"."""
+                    minimum temperature values in column "{temp_min_col}" are
+                    greater than or equal to the maximum temperature values in
+                    column "{temp_max_col}".
+                    """
                 )
             )
 
         warnings.warn(
             tsutils.error_wrapper(
-                """ Since `temp_mean_col` is None, the average daily temperature will be
-estimated by the average of `temp_min_col` and `temp_max_col`"""
+                """
+                Since `temp_mean_col` is None, the average daily temperature
+                will be estimated by the average of `temp_min_col` and
+                `temp_max_col`
+                """
             )
         )
         tsd["tmean"] = (tsd.tmin + tsd.tmax) / 2.0
@@ -86,10 +97,12 @@ estimated by the average of `temp_min_col` and `temp_max_col`"""
                 tsutils.error_wrapper(
                     f""" On the following dates:
 
-        {tsd[tsd.tmin >= tsd.tmean | tsd.tmax <= tsd.tmean]},
+                    {tsd[tsd.tmin >= tsd.tmean | tsd.tmax <= tsd.tmean]},
 
-        the daily average is either below or equal to the minimum temperature in column {temp_min_col} or higher or equal to the maximum temperature in column
-    {temp_max_col}."""
+                    the daily average is either below or equal to the minimum
+                    temperature in column {temp_min_col} or higher or equal to
+                    the maximum temperature in column {temp_max_col}.
+                    """
                 )
             )
     return tsd

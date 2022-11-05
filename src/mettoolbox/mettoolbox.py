@@ -1,10 +1,10 @@
 import os.path
 import sys
 import warnings
-from typing import List, Optional, Union
+from typing import Optional, Union
 
-from mando import Program
-from mando.rst_text_formatter import RSTHelpFormatter
+from cltoolbox import Program
+from cltoolbox.rst_text_formatter import RSTHelpFormatter
 from toolbox_utils import tsutils
 
 from . import disaggregate, indices, pet, ret
@@ -115,7 +115,7 @@ def evaporation_cli(
         Hemisphere, and negative values represent the Southern
         Hemisphere.
     """
-    tsutils._printiso(
+    tsutils.printiso(
         disaggregate.evaporation(
             method,
             input_ts=input_ts,
@@ -356,7 +356,7 @@ def humidity_cli(
         daily mean values of the disaggregated data with the observed
         daily mean humidity.
     """
-    tsutils._printiso(
+    tsutils.printiso(
         disaggregate.humidity(
             method,
             input_ts=input_ts,
@@ -392,7 +392,9 @@ def humidity_cli(
 disaggregate.humidity.__doc__ = humidity_cli.__doc__
 
 
-@program.disaggregate.command("tdew", formatter_class=RSTHelpFormatter, doctype="numpy")
+@program.disaggregate.command(
+    "dewpoint_temperature", formatter_class=RSTHelpFormatter, doctype="numpy"
+)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def dewpoint_temperature_cli(
     method,
@@ -606,8 +608,8 @@ def dewpoint_temperature_cli(
         daily mean values of the disaggregated data with the observed
         daily mean humidity.
     """
-    tsutils._printiso(
-        disaggregate.tdew(
+    tsutils.printiso(
+        disaggregate.dewpoint_temperature(
             method,
             input_ts=input_ts,
             columns=columns,
@@ -721,7 +723,7 @@ def precipitation_cli(
         The column number or name that contains the hourly data used as the reference
         station.
     """
-    tsutils._printiso(
+    tsutils.printiso(
         disaggregate.precipitation(
             method,
             input_ts=input_ts,
@@ -863,7 +865,7 @@ def radiation_cli(
         Filename of HOURLY CSV file that contains radiation values to be
         used with the "mean_course" method.
     """
-    tsutils._printiso(
+    tsutils.printiso(
         disaggregate.radiation(
             method,
             input_ts=input_ts,
@@ -1063,7 +1065,7 @@ def temperature_cli(
         requires an hourly time-series filename specified with the
         `hourly` keyword.
     """
-    tsutils._printiso(
+    tsutils.printiso(
         disaggregate.temperature(
             method,
             source_units,
@@ -1180,7 +1182,7 @@ def wind_speed_cli(
     t_shift: float
         Parameter `t_shift` when method is equal to "cosine".
     """
-    tsutils._printiso(
+    tsutils.printiso(
         disaggregate.wind_speed(
             method,
             input_ts=input_ts,
@@ -1299,7 +1301,7 @@ def allen_cli(
         the input data that represents the daily mean temperature.  If
         None will be estimated by the average of `temp_min_col` and
         `temp_max_col`."""
-    tsutils._printiso(
+    tsutils.printiso(
         pet.allen(
             lat,
             temp_min_col,
@@ -1446,7 +1448,7 @@ def blaney_criddle_cli(
        generalization of temperature‐based methods for calculating evaporation.
        Hydrological processes, 15(2), 305-319.
     """
-    tsutils._printiso(
+    tsutils.printiso(
         pet.blaney_criddle(
             bright_hours_col=bright_hours_col,
             source_units=source_units,
@@ -1598,7 +1600,7 @@ def hamon_cli(
        States. Journal of the American Water Resources Association, 41, 621-
        633.
     """
-    tsutils._printiso(
+    tsutils.printiso(
         pet.hamon(
             lat,
             source_units,
@@ -1716,7 +1718,7 @@ def hargreaves_cli(
         the input data that represents the daily mean temperature.  If
         None will be estimated by the average of `temp_min_col` and
         `temp_max_col`."""
-    tsutils._printiso(
+    tsutils.printiso(
         pet.hargreaves(
             lat,
             temp_min_col,
@@ -1859,7 +1861,7 @@ def linacre_cli(
        evaporation rates in various climates, using temperature data alone.
        Agricultural meteorology, 18(6), 409-424.
     """
-    tsutils._printiso(
+    tsutils.printiso(
         pet.linacre(
             lat,
             elevation,
@@ -2018,7 +2020,7 @@ def oudin_form_cli(
 
     ${tablefmt}
     """
-    tsutils._printiso(
+    tsutils.printiso(
         pet.oudin_form(
             lat,
             source_units=source_units,
@@ -2145,7 +2147,7 @@ def priestley_taylor_cli(
         the input data that represents the daily mean temperature.  If
         None will be estimated by the average of `temp_min_col` and
         `temp_max_col`."""
-    tsutils._printiso(
+    tsutils.printiso(
         pet.priestley_taylor(
             lat,
             lon,
@@ -2292,7 +2294,7 @@ def romanenko_cli(
        moisture using a universal relationship for a large area. Proc. of
        Ukrainian Hydrometeorological Research Institute, 3, 12-25.
     """
-    tsutils._printiso(
+    tsutils.printiso(
         pet.romanenko(
             source_units,
             temp_mean_col=temp_mean_col,
@@ -2417,7 +2419,7 @@ def penman_monteith_cli(
         the input data that represents the daily mean temperature.  If
         None will be estimated by the average of `temp_min_col` and
         `temp_max_col`."""
-    tsutils._printiso(
+    tsutils.printiso(
         ret.penman_monteith(
             lat,
             lon,
@@ -2579,7 +2581,7 @@ def spei_cli(
 
     ${tablefmt}
     """
-    tsutils._printiso(
+    tsutils.printiso(
         indices.spei(
             rainfall,
             pet,
@@ -2725,7 +2727,7 @@ def pe_cli(
 
     ${tablefmt}
     """
-    tsutils._printiso(
+    tsutils.printiso(
         indices.pe(
             rainfall,
             pet,

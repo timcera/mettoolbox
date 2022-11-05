@@ -97,8 +97,9 @@ def disaggregate_tdew(
             tdew_nextday.iloc[-24:] = tdew.iloc[-24:]  # copy the last day
 
             # eq. (20) from Debele et al. (2007):
-            # (corrected - the equation is wrong both in Debele et al. (2007) and Bregaglio et al. (2010) - it should
-            # be (T_dp,day)_(d+1) - (T_dp,day)_d instead of the other way around)
+            # (corrected - the equation is wrong both in Debele et al. (2007)
+            # and Bregaglio et al. (2010) - it should be (T_dp,day)_(d+1)
+            # - (T_dp,day)_d instead of the other way around)
             tdew += temp.index.hour / 24.0 * (tdew_nextday - tdew) + tdew_delta
 
         tdew_disagg = tdew
