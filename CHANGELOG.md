@@ -1,3 +1,9 @@
+## v4.0.2 (2022-11-05)
+
+### Fix
+
+- corrected cltoolbox call that doesn't include doctype keyword
+
 ## v4.0.1 (2022-11-05)
 
 ### Fix
