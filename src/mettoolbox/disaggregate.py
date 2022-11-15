@@ -290,6 +290,8 @@ def prepare_hum_tdew(
     hourly_temp=None,
     hourly_precip_hum=None,
     preserve_daily_mean=None,
+    disagg_type=None,
+
 ):
     """Disaggregate daily humidity to hourly humidity data."""
     target_units = single_target_units(source_units, target_units, "")
@@ -491,14 +493,27 @@ def prepare_hum_tdew(
 
         elif method == "month_hour_precip_mean":
             tsd.columns = ["precip"]
-    if method in [
-        "minimal",
-        "dewpoint_regression",
-        "linear_dewpoint_variation",
-        "min_max",
-    ]:
-        hourly_temp = tstoolbox.read(hourly_temp)
-        hourly_temp = hourly_temp.astype(float).squeeze()
+    if disagg_type == 'humidity':
+        if method in [
+            "minimal",
+            "dewpoint_regression",
+            "linear_dewpoint_variation",
+            "min_max",
+        ]:
+            hourly_temp = tstoolbox.read(hourly_temp)
+            hourly_temp = hourly_temp.astype(float).squeeze()
+    elif disagg_type == 'dewpoint':
+        if method in [
+            "equal",
+            "minimal",
+            "dewpoint_regression",
+            "linear_dewpoint_variation",
+            "min_max",
+            "month_hour_precip_mean",
+        ]:
+            hourly_temp = tstoolbox.read(hourly_temp)
+            hourly_temp = hourly_temp.astype(float).squeeze()
+
 
     if method == "month_hour_precip_mean":
         hourly_precip_hum = tstoolbox.read(hourly_precip_hum)
@@ -562,7 +577,6 @@ def humidity(
         index_type=index_type,
         names=names,
         target_units=target_units,
-        print_input=print_input,
         hum_min_col=hum_min_col,
         hum_max_col=hum_max_col,
         hum_mean_col=hum_mean_col,
@@ -575,6 +589,7 @@ def humidity(
         hourly_temp=hourly_temp,
         hourly_precip_hum=hourly_precip_hum,
         preserve_daily_mean=preserve_daily_mean,
+        disagg_type='humidity'
     )
 
     ntsd = pd.DataFrame(
@@ -649,7 +664,6 @@ def dewpoint_temperature(
         index_type=index_type,
         names=names,
         target_units=target_units,
-        print_input=print_input,
         hum_min_col=hum_min_col,
         hum_max_col=hum_max_col,
         hum_mean_col=hum_mean_col,
@@ -662,6 +676,8 @@ def dewpoint_temperature(
         hourly_temp=hourly_temp,
         hourly_precip_hum=hourly_precip_hum,
         preserve_daily_mean=preserve_daily_mean,
+        disagg_type='dewpoint'
+
     )
 
     ntsd = pd.DataFrame(
