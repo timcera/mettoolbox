@@ -7,11 +7,11 @@ Python API Function Summary
     :toctree: _function_autosummary
 
     mettoolbox.mettoolbox.about
+    mettoolbox.mettoolbox.disaggregate.dewpoint_temperature
     mettoolbox.mettoolbox.disaggregate.evaporation
     mettoolbox.mettoolbox.disaggregate.humidity
     mettoolbox.mettoolbox.disaggregate.precipitation
     mettoolbox.mettoolbox.disaggregate.radiation
-    mettoolbox.mettoolbox.disaggregate.tdew
     mettoolbox.mettoolbox.disaggregate.temperature
     mettoolbox.mettoolbox.disaggregate.wind_speed
     mettoolbox.mettoolbox.indices.pe

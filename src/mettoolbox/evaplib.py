@@ -500,7 +500,7 @@ def tvardry(
     cp=scipy.array([]),
     T=scipy.array([]),
     sigma_t=scipy.array([]),
-    z=float(),
+    z=0.0,
     d=0.0,
     C1=2.9,
     C2=28.4,

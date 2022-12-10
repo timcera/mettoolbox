@@ -202,8 +202,7 @@ def calc_es(tmean=None, tmax=None, tmin=None):
         eamax = calc_e0(tmax)
         eamin = calc_e0(tmin)
         return (eamax + eamin) / 2
-    else:
-        return calc_e0(tmean)
+    return calc_e0(tmean)
 
 
 def calc_ea(tmean=None, tmax=None, tmin=None, rhmax=None, rhmin=None, rh=None):

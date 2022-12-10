@@ -17,6 +17,11 @@ disaggregate
 .. program-output:: mettoolbox disaggregate --help
    :prompt:
 
+disaggregate dewpoint_temperature
+---------------------------------
+.. program-output:: mettoolbox disaggregate dewpoint_temperature --help
+   :prompt:
+
 disaggregate evaporation
 ------------------------
 .. program-output:: mettoolbox disaggregate evaporation --help
@@ -35,11 +40,6 @@ disaggregate precipitation
 disaggregate radiation
 ----------------------
 .. program-output:: mettoolbox disaggregate radiation --help
-   :prompt:
-
-disaggregate tdew
------------------
-.. program-output:: mettoolbox disaggregate tdew --help
    :prompt:
 
 disaggregate temperature
