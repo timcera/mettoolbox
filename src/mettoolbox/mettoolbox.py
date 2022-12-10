@@ -368,9 +368,9 @@ def humidity_cli(
             source_units=source_units,
             target_units=target_units,
             print_input=print_input,
-            precip_col=hum_min_col,
-            temp_min_col=hum_min_col,
-            temp_max_col=hum_max_col,
+            precip_col=precip_col,
+            temp_min_col=temp_min_col,
+            temp_max_col=temp_max_col,
             hum_min_col=hum_min_col,
             hum_max_col=hum_max_col,
             hum_mean_col=hum_mean_col,
@@ -767,6 +767,10 @@ def radiation_cli(
     lat=None,
     lon=None,
     hourly_rad=None,
+    glob_swr_col=None,
+    ssd_col=None,
+    temp_min_col=None,
+    temp_max_col=None,
 ):
     """Disaggregate daily radiation to hourly radiation.
 
@@ -854,6 +858,23 @@ def radiation_cli(
     mean_course:
         Filename of HOURLY CSV file that contains radiation values to be
         used with the "mean_course" method.
+
+    glob_swr_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the mean global radiation.
+
+    ssd_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the solar duration.
+
+    temp_min_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily minimum temperature.
+
+    temp_max_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily maximum temperature.
+
     """
     tsutils.printiso(
         disaggregate.radiation(
@@ -879,6 +900,10 @@ def radiation_cli(
             hourly_rad=hourly_rad,
             lat=lat,
             lon=lon,
+            glob_swr_col=glob_swr_col,
+            ssd_col=ssd_col,
+            temp_min_col=temp_min_col,
+            temp_max_col=temp_max_col,
         ),
         tablefmt=tablefmt,
     )

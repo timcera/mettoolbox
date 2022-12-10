@@ -103,12 +103,12 @@ def disaggregate_tdew(
             tdew += temp.index.hour / 24.0 * (tdew_nextday - tdew) + tdew_delta
 
         tdew_disagg = tdew
-        sat_vap_press_tdew = vapor_pressure(tdew, 100)
-        sat_vap_press_t = vapor_pressure(temp, 100)
-
-        hum_disagg = pd.Series(
-            index=temp.index, data=100 * sat_vap_press_tdew / sat_vap_press_t
-        )
+        if preserve_daily_mean:
+            sat_vap_press_tdew = vapor_pressure(tdew, 100)
+            sat_vap_press_t = vapor_pressure(temp, 100)
+            hum_disagg = pd.Series(
+                index=temp.index, data=100 * sat_vap_press_tdew / sat_vap_press_t
+            )
     elif method == "min_max":
         assert (
             "hum_min" in data_daily.columns and "hum_max" in data_daily.columns
