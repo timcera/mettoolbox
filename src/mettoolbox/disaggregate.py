@@ -281,6 +281,7 @@ def prepare_hum_tdew(
     hourly_temp=None,
     hourly_precip_hum=None,
     preserve_daily_mean=None,
+    disagg_type=None,
 ):
     """Disaggregate daily humidity to hourly humidity data."""
     target_units = single_target_units(source_units, target_units, "")
@@ -465,15 +466,27 @@ def prepare_hum_tdew(
             tsd.columns = ("tmin", "tmax", "hum_min", "hum_max")
 
         elif method == "month_hour_precip_mean":
-            tsd.columns = "precip"
-    if method in (
-        "minimal",
-        "dewpoint_regression",
-        "linear_dewpoint_variation",
-        "min_max",
-    ):
-        hourly_temp = tstoolbox.read(hourly_temp)
-        hourly_temp = hourly_temp.astype(float).squeeze()
+            tsd.columns = ["precip"]
+    if disagg_type == "humidity":
+        if method in [
+            "minimal",
+            "dewpoint_regression",
+            "linear_dewpoint_variation",
+            "min_max",
+        ]:
+            hourly_temp = tstoolbox.read(hourly_temp)
+            hourly_temp = hourly_temp.astype(float).squeeze()
+    elif disagg_type == "dewpoint":
+        if method in [
+            "equal",
+            "minimal",
+            "dewpoint_regression",
+            "linear_dewpoint_variation",
+            "min_max",
+            "month_hour_precip_mean",
+        ]:
+            hourly_temp = tstoolbox.read(hourly_temp)
+            hourly_temp = hourly_temp.astype(float).squeeze()
 
     if method == "month_hour_precip_mean":
         hourly_precip_hum = tstoolbox.read(hourly_precip_hum)
@@ -537,7 +550,6 @@ def humidity(
         index_type=index_type,
         names=names,
         target_units=target_units,
-        print_input=print_input,
         hum_min_col=hum_min_col,
         hum_max_col=hum_max_col,
         hum_mean_col=hum_mean_col,
@@ -550,6 +562,7 @@ def humidity(
         hourly_temp=hourly_temp,
         hourly_precip_hum=hourly_precip_hum,
         preserve_daily_mean=preserve_daily_mean,
+        disagg_type="humidity",
     )
 
     ntsd = pd.DataFrame(
@@ -636,6 +649,7 @@ def dewpoint_temperature(
         hourly_temp=hourly_temp,
         hourly_precip_hum=hourly_precip_hum,
         preserve_daily_mean=preserve_daily_mean,
+        disagg_type="dewpoint",
     )
 
     ntsd = pd.DataFrame(
@@ -757,12 +771,15 @@ def radiation(
     hourly_rad=None,
     lat=None,
     lon=None,
-    glob_swr_col=None,
+    glob_swr_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    temp_min_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    temp_max_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
+    ssd_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
 ):
     """Disaggregate daily to hourly data."""
-    target_units = single_target_units(source_units, target_units, "W/m2")
+    target_units = single_target_units(source_units, target_units, "W/m**2")
 
-    target_units = target_units[0] * len(source_units)
+    # target_units = target_units[0] * len(source_units)
 
     pd.options.display.width = 60
 
@@ -796,6 +813,33 @@ def radiation(
             )
         )
 
+    columns = []
+    if method in ["pot_rad", "mean_course"]:
+        try:
+            glob_swr_col = int(glob_swr_col)
+        except TypeError:
+            pass
+        columns.append(glob_swr_col)
+
+    if method in ["pot_rad_via_ssd"]:
+        try:
+            glob_swr_col = int(ssd_col)
+        except TypeError:
+            pass
+        columns.append(ssd_col)
+
+    if method == "pot_rad_via_bc":
+        try:
+            temp_min_col = int(temp_min_col)
+        except TypeError:
+            pass
+        columns.append(temp_min_col)
+        try:
+            temp_max_col = int(temp_max_col)
+        except TypeError:
+            pass
+        columns.append(temp_max_col)
+
     tsd = tsutils.common_kwds(
         tsutils.read_iso_ts(
             input_ts, skiprows=skiprows, names=names, index_type=index_type
@@ -810,32 +854,44 @@ def radiation(
         clean=clean,
     )
 
-    if method in ("pot_rad", "mean_course"):
-        with suppress(ValueError):
-            glob_swr_col = glob_swr_col - 1
-        tsd["glob"] = tsd[glob_swr_col]
+    if method in ["pot_rad", "mean_course"]:
+        tsd.columns = ["glob"]
+    if method in ["pot_rad_via_bc"]:
+        tsd.columns = ["tmin", "tmax"]
+    if method in ["pot_rad_via_ssd"]:
+        tsd.columns = ["ssd"]
+
+    if method == "mean_course":
+        hourly_rad = tstoolbox.read(hourly_rad)
+        hourly_rad = hourly_rad.astype(float).squeeze()
+        mean_course = calculate_mean_daily_course_by_month(
+            hourly_rad.squeeze(), normalize=True
+        )
+        pot_rad = None
+    else:
+        pot_rad = tstoolbox.read(pot_rad)
+        pot_rad = pot_rad.astype(float).squeeze()
+        mean_course = None
 
     sun_times = None
     if method == "pot_rad_via_ssd":
         sun_times = get_sun_times(tsd.index, float(lon), float(lat), round(lon / 15.0))
 
-    return tsutils.return_input(
-        print_input,
-        tsd,
-        pd.DataFrame(
-            disaggregate_radiation(
-                tsd,
-                sun_times=sun_times,
-                pot_rad=pot_rad,
-                method=method,
-                angstr_a=angstr_a,
-                angstr_b=angstr_b,
-                bristcamp_a=bristcamp_a,
-                bristcamp_c=bristcamp_c,
-                mean_course=hourly_rad,
-            )
-        ),
+    ntsd = pd.DataFrame(
+        disaggregate_radiation(
+            tsd.astype(float),
+            method=method,
+            sun_times=sun_times,
+            pot_rad=pot_rad,
+            angstr_a=angstr_a,
+            angstr_b=angstr_b,
+            bristcamp_a=bristcamp_a,
+            bristcamp_c=bristcamp_c,
+            mean_course=mean_course,
+        )
     )
+    ntsd.columns = ["Radiation:W/m**2:disagg"]
+    return tsutils.return_input(print_input, tsd, ntsd)
 
 
 @validate_arguments(config=dict(arbitrary_types_allowed=True))
