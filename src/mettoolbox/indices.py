@@ -73,6 +73,13 @@ def spei(
         names=["rainfall", "pet"],
         source_units=source_units,
         target_units=["mm", "mm"],
+        start_date=start_date,
+        end_date=end_date,
+        dropna=dropna,
+        clean=clean,
+        round_index=round_index,
+        skiprows=skiprows,
+        index_type=index_type,
     )
 
     tsd["pe"] = tsd["rainfall:mm"] - tsd["pet:mm"]

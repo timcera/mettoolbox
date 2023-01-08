@@ -2,8 +2,8 @@ This is a description of the files
 
 Example 1:
 test_disaggregate_temperature		Simple test for temperature disaggregation
-input: data_temperature_gainesville.csv 
-output: data_temperature_gainesville_sine_mean.csv 
+input: data_temperature_gainesville.csv
+output: data_temperature_gainesville_sine_mean.csv
 
 Example 2:
 Example from Melodist
@@ -17,4 +17,3 @@ data_obs_hourly_precip_hum.csv		hourly precip and rh data
 data_obs_hourly_glob.csv		hourly solar radiation data
 
 data_hourly_rad_pot.csv			potential radiation
-

@@ -58,3 +58,4 @@ htmlcov
 
 __pycache__
 docs/_function_autosummary
+cache

@@ -106,13 +106,13 @@ def temperature(
         mean_course = calculate_mean_daily_course_by_month(
             hourly.squeeze(), normalize=True
         )
+
+        if min_max_time == "sun_loc_shift" or max_delta:
+            max_delta = get_shift_by_data(hourly.squeeze(), lon, lat, round(lon / 15.0))
+        else:
+            max_delta = None
     else:
         mean_course = None
-
-    if min_max_time == "sun_loc_shift" or max_delta:
-        max_delta = get_shift_by_data(hourly.squeeze(), lon, lat, round(lon / 15.0))
-    else:
-        max_delta = None
 
     if temp_min_col is None or temp_max_col is None:
         raise ValueError(
@@ -666,7 +666,7 @@ def dewpoint_temperature(
     )
 
     ntsd.columns = ["dewpoint_temp:degK:disagg"]
-    ntsd_units = tsutils._normalize_units(
+    ntsd = tsutils._normalize_units(
         ntsd, source_units="degK", target_units=target_units[0]
     )
     return tsutils.return_input(print_input, tsd, ntsd)
@@ -736,7 +736,7 @@ def wind_speed(
     )
 
     ndf = pd.DataFrame()
-    for column_name, column_data in tsd.iteritems():
+    for _, column_data in tsd.iteritems():
         df = disaggregate_wind(column_data, method=method, a=a, b=b, t_shift=t_shift)
         ndf = ndf.join(df, how="outer")
 
@@ -965,18 +965,13 @@ def precipitation(
         master = (
             master.loc[mask, master.columns[0]] / master.loc[mask, master.columns[1]]
         ).to_frame()
-        print(master)
         ntsd = tsd.loc[:, tsd.columns != masterstation_hour_col].asfreq(
             "H", method="ffill"
         )
-        print(ntsd)
         ntsd = ntsd.join(master)
-        print(ntsd)
         ntsd = ntsd.loc[:, tsd.columns != masterstation_hour_col].multiply(
             ntsd.iloc[:, -1:], axis="index"
         )
-        print(ntsd)
-        sys.exit()
         # All the remaining columns are daily.
         ntsd = (
             tsd.loc[:, tsd.columns != masterstation_hour_col]

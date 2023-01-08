@@ -19,10 +19,10 @@ def _columns(tsd, req_column_list=[], optional_column_list=[]):
         raise ValueError(
             tsutils.error_wrapper(
                 f"""
-You need to supply the column (name or number, data column numbering
-starts at 1) for {len(req_column_list)} time-series.
+                You need to supply the column (name or number, data column
+                numbering starts at 1) for {len(req_column_list)} time-series.
 
-Instead you gave {req_column_list}"""
+                Instead you gave {req_column_list}"""
             )
         )
 
@@ -135,8 +135,10 @@ def _preprocess(
                 raise ValueError(
                     tsutils.error_wrapper(
                         """
-If "source_units" are not supplied as the second ":" delimited field in the
-column name they must be supplied with the "source_units" keyword.  """
+                        If "source_units" are not supplied as the second ":"
+                        delimited field in the column name they must be
+                        supplied with the "source_units" keyword.
+                        """
                     )
                 )
     else:
@@ -145,8 +147,9 @@ column name they must be supplied with the "source_units" keyword.  """
         raise ValueError(
             tsutils.error_wrapper(
                 """
-The number of "source_units" terms must match the number of temperature
-columns.  """
+                The number of "source_units" terms must match the number of
+                temperature columns.
+                """
             )
         )
     interim_target_units = ["degC"] * len(tsd.columns)
@@ -223,7 +226,7 @@ def blaney_criddle(
     target_units="mm",
     print_input=False,
 ):
-    """Evaporation calculated according to [blaney_1952]_."""
+    """Evaporation calculated according to (Blaney, 1952)."""
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
@@ -271,7 +274,7 @@ def hamon(
     target_units=None,
     print_input=False,
 ):
-    """Evaporation calculated according to [hamon_1961]_."""
+    """Evaporation calculated according to (Hamon, 1961)."""
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
@@ -313,7 +316,7 @@ def romanenko(
     target_units=None,
     print_input=False,
 ):
-    """Evaporation calculated according to [romanenko_1961]_."""
+    """Evaporation calculated according to (Romanenko, 1961)."""
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
@@ -365,7 +368,7 @@ def linacre(
     target_units=None,
     print_input=False,
 ):
-    """Evaporation calculated according to [linacre_1977]_."""
+    """Evaporation calculated according to (Linacre, 1977)."""
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
