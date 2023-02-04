@@ -1355,6 +1355,7 @@ def blaney_criddle_cli(
     names=None,
     target_units="mm",
     print_input=False,
+    tablefmt="csv",
 ):
     """Evaporation calculated according to [blaney_1952]_.
 
@@ -1363,24 +1364,9 @@ def blaney_criddle_cli(
 
     Parameters
     ----------
-    lat: float
-        The latitude of the station.  Positive specifies the Northern
-        Hemisphere, and negative values represent the Southern
-        Hemisphere.
-
-    temp_min_col: str, int
-        The column name or number (data columns start numbering at 1) in
-        the input data that represents the daily minimum temperature.
-
-    temp_max_col: str, int
-        The column name or number (data columns start numbering at 1) in
-        the input data that represents the daily maximum temperature.
-
-    k: float
-        A scaling factor, defaults to 1.  This is an adjustment for local conditions,
-        for example, Lu, 2005 found that k=1.2 was a better fit for the southeastern
-        United States.
-
+    bright_hours_col
+        The column number (data columns start at 1) or column name that holds
+        the time-series of the number of bright hours each day.
     source_units
         If unit is specified for the column as the second field of a ':'
         delimited column name, then the specified units and the
@@ -1406,6 +1392,25 @@ def blaney_criddle_cli(
                               ["degF", "degF"],
                               input_ts="tmin_tmax_data.csv")
 
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+
+    k: float
+        A scaling factor, defaults to 1.  This is an adjustment for local conditions,
+        for example, Lu, 2005 found that k=1.2 was a better fit for the southeastern
+        United States.
+
     ${start_date}
 
     ${end_date}
@@ -1418,8 +1423,6 @@ def blaney_criddle_cli(
 
     ${skiprows}
 
-    ${index_type}
-
     ${names}
 
     ${target_units}
@@ -1427,13 +1430,6 @@ def blaney_criddle_cli(
     ${print_input}
 
     ${tablefmt}
-
-    temp_mean_col: str, int
-        The column name or number (data columns start numbering at 1) in
-        the input data that represents the daily mean temperature.  If
-        None will be estimated by the average of `temp_min_col` and
-        `temp_max_col`.
-
 
     Returns
     -------
@@ -1474,7 +1470,8 @@ def blaney_criddle_cli(
             names=names,
             target_units=target_units,
             print_input=print_input,
-        )
+        ),
+        tablefmt=tablefmt,
     )
 
 
@@ -1787,15 +1784,8 @@ def linacre_cli(
         Hemisphere.
 
     elevation: float
-        The elevation of the station in meters.
-
-    temp_min_col: str, int
-        The column name or number (data columns start numbering at 1) in
-        the input data that represents the daily minimum temperature.
-
-    temp_max_col: str, int
-        The column name or number (data columns start numbering at 1) in
-        the input data that represents the daily maximum temperature.
+        The elevation of the station in
+        meters.
 
     source_units
         If unit is specified for the column as the second field of a ':'
@@ -1822,6 +1812,24 @@ def linacre_cli(
                                    ["degF", "degF"],
                                    input_ts="tmin_tmax_data.csv")
 
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+
+    tdew_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily dewpoint temperature.
+
     ${start_date}
 
     ${end_date}
@@ -1843,12 +1851,6 @@ def linacre_cli(
     ${print_input}
 
     ${tablefmt}
-
-    temp_mean_col: str, int
-        The column name or number (data columns start numbering at 1) in
-        the input data that represents the daily mean temperature.  If
-        None will be estimated by the average of `temp_min_col` and
-        `temp_max_col`.
 
     Returns
     -------
@@ -2059,6 +2061,7 @@ pet.oudin_form.__doc__ = oudin_form_cli.__doc__
 @program.pet.command("priestley_taylor", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def priestley_taylor_cli(
+    input_ts,
     lat,
     lon,
     tmin_col,
@@ -2087,10 +2090,17 @@ def priestley_taylor_cli(
 
     Parameters
     ----------
+    ${input_ts}
+
     lat: float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
         Hemisphere.
+
+    lon: float
+        The longitude of the station.  Positive specifies east of the
+        prime meridian, and negative values represent west of the
+        prime meridian.
 
     temp_min_col: str, int
         The column name or number (data columns start numbering at 1) in
@@ -2099,6 +2109,14 @@ def priestley_taylor_cli(
     temp_max_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
+
+    srad_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily solar radiation.
+
+    dayl_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily day light fraction.
 
     source_units
         If unit is specified for the column as the second field of a ':'
@@ -2125,7 +2143,13 @@ def priestley_taylor_cli(
                                    ["degF", "degF"],
                                    input_ts="tmin_tmax_data.csv")
 
-    ${input_ts}
+    rh_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily average relative humidity.
+
+    u2_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily u2.
 
     ${start_date}
 
@@ -2148,12 +2172,7 @@ def priestley_taylor_cli(
     ${print_input}
 
     ${tablefmt}
-
-    temp_mean_col: str, int
-        The column name or number (data columns start numbering at 1) in
-        the input data that represents the daily mean temperature.  If
-        None will be estimated by the average of `temp_min_col` and
-        `temp_max_col`."""
+    """
     tsutils.printiso(
         pet.priestley_taylor(
             lat,
@@ -2329,6 +2348,7 @@ pet.romanenko.__doc__ = romanenko_cli.__doc__
 @program.ret.command("penman_monteith", formatter_class=RSTHelpFormatter)
 @tsutils.doc(_LOCAL_DOCSTRINGS)
 def penman_monteith_cli(
+    input_ts,
     lat,
     lon,
     tmin_col,
@@ -2357,10 +2377,17 @@ def penman_monteith_cli(
 
     Parameters
     ----------
+    {input_ts}
+
     lat: float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
         Hemisphere.
+
+    lon: float
+        The longitude of the station.  Positive specifies east of the
+        prime meridian, and negative values represent west of the
+        prime meridian.
 
     temp_min_col: str, int
         The column name or number (data columns start numbering at 1) in
@@ -2369,6 +2396,15 @@ def penman_monteith_cli(
     temp_max_col: str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
+
+    srad_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily solar radiation.
+
+    dayl_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily day light fraction.
+
 
     source_units
         If unit is specified for the column as the second field of a ':'
@@ -2395,7 +2431,13 @@ def penman_monteith_cli(
                                    ["degF", "degF"],
                                    input_ts="tmin_tmax_data.csv")
 
-    ${input_ts}
+    rh_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily average relative humidity.
+
+    u2_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily u2.
 
     ${start_date}
 
@@ -2418,12 +2460,7 @@ def penman_monteith_cli(
     ${print_input}
 
     ${tablefmt}
-
-    temp_mean_col: str, int
-        The column name or number (data columns start numbering at 1) in
-        the input data that represents the daily mean temperature.  If
-        None will be estimated by the average of `temp_min_col` and
-        `temp_max_col`."""
+    """
     tsutils.printiso(
         ret.penman_monteith(
             lat,
