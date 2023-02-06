@@ -92,7 +92,7 @@ ignore = [".travis.yml",
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "4.0.4"
+version = "5.0.0"
 tag_format = "v$version"
 version_files = ["VERSION"]
 update_changelog_on_bump = true
