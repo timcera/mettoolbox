@@ -1,17 +1,16 @@
 [build-system]
+build-backend = "setuptools.build_meta"
 requires = [
     "setuptools>=45",
     "setuptools_scm[toml]>=6.2",
     "wheel",
-    "oldest-supported-numpy",
+    "oldest-supported-numpy"
 ]
-build-backend = "setuptools.build_meta"
 
 [project]
 name = "mettoolbox"
 dynamic = ["readme", "version"]
 description = "mettoolbox is set of command line and Python tools for the analysis and reporting of meteorological data."
-requires-python = ">=3.7.1"
 dependencies = [
     "toolbox_utils >= 3.0.0, < 4.0.0",
     "tstoolbox >= 105.0.0, < 106.0.0",
@@ -19,62 +18,74 @@ dependencies = [
     "solarpy",
     "standard-precip",
     "pydaymet",
-    "pyet",
-    ]
-license = {text = "BSD-3-Clause"}
+    "pyet"
+]
 authors = [
     {name = "Tim Cera", email = "tim@cerazone.net"}
-    ]
+]
 classifiers = [
-        "Development Status :: 5 - Production/Stable",
-        "Intended Audience :: Science/Research",
-        "Intended Audience :: End Users/Desktop",
-        "Intended Audience :: Developers",
-        "Environment :: Console",
-        "License :: OSI Approved :: BSD License",
-        "Natural Language :: English",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Topic :: Scientific/Engineering :: Information Analysis",
-        "Topic :: Scientific/Engineering",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-    ]
-keywords = ["time-series",
-            "cli-app",
-            "meteorology",
-            "evaporation",
-            "precipitation",
-            "climate",
-            "weather",
-            "climate-data",
-            "climate-data-analysis",
-            "climate-data-analysis-tools",
-            "temperature",
-            "humidity",
-            "wind",
-            ]
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Developers",
+    "Environment :: Console",
+    "License :: OSI Approved :: BSD License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+keywords = [
+    "time-series",
+    "cli-app",
+    "meteorology",
+    "evaporation",
+    "precipitation",
+    "climate",
+    "weather",
+    "climate-data",
+    "climate-data-analysis",
+    "climate-data-analysis-tools",
+    "temperature",
+    "humidity",
+    "wind"
+]
+license = {text = "BSD-3-Clause"}
+requires-python = ">=3.8"
 
 [project.optional-dependencies]
 dev = [
+    "bandit",
     "black",
+    "blacken-docs",
+    "black-nbconvert",
     "cleanpy",
-    "twine",
+    "commitizen",
+    "coverage[toml]",
+    "isort",
+    "mypy",
+    "pre-commit",
+    "pyflakes",
+    "pylama",
+    "pyle",
+    "pylint",
+    "pyre",
+    "pyroma",
     "pytest",
-    "coverage",
-    "flake8",
     "pytest-cov",
     "pytest-mpl",
-    "pre-commit",
-    "black-nbconvert",
-    "blacken-docs",
-    "velin",
-    "isort",
     "pyupgrade",
-    "commitizen",
-    ]
+    "twine",
+    "unimport",
+    "velin",
+    "vulture"
+]
 
 [project.scripts]
 mettoolbox = "mettoolbox.mettoolbox:main"
@@ -84,21 +95,18 @@ documentation = "https://timcera.bitbucket.io/mettoolbox/docs/index.html#mettool
 github = "https://github.com/timcera/mettoolbox"
 bitbucket = "https://bitbucket.org/timcera/mettoolbox/src/main/"
 
-[tool]
-
 [tool.check-manifest]
-ignore = [".travis.yml",
-          "docs/_function_autosummary/*"]
+ignore = [
+    ".travis.yml",
+    "docs/_function_autosummary/*"
+]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "5.0.0"
 tag_format = "v$version"
-version_files = ["VERSION"]
 update_changelog_on_bump = true
-
-[tool.coverage.run]
-relative_files = true
+version = "5.0.0"
+version_files = ["VERSION"]
 
 [tool.isort]
 profile = "black"
@@ -112,7 +120,7 @@ readme = {file = "README.rst"}
 version = {file = "VERSION"}
 
 [tool.setuptools.packages.find]
-where = ["src"]
 exclude = ["examples*", "tools*", "docs*", "mettoolbox.tests*"]
+where = ["src"]
 
 [tool.setuptools_scm]
