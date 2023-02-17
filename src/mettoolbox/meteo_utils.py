@@ -14,14 +14,14 @@ def calc_psy(pressure, tmean=None):
 
     Parameters
     ----------
-    pressure: float
+    pressure : float
         atmospheric pressure [kPa].
-    tmean: float, optional
+    tmean : float, optional
         average day temperature [°C].
 
     Returns
     -------
-        pandas.Series containing the Psychrometric constant [kPa °C-1].
+    pandas.Series containing the Psychrometric constant [kPa °C-1].
 
     Examples
     --------
@@ -53,12 +53,12 @@ def calc_vpc(tmean):
 
     Parameters
     ----------
-    tmean: pandas.Series, optional
+    tmean : pandas.Series, optional
         average day temperature [°C]
 
     Returns
     -------
-        pandas.Series containing the calculated Saturation vapour pressure
+    pandas.Series containing the calculated Saturation vapour pressure
         [kPa °C-1].
 
     Examples
@@ -78,7 +78,7 @@ def calc_lambda(tmean):
 
     Parameters
     ----------
-    tmean: pandas.Series/float, optional
+    tmean : pandas.Series/float, optional
         average day temperature [°C]
 
     Returns
@@ -102,7 +102,7 @@ def calc_press(elevation):
 
     Parameters
     ----------
-    elevation: float, optional
+    elevation : float, optional
         the site elevation [m]
 
     Returns
@@ -155,7 +155,7 @@ def calc_e0(tmean):
 
     Parameters
     ----------
-    tmean: pandas.Series, optional
+    tmean : pandas.Series, optional
         average day temperature [°C]
 
     Returns
@@ -179,11 +179,11 @@ def calc_es(tmean=None, tmax=None, tmin=None):
 
     Parameters
     ----------
-    tmean: pandas.Series, optional
+    tmean : pandas.Series, optional
         average day temperature [°C]
-    tmax: pandas.Series, optional
+    tmax : pandas.Series, optional
         maximum day temperature [°C]
-    tmin: pandas.Series, optional
+    tmin : pandas.Series, optional
         minimum day temperature [°C]
 
     Returns
@@ -210,17 +210,17 @@ def calc_ea(tmean=None, tmax=None, tmin=None, rhmax=None, rhmin=None, rh=None):
 
     Parameters
     ----------
-    tmean: pandas.Series, optional
+    tmean : pandas.Series, optional
         average day temperature [°C]
-    tmax: pandas.Series, optional
+    tmax : pandas.Series, optional
         maximum day temperature [°C]
-    tmin: pandas.Series, optional
+    tmin : pandas.Series, optional
         minimum day temperature [°C]
-    rhmax: pandas.Series, optional
+    rhmax : pandas.Series, optional
         maximum daily relative humidity [%]
-    rhmin: pandas.Series, optional
+    rhmin : pandas.Series, optional
         mainimum daily relative humidity [%]
-    rh: pandas.Series, optional
+    rh : pandas.Series, optional
         mean daily relative humidity [%]
 
     Returns
@@ -252,7 +252,7 @@ def day_of_year(tindex):
 
     Parameters
     ----------
-    tindex: pandas.Index
+    tindex : pandas.Index
 
     Returns
     -------
@@ -267,8 +267,8 @@ def daylight_hours(tindex, lat):
 
     Parameters
     ----------
-    tindex: pandas.Index
-    lat: float
+    tindex : pandas.Index
+    lat : float
         the site latitude [rad]
 
     Returns
@@ -290,9 +290,9 @@ def sunset_angle(sol_dec, lat):
 
     Parameters
     ----------
-    sol_dec: pandas.Series
+    sol_dec : pandas.Series
         solar declination [rad]
-    lat: float
+    lat : float
         the site latitude [rad]
 
     Returns
@@ -311,16 +311,16 @@ def sunset_angle_hour(tindex, lat, lz, lon):
 
     Parameters
     ----------
-    tindex: pandas.Index
-    lat: float
+    tindex : pandas.Index
+    lat : float
         the site latitude [rad]
-    lz: float
+    lz : float
         longitude of the center of the local time zone [expressed as positive
         degrees west of Greenwich, England]. In the United States, Lz = 75, 90,
         105 and 120° for the Eastern, Central, Rocky Mountain and Pacific time
         zones, respectively, and Lz = 0° for Greenwich, 345° for Paris
         (France), and 255° for Bangkok (Thailand) [deg]
-    lon: float
+    lon : float
         longitude of the solar radiation measurement site [expressed as
         positive degrees west of Greenwich, England]
 
@@ -376,14 +376,12 @@ def solar_declination(j):
 
     Parameters
     ----------
-    j: array.py
+    j : array.py
         day of the year (1-365)
-    Returns
-    -------
     array.py of solar declination [rad].
 
     Notes
-    -------
+    -----
     Based on equations 24 in [allen_1998]_.
     """
     return 0.409 * sin(2.0 * pi / 365.0 * j - 1.39)
@@ -394,14 +392,12 @@ def relative_distance(j):
 
     Parameters
     ----------
-    j: array.py
+    j : array.py
         day of the year (1-365)
-    Returns
-    -------
     array.py specifyng relative distance between earth and sun.
 
     Notes
-    -------
+    -----
     Based on equations 23 in [allen_1998]_.
     """
     return 1 + 0.033 * cos(2.0 * pi / 365.0 * j)
@@ -412,8 +408,8 @@ def extraterrestrial_r(tindex, lat):
 
     Parameters
     ----------
-    tindex: pandas.Index
-    lat: float
+    tindex : pandas.Index
+    lat : float
         the site latitude [rad]
 
     Returns
@@ -439,16 +435,16 @@ def extraterrestrial_r_hour(tindex, lat, lz, lon):
 
     Parameters
     ----------
-    tindex: pandas.Index
-    lat: float
+    tindex : pandas.Index
+    lat : float
         the site latitude [rad]
-    lz: float
+    lz : float
         longitude of the center of the local time zone [expressed as positive
         degrees west of Greenwich, England]. In the United States, Lz = 75, 90,
         105 and 120° for the Eastern, Central, Rocky Mountain and Pacific time
         zones, respectively, and Lz = 0° for Greenwich, 345° for Paris
         (France), and 255° for Bangkok (Thailand)
-    lon: float
+    lon : float
         longitude of the solar radiation measurement site [expressed as
         positive degrees west of Greenwich, England]
 
@@ -479,35 +475,34 @@ def calc_res_surf(lai=None, r_s=70, r_l=100, lai_eff=0, srs=None, co2=None):
 
     Parameters
     ----------
-    lai: pandas.Series/float, optional
+    lai : pandas.Series/float, optional
         leaf area index [-]
-    r_s: pandas.series/float, optional
+    r_s : pandas.series/float, optional
         surface resistance [s m-1]
-    r_l: float, optional
+    r_l : float, optional
         bulk stomatal resistance [s m-1]
-    lai_eff: float, optional
+    lai_eff : float, optional
         1 => LAI_eff = 0.5 * LAI
         2 => LAI_eff = lai / (0.3 * lai + 1.2)
         3 => LAI_eff = 0.5 * LAI; (LAI>4=4)
         4 => see [zhang_2008]_.
-    srs: float, optional
+    srs : float, optional
         Relative sensitivity of rl to Δ[CO2] [yang_2019]_
-    co2: float
+    co2 : float
         CO2 concentration [ppm]
 
     Returns
     -------
     pandas.Series containing the calculated surface resistance
-
     References
     -----
     .. [zhang_2008] Zhang, B., Kang, S., Li, F., & Zhang, L. (2008). Comparison
-       of three evapotranspiration models to Bowen ratio-energy balance method
-       for a vineyard in an arid desert region of northwest China. Agricultural
-       and Forest Meteorology, 148(10), 1629-1640.
+        of three evapotranspiration models to Bowen ratio-energy balance method
+        for a vineyard in an arid desert region of northwest China. Agricultural
+        and Forest Meteorology, 148(10), 1629-1640.
     .. [yang_2019] Yang, Y., Roderick, M. L., Zhang, S., McVicar, T. R., &
-       Donohue, R. J. (2019). Hydrologic implications of vegetation response to
-       elevated CO 2 in climate projections. Nature Climate Change, 9, 44-48.
+        Donohue, R. J. (2019). Hydrologic implications of vegetation response to
+        elevated CO 2 in climate projections. Nature Climate Change, 9, 44-48.
 
     """
     if lai is None:
@@ -522,9 +517,9 @@ def calc_laieff(lai=None, lai_eff=0):
 
     Parameters
     ----------
-    lai: pandas.Series/float, optional
+    lai : pandas.Series/float, optional
         leaf area index [-]
-    lai_eff: float, optional
+    lai_eff : float, optional
         0 => LAI_eff = 0.5 * LAI
         1 => LAI_eff = lai / (0.3 * lai + 1.2)
         2 => LAI_eff = 0.5 * LAI; (LAI>4=4)
@@ -554,19 +549,17 @@ def calc_res_aero(wind, croph=None, zw=2, zh=2, ra_method=1):
 
     Parameters
     ----------
-    wind: pandas.Series
+    wind : pandas.Series
         mean day wind speed [m/s]
-    croph: pandas.series/float, optional
+    croph : pandas.series/float, optional
         crop height [m]
-    zw: float, optional
+    zw : float, optional
         height of wind measurement [m]
-    zh: float, optional
-         height of humidity and or air temperature measurement [m]
-    ra_method: float, optional
+    zh : float, optional
+        height of humidity and or air temperature measurement [m]
+    ra_method : float, optional
         1 => ra = 208/wind
         2 => ra is calculated based on equation 36 in FAO (1990), ANNEX V.
-    Returns
-    -------
     pandas.Series containing the calculated aerodynamic resistance
     """
     if ra_method == 1:

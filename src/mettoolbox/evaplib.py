@@ -43,25 +43,7 @@ def evaplib():
 
     Parameters
     ----------
-    E0:
-        Calculate Penman (1948, 1956) open water evaporation.
-    Em:
-        Calculate evaporation according to Makkink (1965).
-    Ept:
-        Calculate evaporation according to Priestley and Taylor (1972).
-    ET0pm:
-        Calculate Penman Monteith reference evaporation short grass (FAO).
-    Epm:
-        Calculate Penman Monteith reference evaporation (Monteith, 1965).
-    ra:
-        Calculate  from windspeed and roughnes parameters.
-    tvardry:
-        Calculate sensible heat flux from temperature variations (Vugts et al., 1993).
-    gash79:
-        Calculate rainfall interception (Gash, 1979).
-    Author: Dr. Maarten J. Waterloo <maarten.waterloo@acaciawater.com>.
     Version 1.0.
-    Date: Sep 2012, last modified November June 2016.
 
     """
     print("A libray with Python functions for calculation of")
@@ -84,7 +66,6 @@ def evaplib():
 
 
 def ra(z=float, z0=float, d=float, u=scipy.array([])):
-
     """
     Function to calculate aerodynamic resistance from windspeed:
 
@@ -138,7 +119,6 @@ def E0(
     alpha=0.08,
     Z=0.0,
 ):
-
     """
     Function to calculate daily Penman (open) water evaporation estimates:
 
@@ -234,7 +214,6 @@ def ET0pm(
     u=scipy.array([]),
     Z=0.0,
 ):
-
     """
     Function to calculate daily Penman Monteith reference evaporation estimates.
 
@@ -311,7 +290,6 @@ def Em(
     airpress=scipy.array([]),
     Rs=scipy.array([]),
 ):
-
     """
     Function to calculate Makkink evaporation (in mm/day):
 
@@ -374,7 +352,6 @@ def Ept(
     Rn=scipy.array([]),
     G=scipy.array([]),
 ):
-
     """
     Function to calculate daily Priestley - Taylor evaporation:
 
@@ -433,7 +410,6 @@ def Epm(
     ra=scipy.array([]),
     rs=scipy.array([]),
 ):
-
     """
     Function to calculate the Penman Monteith evaporation.
 
@@ -505,7 +481,6 @@ def tvardry(
     C1=2.9,
     C2=28.4,
 ):
-
     """Function to calculate the sensible heat flux from high
     frequency temperature measurements and their standard deviation:
 
@@ -586,7 +561,6 @@ def tvardry(
 
 
 def gash79(Pg=scipy.array([]), ER=float, S=float, St=float, p=float, pt=float):
-
     """
     Function to calculate precipitation interception loss from daily
     precipitation values and vegetation parameters.
@@ -626,7 +600,6 @@ def gash79(Pg=scipy.array([]), ER=float, S=float, St=float, p=float, pt=float):
     l = scipy.size(Pg)
     # Check if we have a single precipitation value or an array
     if l < 2:  # Dealing with single value...
-
         # PGsat calculation (for the saturation of the canopy)
         PGsat = -(1 / ER * S) * scipy.log(1 - (ER / (1 - p - pt)))
 

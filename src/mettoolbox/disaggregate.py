@@ -1,14 +1,13 @@
 import datetime
 import warnings
 from contextlib import suppress
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
 import numpy as np
 import pandas as pd
 from pydantic import PositiveInt, confloat, validate_arguments
 from toolbox_utils import tsutils
 from tstoolbox import tstoolbox
-from typing_extensions import Literal
 
 from . import tdew as tdew_melo
 from .melodist.melodist.humidity import (

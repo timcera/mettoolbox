@@ -579,7 +579,6 @@ def allen(
 def prepare_daymet(
     tmin_col, tmax_col, srad_col, dayl_col, rh_col, u2_col, source_units, target_units
 ):
-
     read_args = [tmin_col, tmax_col, srad_col, dayl_col]
     read_kwds = {
         "source_units": source_units,

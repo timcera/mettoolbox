@@ -72,7 +72,7 @@ def evaporation_cli(
 
     Parameters
     ----------
-    method: str
+    method : str
         This is the method that will be used to disaggregate
         the daily evaporation data.
 
@@ -108,7 +108,7 @@ def evaporation_cli(
 
     ${tablefmt}
 
-    lat: float
+    lat : float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
         Hemisphere.
@@ -204,7 +204,7 @@ def humidity_cli(
 
     Parameters
     ----------
-    method: str
+    method : str
         Available disaggregation methods for
         humidity.
 
@@ -326,27 +326,27 @@ def humidity_cli(
         Column index (data columns start numbering at 1) or column name
         from the input data that contains the daily maximum humidity.
 
-    a0: float
+    a0 : float
         The "a0"
         parameter.
 
-    a1: float
+    a1 : float
         The "a1"
         parameter.
 
-    kr: int
+    kr : int
         Parameter for the "linear_dewpoint_variation"
         method.
 
-    hourly_temp: str
+    hourly_temp : str
         Filename of a CSV file that contains an hourly time series of
         temperatures.
 
-    hourly_precip_hum: str
+    hourly_precip_hum : str
         Filename of a CSV file that contains an hourly time series of
         precipitation and humidity.
 
-    preserve_daily_mean: str
+    preserve_daily_mean : str
         Column name or index (data columns start at 1) that identifies
         the observed daily mean humidity.  If not None will correct the
         daily mean values of the disaggregated data with the observed
@@ -454,7 +454,7 @@ def dewpoint_temperature_cli(
 
     Parameters
     ----------
-    method: str
+    method : str
         Available disaggregation methods for
         humidity.
 
@@ -576,27 +576,27 @@ def dewpoint_temperature_cli(
         Column index (data columns start numbering at 1) or column name
         from the input data that contains the daily maximum humidity.
 
-    a0: float
+    a0 : float
         The "a0"
         parameter.
 
-    a1: float
+    a1 : float
         The "a1"
         parameter.
 
-    kr: int
+    kr : int
         Parameter for the "linear_dewpoint_variation"
         method.
 
-    hourly_temp: str
+    hourly_temp : str
         Filename of a CSV file that contains an hourly time series of
         temperatures.
 
-    hourly_precip_hum: str
+    hourly_precip_hum : str
         Filename of a CSV file that contains an hourly time series of
         precipitation and humidity.
 
-    preserve_daily_mean: str
+    preserve_daily_mean : str
         Column name or index (data columns start at 1) that identifies
         the observed daily mean humidity.  If not None will correct the
         daily mean values of the disaggregated data with the observed
@@ -662,7 +662,7 @@ def precipitation_cli(
 
     Parameters
     ----------
-    method: str
+    method : str
         Disaggregation methods available for precipitation.
 
         +---------------+--------------------------------------------+
@@ -776,7 +776,7 @@ def radiation_cli(
 
     Parameters
     ----------
-    method: str
+    method : str
         Disaggregation methods available for radiation
 
         +-----------------+-----------------------------------------+
@@ -831,28 +831,28 @@ def radiation_cli(
 
     ${tablefmt}
 
-    pot_rad: str
+    pot_rad : str
         hourly dataframe including potential radiation
 
-    angstr_a: float
+    angstr_a : float
         parameter a of the Angstrom model (intercept)
 
-    angstr_b: float
+    angstr_b : float
         parameter b of the Angstrom model (slope)
 
-    bristcamp_a: float
+    bristcamp_a : float
         parameter a for bristcamp
 
-    bristcamp_c: float
+    bristcamp_c : float
         parameter c for bristcamp
 
-    hourly_rad: str
+    hourly_rad : str
         monthly values of the mean hourly radiation course
 
-    lat: float
+    lat : float
         Latitude
 
-    lon: float
+    lon : float
         Longitude
 
     mean_course:
@@ -967,7 +967,7 @@ def temperature_cli(
 
     Parameters
     ----------
-    method: str
+    method : str
         Disaggregation methods available for temperature.
 
         +---------------------+--------------------------------------+
@@ -998,7 +998,7 @@ def temperature_cli(
 
     ${psource_units}
 
-    min_max_time: str
+    min_max_time : str
         +----------------+------------------------------------------+
         | `min_max_time` | Description                              |
         +================+==========================================+
@@ -1017,7 +1017,7 @@ def temperature_cli(
         |                | keyword.                                 |
         +----------------+------------------------------------------+
 
-    mod_nighttime: bool
+    mod_nighttime : bool
         Allows one to apply a linear interpolation of night time values,
         which proves preferable during polar nights.
 
@@ -1045,34 +1045,34 @@ def temperature_cli(
 
     ${tablefmt}
 
-    temp_min_col: str, int
+    temp_min_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily minimum temperature.
 
-    temp_max_col: str, int
+    temp_max_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
 
-    temp_mean_col: str, int
+    temp_mean_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily mean temperature.  If
         None will be estimated by the average of `temp_min_col` and
         `temp_max_col`.
 
-    lat: float
+    lat : float
         The latitude of the station.  Required if `min_max_time` is
         "sun_loc" or "sun_loc_shift".
 
-    lon: float
+    lon : float
         The longitude of the station.  Required if `min_max_time` is
         "sun_loc" or "sun_loc_shift".
 
-    hourly: str
+    hourly : str
         File name that contains the hourly time series of temperatures
         to use when `method` is "mean_course_min" or "mean_course_mean"
         or when `max_delta` is True.
 
-    max_delta: bool
+    max_delta : bool
         Uses maximum delta of hourly values for each month to constrain
         the disaggregated hourly temperature values.  If set to True
         requires an hourly time-series filename specified with the
@@ -1136,7 +1136,7 @@ def wind_speed_cli(
 
     Parameters
     ----------
-    method: str
+    method : str
         Disaggregation methods available for wind speed.
 
         +----------+------------------------------------------------+
@@ -1184,13 +1184,13 @@ def wind_speed_cli(
 
     ${tablefmt}
 
-    a: float
+    a : float
         Parameter `a` when method is equal to "cosine".
 
-    b: float
+    b : float
         Parameter `b` when method is equal to "cosine".
 
-    t_shift: float
+    t_shift : float
         Parameter `t_shift` when method is equal to "cosine".
     """
     tsutils.printiso(
@@ -1247,16 +1247,16 @@ def allen_cli(
 
     Parameters
     ----------
-    lat: float
+    lat : float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
         Hemisphere.
 
-    temp_min_col: str, int
+    temp_min_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily minimum temperature.
 
-    temp_max_col: str, int
+    temp_max_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
 
@@ -1307,7 +1307,7 @@ def allen_cli(
 
     ${tablefmt}
 
-    temp_mean_col: str, int
+    temp_mean_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily mean temperature.  If
         None will be estimated by the average of `temp_min_col` and
@@ -1367,6 +1367,7 @@ def blaney_criddle_cli(
     bright_hours_col
         The column number (data columns start at 1) or column name that holds
         the time-series of the number of bright hours each day.
+
     source_units
         If unit is specified for the column as the second field of a ':'
         delimited column name, then the specified units and the
@@ -1392,21 +1393,21 @@ def blaney_criddle_cli(
                               ["degF", "degF"],
                               input_ts="tmin_tmax_data.csv")
 
-    temp_mean_col: str, int
+    temp_mean_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily mean temperature.  If
         None will be estimated by the average of `temp_min_col` and
         `temp_max_col`.
 
-    temp_min_col: str, int
+    temp_min_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily minimum temperature.
 
-    temp_max_col: str, int
+    temp_max_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
 
-    k: float
+    k : float
         A scaling factor, defaults to 1.  This is an adjustment for local conditions,
         for example, Lu, 2005 found that k=1.2 was a better fit for the southeastern
         United States.
@@ -1659,16 +1660,16 @@ def hargreaves_cli(
 
     Parameters
     ----------
-    lat: float
+    lat : float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
         Hemisphere.
 
-    temp_min_col: str, int
+    temp_min_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily minimum temperature.
 
-    temp_max_col: str, int
+    temp_max_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
 
@@ -1719,7 +1720,7 @@ def hargreaves_cli(
 
     ${tablefmt}
 
-    temp_mean_col: str, int
+    temp_mean_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily mean temperature.  If
         None will be estimated by the average of `temp_min_col` and
@@ -1952,20 +1953,20 @@ def oudin_form_cli(
 
     Parameters
     ----------
-    lat: float
+    lat : float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
         Hemisphere.
 
-    temp_min_col: str, int
+    temp_min_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily minimum temperature.
 
-    temp_max_col: str, int
+    temp_max_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
 
-    temp_mean_col: str, int
+    temp_mean_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily mean temperature.  If
         None will be estimated by the average of `temp_min_col` and
@@ -2092,21 +2093,21 @@ def priestley_taylor_cli(
     ----------
     ${input_ts}
 
-    lat: float
+    lat : float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
         Hemisphere.
 
-    lon: float
+    lon : float
         The longitude of the station.  Positive specifies east of the
         prime meridian, and negative values represent west of the
         prime meridian.
 
-    temp_min_col: str, int
+    temp_min_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily minimum temperature.
 
-    temp_max_col: str, int
+    temp_max_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
 
@@ -2379,21 +2380,21 @@ def penman_monteith_cli(
     ----------
     {input_ts}
 
-    lat: float
+    lat : float
         The latitude of the station.  Positive specifies the Northern
         Hemisphere, and negative values represent the Southern
         Hemisphere.
 
-    lon: float
+    lon : float
         The longitude of the station.  Positive specifies east of the
         prime meridian, and negative values represent west of the
         prime meridian.
 
-    temp_min_col: str, int
+    temp_min_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily minimum temperature.
 
-    temp_max_col: str, int
+    temp_max_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily maximum temperature.
 
@@ -2404,7 +2405,6 @@ def penman_monteith_cli(
     dayl_col:
         The column name or number (data columns start numbering at 1) in the
         input data that represents daily day light fraction.
-
 
     source_units
         If unit is specified for the column as the second field of a ':'
@@ -2431,7 +2431,7 @@ def penman_monteith_cli(
                                    ["degF", "degF"],
                                    input_ts="tmin_tmax_data.csv")
 
-    rh_col: str, int
+    rh_col : str, int
         The column name or number (data columns start numbering at 1) in
         the input data that represents the daily average relative humidity.
 
@@ -2557,13 +2557,13 @@ def spei_cli(
         Pandas offset period string representing the time over which the
         `nsmallest` or `nlargest` values would be evaluated.
 
-    fit_type: str ("lmom" or "mle")
+    fit_type : str ("lmom" or "mle")
         Specify the type of fit to use for fitting distribution to the
         precipitation data. Either L-moments (lmom) or Maximum Likelihood
         Estimation (mle). Note use L-moments when comparing to NCAR's NCL code
         and R's packages to calculate SPI and SPEI.
 
-    dist_type: str
+    dist_type : str
         The distribution type to fit using either L-moments (fit_type="lmom")
         or MLE (fit_type="mle").
 
@@ -2596,7 +2596,7 @@ def spei_cli(
         | wak       | Wakeby                    | X         |          |
         +-----------+---------------------------+-----------+----------+
 
-    scale: int (default=1)
+    scale : int (default=1)
         Integer to specify the number of time periods over which the
         standardized precipitation index is to be calculated. If freq="M" then
         this is the number of months.
@@ -2730,20 +2730,20 @@ def pe_cli(
         window will be a variable sized based on the observations included in
         the time-period. This is only valid for datetimelike indexes.
 
-    min_periods: int, default 170 days
+    min_periods : int, default 170 days
         Minimum number of observations in window required to have a value
         (otherwise result is NA). For a window that is specified by an offset,
         min_periods will default to 1. Otherwise, min_periods will default to
         the size of the window.
 
-    center: bool, default False
+    center : bool, default False
         Set the labels at the center of the window.
 
-    win_type: str, default None
+    win_type : str, default None
         Provide a window type. If None, all points are evenly weighted. See the
         notes below for further information.
 
-    closed: str, default None
+    closed : str, default None
         Make the interval closed on the ‘right’, ‘left’, ‘both’ or ‘neither’
         endpoints. Defaults to ‘right’.
 
