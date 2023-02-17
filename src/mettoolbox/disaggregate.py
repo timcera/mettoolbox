@@ -460,7 +460,7 @@ def prepare_hum_tdew(
         preserve_daily_mean = True
     else:
         if method in ("minimal", "dewpoint_regression", "linear_dewpoint_variation"):
-            tsd.columns = "tmin"
+            tsd.columns = ["tmin"]
         if method == "min_max":
             tsd.columns = ("tmin", "tmax", "hum_min", "hum_max")
 
