@@ -179,16 +179,6 @@ def et0_pm(
     names=None,
     source_units=None,
     target_units=None,
-    print_input=False,
-    tablefmt="csv",
-    avp=None,
-    avp_from_tdew=None,
-    avp_from_twet_tdry=None,
-    avp_from_rhmin_rh_max=None,
-    avp_from_rhmax=None,
-    avp_from_rhmean=None,
-    avp_from_tmin=None,
-    lat=None,
 ):
     """Penman-Monteith evaporation."""
     tsd = tsutils.common_kwds(
@@ -238,7 +228,6 @@ def blaney_criddle(
         clean=clean,
         round_index=round_index,
         skiprows=skiprows,
-        names=names,
     )
     bright_hours = tsutils.common_kwds(
         bright_hours_col,
@@ -286,7 +275,6 @@ def hamon(
         clean=clean,
         round_index=round_index,
         skiprows=skiprows,
-        names=names,
     )
 
     daylh = daylight_hours(tsd.index, lat)
@@ -328,7 +316,6 @@ def romanenko(
         clean=clean,
         round_index=round_index,
         skiprows=skiprows,
-        names=names,
     )
     rh_col = tsutils.common_kwds(
         rh_col,
@@ -380,7 +367,6 @@ def linacre(
         clean=clean,
         round_index=round_index,
         skiprows=skiprows,
-        names=names,
     )
     tdew_col = tsutils.common_kwds(
         tdew_col,
@@ -447,7 +433,6 @@ def hargreaves(
         round_index=round_index,
         skiprows=skiprows,
         index_type=index_type,
-        names=names,
     )
 
     newra = utils.radiation(tsd, lat)
@@ -502,7 +487,6 @@ def oudin_form(
         round_index=round_index,
         skiprows=skiprows,
         index_type=index_type,
-        names=names,
     )
 
     newra = utils.radiation(tsd, lat)
@@ -554,7 +538,6 @@ def allen(
         round_index=round_index,
         skiprows=skiprows,
         index_type=index_type,
-        names=names,
     )
 
     newra = utils.radiation(tsd, lat)
@@ -609,14 +592,6 @@ def priestley_taylor(
     rh_col=None,
     u2_col=None,
     input_ts="-",
-    start_date=None,
-    end_date=None,
-    dropna="no",
-    clean=False,
-    round_index=None,
-    skiprows=None,
-    index_type="datetime",
-    names=None,
     target_units="mm",
     print_input=False,
 ):
@@ -661,14 +636,6 @@ def penman_monteith(
     rh_col=None,
     u2_col=None,
     input_ts="-",
-    start_date=None,
-    end_date=None,
-    dropna="no",
-    clean=False,
-    round_index=None,
-    skiprows=None,
-    index_type="datetime",
-    names=None,
     target_units="mm",
     print_input=False,
 ):

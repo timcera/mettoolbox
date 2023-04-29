@@ -28,8 +28,11 @@
 ########################################################################
 
 
+from typing import Literal
+
 import numpy as np
 import pandas as pd
+from pydantic import validate_arguments
 
 from .melodist.melodist.util.util import (
     dewpoint_temperature,
@@ -39,9 +42,17 @@ from .melodist.melodist.util.util import (
 )
 
 
+@validate_arguments
 def disaggregate_tdew(
     data_daily,
-    method="equal",
+    method: Literal[
+        "equal",
+        "minimal",
+        "dewpoint_regression",
+        "min_max",
+        "linear_dewpoint_variation",
+        "month_hour_precip_mean",
+    ] = "equal",
     temp=None,
     a0=None,
     a1=None,
@@ -63,15 +74,6 @@ def disaggregate_tdew(
     Returns:
         Disaggregated hourly values of relative humidity.
     """
-    assert method in (
-        "equal",
-        "minimal",
-        "dewpoint_regression",
-        "min_max",
-        "linear_dewpoint_variation",
-        "month_hour_precip_mean",
-    ), "Invalid option"
-
     if method == "equal":
         hum_disagg = distribute_equally(data_daily.hum)
         hum_disagg = hum_disagg.clip(0, 100)
@@ -139,7 +141,7 @@ def disaggregate_tdew(
 
     if preserve_daily_mean:
         daily_mean_df = pd.DataFrame(
-            data=dict(obs=data_daily.hum, disagg=hum_disagg.resample("D").mean())
+            data={"obs": data_daily.hum, "disagg": hum_disagg.resample("D").mean()}
         )
         bias = distribute_equally(daily_mean_df.disagg - daily_mean_df.obs)
         bias = bias.fillna(0)
@@ -155,7 +157,7 @@ def calculate_dewpoint_regression(hourly_data_obs, return_stats=False):
 
     tdew = dewpoint_temperature(temphum.temp, temphum.hum).resample("D").mean()
     tmin = temphum.temp.groupby(temphum.index.date).min()
-    df = pd.DataFrame(data=dict(tmin=tmin, tdew=tdew)).dropna(how="any")
+    df = pd.DataFrame(data={"tmin": tmin, "tdew": tdew}).dropna(how="any")
 
     return linregress(df.tmin, df.tdew, return_stats=return_stats)
 

@@ -13,7 +13,7 @@ dynamic = ["readme", "version"]
 description = "mettoolbox is set of command line and Python tools for the analysis and reporting of meteorological data."
 dependencies = [
     "toolbox_utils >= 3.0.0, < 4.0.0",
-    "tstoolbox >= 105.0.0, < 106.0.0",
+    "tstoolbox >= 106.0.0, < 107.0.0",
     "cltoolbox",
     "solarpy",
     "standard-precip",

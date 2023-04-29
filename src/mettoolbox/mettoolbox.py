@@ -173,34 +173,30 @@ def humidity_cli(
 
     Relative humidity disaggregation requires the following input data.
 
-    +--------------+---------------------------------------------+
-    | Input data   | Description                                 |
-    +==============+=============================================+
-    | hum_min_col  | Required column name or number representing |
-    |              | the minimum daily relative humidity.        |
-    +--------------+---------------------------------------------+
-    | hum_max_col  | Required column name or number representing |
-    |              | the maximum daily relative humidity.        |
-    +--------------+---------------------------------------------+
-    | hum_mean_col | Optional column name or number representing |
-    |              | the average daily relative humidity.        |
-    |              | Default is None and if None will be         |
-    |              | calculated as average of `hum_tmin_col` and |
-    |              | `hum_tmax_col`.                             |
-    +--------------+---------------------------------------------+
-    | temp_min_col | Required column name or number representing |
-    |              | the minimum daily temperature for `minimal`,|
-    |              | `dewpoint regression`, `linear dewpoint     |
-    |              | variation`, and `min_max` methods.          |
-    +--------------+---------------------------------------------+
-    | temp_max_col | Required column name or number representing |
-    |              | the maximum daily temperature for min_max   |
-    |              | method.                                     |
-    +--------------+---------------------------------------------+
-    | precip_col   | Required column name or number representing |
-    |              | the total precipitation for                 |
-    |              | month_hour_precip_mean method.              |
-    +--------------+---------------------------------------------+
+    +--------------+----------------------------------------------------------+
+    | Input data   | Description                                              |
+    +==============+==========================================================+
+    | hum_min_col  | Required column name or number representing the minimum  |
+    |              | daily relative humidity.                                 |
+    +--------------+----------------------------------------------------------+
+    | hum_max_col  | Required column name or number representing the maximum  |
+    |              | daily relative humidity.                                 |
+    +--------------+----------------------------------------------------------+
+    | hum_mean_col | Optional column name or number representing the average  |
+    |              | daily relative humidity. Default is None and if None     |
+    |              | will be calculated as average of `hum_min_col` and       |
+    |              | `hum_max_col`.                                           |
+    +--------------+----------------------------------------------------------+
+    | temp_min_col | Required column name or number representing the minimum  |
+    |              | daily temperature for `minimal`, `dewpoint regression`,  |
+    |              | `linear dewpoint variation`, and `min_max` methods.      |
+    +--------------+----------------------------------------------------------+
+    | temp_max_col | Required column name or number representing the maximum  |
+    |              | daily temperature for min_max method.                    |
+    +--------------+----------------------------------------------------------+
+    | precip_col   | Required column name or number representing the total    |
+    |              | precipitation for month_hour_precip_mean method.         |
+    +--------------+----------------------------------------------------------+
 
     Parameters
     ----------
@@ -208,42 +204,36 @@ def humidity_cli(
         Available disaggregation methods for
         humidity.
 
-        +---------------------------+-------------------------------+
-        | `method`                  | Description                   |
-        +===========================+===============================+
-        | equal                     | Duplicate mean daily humidity |
-        |                           | for the 24 hours of the day.  |
-        +---------------------------+-------------------------------+
-        | minimal                   | The dew point temperature is  |
-        |                           | set to the minimum            |
-        |                           | temperature on that day.      |
-        +---------------------------+-------------------------------+
-        | dewpoint_regression       | Using hourly observations, a  |
-        |                           | regression approach is        |
-        |                           | applied to calculate daily    |
-        |                           | dew point temperature.        |
-        |                           | Regression parameters must be |
-        |                           | specified.                    |
-        +---------------------------+-------------------------------+
-        | linear_dewpoint_variation | This method extends through   |
-        |                           | linearly varying dew point    |
-        |                           | temperature between           |
-        |                           | consecutive days. The         |
-        |                           | parameter kr needs to be      |
-        |                           | specified (kr=6 if monthly    |
-        |                           | radiation exceeds 100 W/m2    |
-        |                           | else kr=12).                  |
-        +---------------------------+-------------------------------+
-        | min_max                   | This method requires minimum  |
-        |                           | and maximum relative humidity |
-        |                           | for each day.                 |
-        +---------------------------+-------------------------------+
-        | month_hour_precip_mean    | Calculate hourly humidity     |
-        |                           | from categorical              |
-        |                           | [month, hour, precip(y/n)]    |
-        |                           | mean values derived from      |
-        |                           | observations.                 |
-        +---------------------------+-------------------------------+
+        +---------------------------+----------------------------------------+
+        | `method`                  | Description                            |
+        +===========================+========================================+
+        | equal                     | Duplicate mean daily humidity for the  |
+        |                           | 24 hours of the day.                   |
+        +---------------------------+----------------------------------------+
+        | minimal                   | The dew point temperature is set to    |
+        |                           | the minimum temperature on that day.   |
+        +---------------------------+----------------------------------------+
+        | dewpoint_regression       | Using hourly observations, a           |
+        |                           | regression approach is applied to      |
+        |                           | calculate daily dew point temperature. |
+        |                           | Regression parameters must be          |
+        |                           | specified.                             |
+        +---------------------------+----------------------------------------+
+        | linear_dewpoint_variation | This method extends through linearly   |
+        |                           | varying dew point temperature between  |
+        |                           | consecutive days. The parameter kr     |
+        |                           | needs to be specified (kr=6 if monthly |
+        |                           | radiation exceeds 100 W/m2 else        |
+        |                           | kr=12).                                |
+        +---------------------------+----------------------------------------+
+        | min_max                   | This method requires minimum and       |
+        |                           | maximum relative humidity for each     |
+        |                           | day.                                   |
+        +---------------------------+----------------------------------------+
+        | month_hour_precip_mean    | Calculate hourly humidity from         |
+        |                           | categorical [month, hour, precip(y/n)] |
+        |                           | mean values derived from observations. |
+        +---------------------------+----------------------------------------+
 
         Required keywords for each method.  The "Column Name/Index
         Keywords" represent the column name or index (data columns
@@ -423,34 +413,30 @@ def dewpoint_temperature_cli(
 
     Dewpoint disaggregation requires the following input data.
 
-    +--------------+---------------------------------------------+
-    | Input data   | Description                                 |
-    +==============+=============================================+
-    | hum_min_col  | Required column name or number representing |
-    |              | the minimum daily relative humidity.        |
-    +--------------+---------------------------------------------+
-    | hum_max_col  | Required column name or number representing |
-    |              | the maximum daily relative humidity.        |
-    +--------------+---------------------------------------------+
-    | hum_mean_col | Optional column name or number representing |
-    |              | the average daily relative humidity.        |
-    |              | Default is None and if None will be         |
-    |              | calculated as average of `hum_tmin_col` and |
-    |              | `hum_tmax_col`.                             |
-    +--------------+---------------------------------------------+
-    | temp_min_col | Required column name or number representing |
-    |              | the minimum daily temperature for `minimal`,|
-    |              | `dewpoint regression`, `linear dewpoint     |
-    |              | variation`, and `min_max` methods.          |
-    +--------------+---------------------------------------------+
-    | temp_max_col | Required column name or number representing |
-    |              | the maximum daily temperature for min_max   |
-    |              | method.                                     |
-    +--------------+---------------------------------------------+
-    | precip_col   | Required column name or number representing |
-    |              | the total precipitation for                 |
-    |              | month_hour_precip_mean method.              |
-    +--------------+---------------------------------------------+
+    +--------------+---------------------------------------------------------+
+    | Input data   | Description                                             |
+    +==============+=========================================================+
+    | hum_min_col  | Required column name or number representing the minimum |
+    |              | daily relative humidity.                                |
+    +--------------+---------------------------------------------------------+
+    | hum_max_col  | Required column name or number representing the maximum |
+    |              | daily relative humidity.                                |
+    +--------------+---------------------------------------------------------+
+    | hum_mean_col | Optional column name or number representing the average |
+    |              | daily relative humidity. Default is None and if None    |
+    |              | will be calculated as average of `hum_min_col` and      |
+    |              | `hum_max_col`.                                          |
+    +--------------+---------------------------------------------------------+
+    | temp_min_col | Required column name or number representing the minimum |
+    |              | daily temperature for `minimal`, `dewpoint regression`, |
+    |              | `linear dewpoint variation`, and `min_max` methods.     |
+    +--------------+---------------------------------------------------------+
+    | temp_max_col | Required column name or number representing the maximum |
+    |              | daily temperature for min_max method.                   |
+    +--------------+---------------------------------------------------------+
+    | precip_col   | Required column name or number representing the total   |
+    |              | precipitation for month_hour_precip_mean method.        |
+    +--------------+---------------------------------------------------------+
 
     Parameters
     ----------
@@ -458,42 +444,36 @@ def dewpoint_temperature_cli(
         Available disaggregation methods for
         humidity.
 
-        +---------------------------+-------------------------------+
-        | `method`                  | Description                   |
-        +===========================+===============================+
-        | equal                     | Duplicate mean daily humidity |
-        |                           | for the 24 hours of the day.  |
-        +---------------------------+-------------------------------+
-        | minimal                   | The dew point temperature is  |
-        |                           | set to the minimum            |
-        |                           | temperature on that day.      |
-        +---------------------------+-------------------------------+
-        | dewpoint_regression       | Using hourly observations, a  |
-        |                           | regression approach is        |
-        |                           | applied to calculate daily    |
-        |                           | dew point temperature.        |
-        |                           | Regression parameters must be |
-        |                           | specified.                    |
-        +---------------------------+-------------------------------+
-        | linear_dewpoint_variation | This method extends through   |
-        |                           | linearly varying dew point    |
-        |                           | temperature between           |
-        |                           | consecutive days. The         |
-        |                           | parameter kr needs to be      |
-        |                           | specified (kr=6 if monthly    |
-        |                           | radiation exceeds 100 W/m2    |
-        |                           | else kr=12).                  |
-        +---------------------------+-------------------------------+
-        | min_max                   | This method requires minimum  |
-        |                           | and maximum relative humidity |
-        |                           | for each day.                 |
-        +---------------------------+-------------------------------+
-        | month_hour_precip_mean    | Calculate hourly humidity     |
-        |                           | from categorical              |
-        |                           | [month, hour, precip(y/n)]    |
-        |                           | mean values derived from      |
-        |                           | observations.                 |
-        +---------------------------+-------------------------------+
+        +---------------------------+----------------------------------------+
+        | `method`                  | Description                            |
+        +===========================+========================================+
+        | equal                     | Duplicate mean daily humidity for the  |
+        |                           | 24 hours of the day.                   |
+        +---------------------------+----------------------------------------+
+        | minimal                   | The dew point temperature is set to    |
+        |                           | the minimum temperature on that day.   |
+        +---------------------------+----------------------------------------+
+        | dewpoint_regression       | Using hourly observations, a           |
+        |                           | regression approach is applied to      |
+        |                           | calculate daily dew point temperature. |
+        |                           | Regression parameters must be          |
+        |                           | specified.                             |
+        +---------------------------+----------------------------------------+
+        | linear_dewpoint_variation | This method extends through linearly   |
+        |                           | varying dew point temperature between  |
+        |                           | consecutive days. The parameter kr     |
+        |                           | needs to be specified (kr=6 if monthly |
+        |                           | radiation exceeds 100 W/m2 else        |
+        |                           | kr=12).                                |
+        +---------------------------+----------------------------------------+
+        | min_max                   | This method requires minimum and       |
+        |                           | maximum relative humidity for each     |
+        |                           | day.                                   |
+        +---------------------------+----------------------------------------+
+        | month_hour_precip_mean    | Calculate hourly humidity from         |
+        |                           | categorical [month, hour, precip(y/n)] |
+        |                           | mean values derived from observations. |
+        +---------------------------+----------------------------------------+
 
         Required keywords for each method.  The "Column Name/Index
         Keywords" represent the column name or index (data columns
@@ -502,17 +482,15 @@ def dewpoint_temperature_cli(
         +---------------------------+----------------+---------------+
         | `method`                  | Column Name/   | Other         |
         |                           | Index Keywords | Keywords      |
-        +---------------------------+----------------+---------------+
+        +===========================+================+===============+
         | equal                     | `hum_mean_col` | `hourly_temp` |
         +---------------------------+----------------+---------------+
         | minimal                   | `temp_min_col` |               |
         +---------------------------+----------------+---------------+
-        | dewpoint_regression       | `temp_min_col` | `a0`          |
-        |                           |                | `a1`          |
+        | dewpoint_regression       | `temp_min_col` | `a0` `a1`     |
         |                           |                | `hourly_temp` |
         +---------------------------+----------------+---------------+
-        | linear_dewpoint_variation | `temp_min_col` | `a0`          |
-        |                           |                | `a1`          |
+        | linear_dewpoint_variation | `temp_min_col` | `a0` `a1`     |
         |                           |                | `kr`          |
         |                           |                | `hourly_temp` |
         +---------------------------+----------------+---------------+
@@ -665,23 +643,24 @@ def precipitation_cli(
     method : str
         Disaggregation methods available for precipitation.
 
-        +---------------+--------------------------------------------+
-        | `method`      | Description                                |
-        +===============+============================================+
-        | equal         | In order to derive hourly from daily       |
-        |               | values, the daily total is simply divided  |
-        |               | by 24 resulting in an equal distribution.  |
-        +---------------+--------------------------------------------+
-        | cascade       | The cascade model is more complex and      |
-        |               | requires a parameter estimation method.    |
-        +---------------+--------------------------------------------+
-        | masterstation | If hourly values are available for another |
-        |               | site in the vicinity of the station        |
-        |               | considered, the cumulative sub-daily mass  |
-        |               | curve can be transferred from the station  |
-        |               | that provides hourly values to the station |
-        |               | of interest.                               |
-        +---------------+--------------------------------------------+
+        +---------------+-----------------------------------------------------+
+        | `method`      | Description                                         |
+        +===============+=====================================================+
+        | equal         | In order to derive hourly from daily values, the    |
+        |               | daily total is simply divided by 24 resulting in an |
+        |               | equal distribution.                                 |
+        +---------------+-----------------------------------------------------+
+        | cascade       | The cascade model is more complex and requires a    |
+        |               | parameter estimation method.                        |
+        +---------------+-----------------------------------------------------+
+        | masterstation | If hourly values are available for another site in  |
+        |               | the vicinity of the station considered, the         |
+        |               | cumulative sub-daily mass curve can be transferred  |
+        |               | from the station that provides hourly values to the |
+        |               | station of interest.                                |
+        +---------------+-----------------------------------------------------+
+
+    ${psource_units}
 
     ${input_ts}
 
@@ -700,8 +679,6 @@ def precipitation_cli(
     ${index_type}
 
     ${names}
-
-    ${psource_units}
 
     ${target_units}
 
@@ -779,29 +756,26 @@ def radiation_cli(
     method : str
         Disaggregation methods available for radiation
 
-        +-----------------+-----------------------------------------+
-        | `method`        | Description                             |
-        +=================+=========================================+
-        | pot_rad         | This method allows one to disaggregate  |
-        |                 | daily averages of shortwave radiation   |
-        |                 | using hourly values of potential        |
-        |                 | (clear-sky) radiation calculated for    |
-        |                 | the location of the station.            |
-        +-----------------+-----------------------------------------+
-        | pot_rad_via_ssd | If daily sunshine recordings are        |
-        |                 | available, the Angstrom model is        |
-        |                 | applied to transform sunshine duration  |
-        |                 | to shortwave radiation.                 |
-        +-----------------+-----------------------------------------+
-        | pot_rad_via_bc  | In this case, the Bristow-Campbell      |
-        |                 | model is applied which relates minimum  |
-        |                 | and maximum temperature to shortwave    |
-        |                 | radiation.                              |
-        +-----------------+-----------------------------------------+
-        | mean_course     | hourly radiation follows an observed    |
-        |                 | average course (calculated for each     |
-        |                 | month) while preserving the daily mean. |
-        +-----------------+-----------------------------------------+
+        +-----------------+--------------------------------------------------+
+        | `method`        | Description                                      |
+        +=================+==================================================+
+        | pot_rad         | This method allows one to disaggregate daily     |
+        |                 | averages of shortwave radiation using hourly     |
+        |                 | values of potential (clear-sky) radiation        |
+        |                 | calculated for the location of the station.      |
+        +-----------------+--------------------------------------------------+
+        | pot_rad_via_ssd | If daily sunshine recordings are available, the  |
+        |                 | Angstrom model is applied to transform sunshine  |
+        |                 | duration to shortwave radiation.                 |
+        +-----------------+--------------------------------------------------+
+        | pot_rad_via_bc  | In this case, the Bristow-Campbell model is      |
+        |                 | applied which relates minimum and maximum        |
+        |                 | temperature to shortwave radiation.              |
+        +-----------------+--------------------------------------------------+
+        | mean_course     | hourly radiation follows an observed average     |
+        |                 | course (calculated for each month) while         |
+        |                 | preserving the daily mean.                       |
+        +-----------------+--------------------------------------------------+
 
     ${input_ts}
 
@@ -945,77 +919,68 @@ def temperature_cli(
     however other tools in mettoolbox require metric units.  You can use
     `source_units` and `target_units` keywords to change units.
 
-    +---------------+----------------------------+
-    | Input Data    | Description                |
-    +===============+============================+
-    | temp_tmin_col | Required column name or    |
-    |               | number representing the    |
-    |               | minimum daily temperature. |
-    +---------------+----------------------------+
-    | temp_tmax_col | Required column name or    |
-    |               | number representing the    |
-    |               | maximum daily temperature. |
-    +---------------+----------------------------+
-    | temp_mean_col | Optional column name or    |
-    |               | number representing the    |
-    |               | average daily temperature. |
-    |               | Default is None and if     |
-    |               | None will be calculated as |
-    |               | average of `temp_tmin_col` |
-    |               | and `temp_tmax_col`.       |
-    +---------------+----------------------------+
+    +---------------+--------------------------------------------------------+
+    | Input Data    | Description                                            |
+    +===============+========================================================+
+    | temp_min_col  | Required column name or number representing the        |
+    |               | minimum daily temperature.                             |
+    +---------------+--------------------------------------------------------+
+    | temp_max_col  | Required column name or number representing the        |
+    |               | maximum daily temperature.                             |
+    +---------------+--------------------------------------------------------+
+    | temp_mean_col | Optional column name or number representing the        |
+    |               | average daily temperature. Default is None and if None |
+    |               | will be calculated as average of `temp_min_col` and    |
+    |               | `temp_max_col`.                                        |
+    +---------------+--------------------------------------------------------+
 
     Parameters
     ----------
     method : str
         Disaggregation methods available for temperature.
 
-        +---------------------+--------------------------------------+
-        | `method`            | Description                          |
-        +=====================+======================================+
-        | sine_min_max        | Standard sine redistribution;        |
-        |                     | preserves Tmin and Tmax but not      |
-        |                     | Tmean.                               |
-        +---------------------+--------------------------------------+
-        | sine_mean           | Sine redistribution; preserves       |
-        |                     | Tmean and the diurnal temperature    |
-        |                     | range (Tmax – Tmin) but not Tmin     |
-        |                     | and Tmax.                            |
-        +---------------------+--------------------------------------+
-        | mean_course_min_max | Redistribute following a prescribed  |
-        |                     | temperature course calculated from   |
-        |                     | hourly observations; preserves Tmin  |
-        |                     | and Tmax.  Hourly CSV filename       |
-        |                     | specified with the `hourly` keyword. |
-        +---------------------+--------------------------------------+
-        | mean_course_mean    | Redistribute following a prescribed  |
-        |                     | temperature course calculated from   |
-        |                     | hourly observations; preserves       |
-        |                     | Tmean and the diurnal temperature    |
-        |                     | range. Hourly CSV filename specified |
-        |                     | with the `hourly` keyword.           |
-        +---------------------+--------------------------------------+
+        +---------------------+----------------------------------------------+
+        | `method`            | Description                                  |
+        +=====================+==============================================+
+        | sine_min_max        | Standard sine redistribution; preserves Tmin |
+        |                     | and Tmax but not Tmean.                      |
+        +---------------------+----------------------------------------------+
+        | sine_mean           | Sine redistribution; preserves Tmean and the |
+        |                     | diurnal temperature range (Tmax – Tmin) but  |
+        |                     | not Tmin and Tmax.                           |
+        +---------------------+----------------------------------------------+
+        | mean_course_min_max | Redistribute following a prescribed          |
+        |                     | temperature course calculated from hourly    |
+        |                     | observations; preserves Tmin and Tmax.       |
+        |                     | Hourly CSV filename specified with the       |
+        |                     | `hourly` keyword.                            |
+        +---------------------+----------------------------------------------+
+        | mean_course_mean    | Redistribute following a prescribed          |
+        |                     | temperature course calculated from hourly    |
+        |                     | observations; preserves Tmean and the        |
+        |                     | diurnal temperature range. Hourly CSV        |
+        |                     | filename specified with the `hourly`         |
+        |                     | keyword.                                     |
+        +---------------------+----------------------------------------------+
 
     ${psource_units}
 
     min_max_time : str
-        +----------------+------------------------------------------+
-        | `min_max_time` | Description                              |
-        +================+==========================================+
-        | fix            | The diurnal course of temperature is     |
-        |                | fixed without any seasonal variations for|
-        |                | sine method                              |
-        +----------------+------------------------------------------+
-        | sun_loc        | The diurnal course of temperature is     |
-        |                | modelled based on sunrise, noon and      |
-        |                | sunset calculations for sine method.     |
-        +----------------+------------------------------------------+
-        | sun_loc_shift  | This option activates empirical          |
-        |                | corrections of the ideal course modelled |
-        |                | by sun_loc for sine method. Hourly CSV   |
-        |                | filename specifiedwith the `hourly`      |
-        |                | keyword.                                 |
-        +----------------+------------------------------------------+
+        +----------------+---------------------------------------------------+
+        | `min_max_time` | Description                                       |
+        +================+===================================================+
+        | fix            | The diurnal course of temperature is fixed        |
+        |                | without any seasonal variations for sine method   |
+        +----------------+---------------------------------------------------+
+        | sun_loc        | The diurnal course of temperature is modelled     |
+        |                | based on sunrise, noon and sunset calculations    |
+        |                | for sine method.                                  |
+        +----------------+---------------------------------------------------+
+        | sun_loc_shift  | This option activates empirical corrections of    |
+        |                | the ideal course modelled by sun_loc for sine     |
+        |                | method. Hourly CSV filename specifiedwith the     |
+        |                | `hourly` keyword.                                 |
+        +----------------+---------------------------------------------------+
 
     mod_nighttime : bool
         Allows one to apply a linear interpolation of night time values,
@@ -1139,22 +1104,20 @@ def wind_speed_cli(
     method : str
         Disaggregation methods available for wind speed.
 
-        +----------+------------------------------------------------+
-        | `method` | Description                                    |
-        +==========+================================================+
-        | equal    | If this method is chosen, the daily average    |
-        |          | wind speed is assumed to be valid for each     |
-        |          | hour on that day.                              |
-        +----------+------------------------------------------------+
-        | cosine   | The cosine function option simulates a diurnal |
-        |          | course of wind speed and requires calibration  |
-        |          | (calc_wind_stats()).                           |
-        +----------+------------------------------------------------+
-        | random   | This option is a stochastic method that draws  |
-        |          | random numbers to disaggregate wind speed      |
-        |          | taking into account the daily average (no      |
-        |          | parameter estimation required).                |
-        +----------+------------------------------------------------+
+        +----------+---------------------------------------------------------+
+        | `method` | Description                                             |
+        +==========+=========================================================+
+        | equal    | If this method is chosen, the daily average wind speed  |
+        |          | is assumed to be valid for each hour on that day.       |
+        +----------+---------------------------------------------------------+
+        | cosine   | The cosine function option simulates a diurnal course   |
+        |          | of wind speed and requires calibration                  |
+        |          | (calc_wind_stats()).                                    |
+        +----------+---------------------------------------------------------+
+        | random   | This option is a stochastic method that draws random    |
+        |          | numbers to disaggregate wind speed taking into account  |
+        |          | the daily average (no parameter estimation required).   |
+        +----------+---------------------------------------------------------+
 
     ${psource_units}
 
@@ -2065,8 +2028,8 @@ def priestley_taylor_cli(
     input_ts,
     lat,
     lon,
-    tmin_col,
-    tmax_col,
+    temp_min_col,
+    temp_max_col,
     srad_col,
     dayl_col,
     source_units,
@@ -2178,8 +2141,8 @@ def priestley_taylor_cli(
         pet.priestley_taylor(
             lat,
             lon,
-            tmin_col,
-            tmax_col,
+            temp_min_col,
+            temp_max_col,
             srad_col,
             dayl_col,
             source_units,
@@ -2352,8 +2315,8 @@ def penman_monteith_cli(
     input_ts,
     lat,
     lon,
-    tmin_col,
-    tmax_col,
+    temp_min_col,
+    temp_max_col,
     srad_col,
     dayl_col,
     source_units,
@@ -2378,17 +2341,15 @@ def penman_monteith_cli(
 
     Parameters
     ----------
-    {input_ts}
+    ${input_ts}
 
     lat : float
         The latitude of the station.  Positive specifies the Northern
-        Hemisphere, and negative values represent the Southern
-        Hemisphere.
+        Hemisphere, and negative values represent the Southern Hemisphere.
 
     lon : float
-        The longitude of the station.  Positive specifies east of the
-        prime meridian, and negative values represent west of the
-        prime meridian.
+        The longitude of the station.  Positive specifies east of the prime
+        meridian, and negative values represent west of the prime meridian.
 
     temp_min_col : str, int
         The column name or number (data columns start numbering at 1) in
@@ -2465,8 +2426,8 @@ def penman_monteith_cli(
         ret.penman_monteith(
             lat,
             lon,
-            tmin_col,
-            tmax_col,
+            temp_min_col,
+            temp_max_col,
             srad_col,
             dayl_col,
             source_units,

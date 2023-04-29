@@ -48,7 +48,7 @@ def single_target_units(source_units, target_units, default=None, cnt=1):
     return [target_units[0]] * len(source_units)
 
 
-@validate_arguments(config=dict(arbitrary_types_allowed=True))
+@validate_arguments(config={"arbitrary_types_allowed": True})
 def temperature(
     method: Literal[
         "sine_min_max", "sine_mean", "sine", "mean_course_min_max", "mean_course_mean"
@@ -246,7 +246,7 @@ def temperature(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@validate_arguments(config=dict(arbitrary_types_allowed=True))
+@validate_arguments(config={"arbitrary_types_allowed": True})
 def prepare_hum_tdew(
     method: Literal[
         "equal",
@@ -496,7 +496,7 @@ def prepare_hum_tdew(
     return tsd, hourly_temp, month_hour_precip_mean
 
 
-@validate_arguments(config=dict(arbitrary_types_allowed=True))
+@validate_arguments(config={"arbitrary_types_allowed": True})
 def humidity(
     method: Literal[
         "equal",
@@ -582,7 +582,7 @@ def humidity(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@validate_arguments(config=dict(arbitrary_types_allowed=True))
+@validate_arguments(config={"arbitrary_types_allowed": True})
 def dewpoint_temperature(
     method: Literal[
         "equal",
@@ -671,7 +671,7 @@ def dewpoint_temperature(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@validate_arguments(config=dict(arbitrary_types_allowed=True))
+@validate_arguments(config={"arbitrary_types_allowed": True})
 def wind_speed(
     method: Literal["equal", "cosine", "random"],
     source_units,
@@ -746,7 +746,7 @@ def wind_speed(
     )
 
 
-@validate_arguments(config=dict(arbitrary_types_allowed=True))
+@validate_arguments(config={"arbitrary_types_allowed": True})
 def radiation(
     method: Literal["pot_rad", "pot_rad_via_ssd", "pot_rad_via_bc", "mean_course"],
     source_units,
@@ -893,7 +893,7 @@ def radiation(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@validate_arguments(config=dict(arbitrary_types_allowed=True))
+@validate_arguments(config={"arbitrary_types_allowed": True})
 def precipitation(
     method: Literal["equal", "cascade", "masterstation"],
     source_units,
@@ -981,7 +981,7 @@ def precipitation(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@validate_arguments(config=dict(arbitrary_types_allowed=True))
+@validate_arguments(config={"arbitrary_types_allowed": True})
 def evaporation(
     method: Literal["trap", "fixed"],
     source_units,
@@ -1054,7 +1054,7 @@ def evaporation(
         tr3 = tr2 + dtr2
         tr4 = tr3 + dtr4
 
-        for index, toss in enumerate(sunr):
+        for index, _ in enumerate(sunr):
             cdate = ntsd.index[index]
             fdata.loc[
                 datetime.datetime(cdate.year, cdate.month, cdate.day, int(sunr[index])),

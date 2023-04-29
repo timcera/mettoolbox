@@ -43,7 +43,7 @@ def _nlarge_nsmall(
 
 
 @tsutils.transform_args(source_units=tsutils.make_list)
-@validate_arguments(config=dict(arbitrary_types_allowed=True))
+@validate_arguments(config={"arbitrary_types_allowed": True})
 def spei(
     rainfall: Union[PositiveInt, str, pd.DataFrame],
     pet: Union[PositiveInt, str, pd.DataFrame],
@@ -54,7 +54,6 @@ def spei(
     fit_type="lmom",
     dist_type="gam",
     scale=1,
-    input_ts="-",
     start_date=None,
     end_date=None,
     dropna="no",
@@ -62,8 +61,6 @@ def spei(
     round_index=None,
     skiprows=None,
     index_type="datetime",
-    names=None,
-    print_input=False,
 ):
     from tstoolbox.tstoolbox import read
 
@@ -108,7 +105,7 @@ def spei(
 
 
 @tsutils.transform_args(source_units=tsutils.make_list)
-@validate_arguments(config=dict(arbitrary_types_allowed=True))
+@validate_arguments(config={"arbitrary_types_allowed": True})
 def pe(
     rainfall: Union[PositiveInt, str, pd.DataFrame],
     pet: Union[PositiveInt, str, pd.DataFrame],
@@ -121,15 +118,7 @@ def pe(
     center=None,
     win_type=None,
     closed=None,
-    input_ts="-",
-    start_date=None,
-    end_date=None,
-    dropna="no",
-    clean=False,
-    round_index=None,
-    names=None,
     target_units="mm",
-    print_input=False,
 ):
     from tstoolbox.tstoolbox import read
 
