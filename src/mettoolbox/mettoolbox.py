@@ -1551,7 +1551,7 @@ def hamon_cli(
 
     Notes
     -----
-    Following [hamon_1961]_ and [oudin_2005]_.
+    Following [hamon_1961]_, [oudin_2005]_, and [lu_2005]_.
 
     .. math:: PE = (\\frac{DL}{12})^2 exp(\\frac{T_a}{16})
 
