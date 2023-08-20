@@ -665,8 +665,8 @@ def dewpoint_temperature(
     )
 
     ntsd.columns = ["dewpoint_temp:degK:disagg"]
-    ntsd = tsutils._normalize_units(
-        ntsd, source_units="degK", target_units=target_units[0]
+    ntsd = tsutils.common_kwds(
+        input_tsd=ntsd, source_units="degK", target_units=target_units[0]
     )
     return tsutils.return_input(print_input, tsd, ntsd)
 

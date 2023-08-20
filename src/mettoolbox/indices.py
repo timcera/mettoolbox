@@ -132,7 +132,9 @@ def pe(
 
     pe_data = tsd["rainfall:mm"] - tsd["pet:mm"]
 
-    pe_data = tsutils._normalize_units(pe_data, "mm", target_units)
+    pe_data = tsutils.common_kwds(
+        input_tsd=pe_data, source_units=["mm"], target_units=target_units
+    )
 
     pe_data = (
         pe_data.astype(float)
