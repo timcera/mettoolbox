@@ -1,3 +1,9 @@
+## v6.0.1 (2023-08-19)
+
+### Fix
+
+- should use tsutils.common_kwds instead of tsutils._normalize_units
+
 ## v6.0.0 (2023-08-08)
 
 ## v5.0.2 (2023-07-25)
