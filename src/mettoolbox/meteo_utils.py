@@ -43,9 +43,8 @@ def calc_psy(pressure, tmean=None):
     """
     if tmean is None:
         return 0.000665 * pressure
-    else:
-        lambd = calc_lambda(tmean)  # MJ kg-1
-        return CP * pressure / (0.622 * lambd)
+    lambd = calc_lambda(tmean)  # MJ kg-1
+    return CP * pressure / (0.622 * lambd)
 
 
 def calc_vpc(tmean):
@@ -240,10 +239,7 @@ def calc_ea(tmean=None, tmax=None, tmin=None, rhmax=None, rhmin=None, rh=None):
         esmin = calc_e0(tmin)
         return (esmin * rhmax / 200) + (esmax * rhmin / 200)
     else:  # eq. 14
-        if tmax is not None:
-            es = calc_es(tmax=tmax, tmin=tmin)
-        else:
-            es = calc_e0(tmean)
+        es = calc_es(tmax=tmax, tmin=tmin) if tmax is not None else calc_e0(tmean)
         return rh / 100 * es
 
 
@@ -507,9 +503,8 @@ def calc_res_surf(lai=None, r_s=70, r_l=100, lai_eff=0, srs=None, co2=None):
     """
     if lai is None:
         return r_s
-    else:
-        fco2 = 1 + srs * (co2 - 300)
-        return fco2 * r_l / calc_laieff(lai=lai, lai_eff=lai_eff)
+    fco2 = 1 + srs * (co2 - 300)
+    return fco2 * r_l / calc_laieff(lai=lai, lai_eff=lai_eff)
 
 
 def calc_laieff(lai=None, lai_eff=0):
@@ -564,8 +559,7 @@ def calc_res_aero(wind, croph=None, zw=2, zh=2, ra_method=1):
     """
     if ra_method == 1:
         return 208 / wind
-    else:
-        d = 0.667 * croph
-        zom = 0.123 * croph
-        zoh = 0.0123 * croph
-        return (log((zw - d) / zom)) * (log((zh - d) / zoh) / (0.41**2) / wind)
+    d = 0.667 * croph
+    zom = 0.123 * croph
+    zoh = 0.0123 * croph
+    return (log((zw - d) / zom)) * (log((zh - d) / zoh) / (0.41**2) / wind)

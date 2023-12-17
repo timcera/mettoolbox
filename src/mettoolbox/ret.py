@@ -27,8 +27,7 @@ def prepare_daymet(
         read_args.append(u2_col)
         read_kwds["names"].append("u2")
         read_kwds["target_units"].append("m/s")
-    tsd = read(*read_args, **read_kwds)
-    return tsd
+    return read(*read_args, **read_kwds)
 
 
 @validate_arguments

@@ -814,29 +814,21 @@ def radiation(
 
     columns = []
     if method in ["pot_rad", "mean_course"]:
-        try:
+        with suppress(TypeError):
             glob_swr_col = int(glob_swr_col)
-        except TypeError:
-            pass
         columns.append(glob_swr_col)
 
     if method in ["pot_rad_via_ssd"]:
-        try:
+        with suppress(TypeError):
             glob_swr_col = int(ssd_col)
-        except TypeError:
-            pass
         columns.append(ssd_col)
 
     if method == "pot_rad_via_bc":
-        try:
+        with suppress(TypeError):
             temp_min_col = int(temp_min_col)
-        except TypeError:
-            pass
         columns.append(temp_min_col)
-        try:
+        with suppress(TypeError):
             temp_max_col = int(temp_max_col)
-        except TypeError:
-            pass
         columns.append(temp_max_col)
 
     tsd = tsutils.common_kwds(
@@ -941,7 +933,7 @@ def precipitation(
 
         try:
             mhour = tsd[masterstation_hour_col].to_frame()
-        except:
+        except Exception:
             mhour = tsutils.common_kwds(
                 input_tsd=tsutils.make_list(input_ts),
                 skiprows=skiprows,

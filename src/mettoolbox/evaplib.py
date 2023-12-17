@@ -104,9 +104,7 @@ def ra(z=float, z0=float, d=float, u=scipy.array([])):
     # Test input array/value
     u = meteolib._arraytest(u)
 
-    # Calculate ra
-    ra = (scipy.log((z - d) / z0)) ** 2 / (0.16 * u)
-    return ra  # aerodynamic resistanc in s/m
+    return (scipy.log((z - d) / z0)) ** 2 / (0.16 * u)
 
 
 def E0(
@@ -198,11 +196,10 @@ def E0(
     Rnl = f * epsilom * sigma * (airtemp + 273.15) ** 4  # Longwave component [J/m2/d]
     Rnet = Rns - Rnl  # Net radiation [J/m2/d]
     Ea = (1 + 0.536 * u) * (es / 1000 - ea / 1000)
-    E0 = (
+    return (
         DELTA / (DELTA + gamma) * Rnet / Lambda
         + gamma / (DELTA + gamma) * 6430000 * Ea / Lambda
     )
-    return E0
 
 
 def ET0pm(
@@ -277,11 +274,10 @@ def ET0pm(
     epsilom = 0.34 - 0.14 * scipy.sqrt(ea / 1000)
     Rnl = f * epsilom * sigma * (airtemp + 273.15) ** 4  # Longwave component [J/m2/d]
     Rnet = Rns - Rnl  # Net radiation [J/m2/d]
-    ET0pm = (
+    return (
         DELTA / 1000.0 * Rnet / Lambda
         + 900.0 / (airtemp + 273.16) * u * (es - ea) / 1000 * gamma / 1000
     ) / (DELTA / 1000.0 + gamma / 1000 * (1.0 + 0.34 * u))
-    return ET0pm  # FAO reference evaporation [mm/day]
 
 
 def Em(
@@ -340,9 +336,7 @@ def Em(
     gamma = meteolib.gamma_calc(airtemp, rh, airpress)
     Lambda = meteolib.L_calc(airtemp)
 
-    # calculate Em [mm/day]
-    Em = 0.65 * DELTA / (DELTA + gamma) * Rs / Lambda
-    return Em
+    return 0.65 * DELTA / (DELTA + gamma) * Rs / Lambda
 
 
 def Ept(
@@ -396,9 +390,7 @@ def Ept(
     DELTA = meteolib.Delta_calc(airtemp)
     gamma = meteolib.gamma_calc(airtemp, rh, airpress)
     Lambda = meteolib.L_calc(airtemp)
-    # calculate Em [mm/day]
-    Ept = 1.26 * DELTA / (DELTA + gamma) * (Rn - G) / Lambda
-    return Ept
+    return 1.26 * DELTA / (DELTA + gamma) * (Rn - G) / Lambda
 
 
 def Epm(
@@ -463,12 +455,10 @@ def Epm(
     # Calculate saturated and actual water vapour pressures
     es = meteolib.es_calc(airtemp) / 100.0  # [hPa]
     ea = meteolib.ea_calc(airtemp, rh) / 100.0  # [hPa]
-    # Calculate Epm
-    Epm = (
+    return (
         (DELTA * (Rn - G) + rho * cp * (es - ea) / ra)
         / (DELTA + gamma * (1.0 + rs / ra))
     ) / Lambda
-    return Epm  # actual ET in mm
 
 
 def tvardry(
@@ -541,23 +531,9 @@ def tvardry(
     # Define constants
     k = 0.40  # von Karman constant
     g = 9.81  # acceleration due to gravity [m/s^2]
-    # C1 =  2.9 # De Bruin et al., 1992
-    # C2 = 28.4 # De Bruin et al., 1992
-    # L= Obhukov-length [m]
-
-    # Free Convection Limit
-    H = rho * cp * scipy.sqrt((sigma_t / C1) ** 3 * k * g * (z - d) / (T + 273.15) * C2)
-    # else:
-    # including stability correction
-    # zoverL = z/L
-    # tvardry = rho * cp * scipy.sqrt((sigma_t/C1)**3 * k*g*(z-d) / (T+273.15) *\
-    #          (1-C2*z/L)/(-1*z/L))
-
-    # Check if we get complex numbers (square root of negative value) and remove
-    # I = find(zoL >= 0 | H.imag != 0);
-    # H(I) = scipy.ones(size(I))*NaN;
-
-    return H  # sensible heat flux
+    return (
+        rho * cp * scipy.sqrt((sigma_t / C1) ** 3 * k * g * (z - d) / (T + 273.15) * C2)
+    )
 
 
 def gash79(Pg=scipy.array([]), ER=float, S=float, St=float, p=float, pt=float):
@@ -644,7 +620,7 @@ def gash79(Pg=scipy.array([]), ER=float, S=float, St=float, p=float, pt=float):
         PGsat = -(1 / ER * S) * scipy.log(1 - (ER / (1 - p - pt)))
 
         # Process rainfall series
-        for i in range(0, n):
+        for i in range(n):
             Ecan = 0.0
             Etrunk = 0.0
             if Pg[i] < PGsat and Pg[i] > 0:
