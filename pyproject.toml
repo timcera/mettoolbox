@@ -70,7 +70,7 @@ bitbucket = "https://bitbucket.org/timcera/mettoolbox/src/main/"
 name = "cz_conventional_commits"
 tag_format = "v$version"
 update_changelog_on_bump = true
-version = "6.0.4"
+version = "6.0.5"
 version_files = ["VERSION"]
 
 [tool.isort]
