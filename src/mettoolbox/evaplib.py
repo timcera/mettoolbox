@@ -573,9 +573,9 @@ def gash79(Pg=scipy.array([]), ER=float, S=float, St=float, p=float, pt=float):
     Pg = meteolib._arraytest(Pg)
 
     # Determine length of array Pg
-    l = scipy.size(Pg)
+    length_array = scipy.size(Pg)
     # Check if we have a single precipitation value or an array
-    if l < 2:  # Dealing with single value...
+    if length_array < 2:  # Dealing with single value...
         # PGsat calculation (for the saturation of the canopy)
         PGsat = -(1 / ER * S) * scipy.log(1 - (ER / (1 - p - pt)))
 

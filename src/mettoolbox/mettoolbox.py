@@ -5,9 +5,9 @@ from typing import Optional, Union
 
 from cltoolbox import Program
 from cltoolbox.rst_text_formatter import RSTHelpFormatter
-from toolbox_utils import tsutils
 
 from . import disaggregate, indices, pet, ret
+from .toolbox_utils.src.toolbox_utils import tsutils
 
 program = Program("mettoolbox", "0.0")
 
@@ -19,19 +19,13 @@ program.add_subprog("ret")
 program.add_subprog("indices")
 
 _LOCAL_DOCSTRINGS = tsutils.docstrings
-_LOCAL_DOCSTRINGS[
-    "latitude"
-] = """latitude:
+_LOCAL_DOCSTRINGS["latitude"] = """latitude:
         The latitude of the location expressed in decimal degrees.  The
         southern hemisphere is expressed as a negative value."""
-_LOCAL_DOCSTRINGS[
-    "longitude"
-] = """longitude:
+_LOCAL_DOCSTRINGS["longitude"] = """longitude:
         The longitude of the location expressed in decimal degrees.  The
         western hemisphere is expressed as a negative value."""
-_LOCAL_DOCSTRINGS[
-    "vardesc"
-] = """If int or float use the value.  If
+_LOCAL_DOCSTRINGS["vardesc"] = """If int or float use the value.  If
         array_like, then convert to numpy array.  If string, then split
         on commas and use as array_like.
 

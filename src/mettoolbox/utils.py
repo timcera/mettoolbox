@@ -5,7 +5,8 @@ import warnings
 import numpy as np
 import pandas as pd
 from solarpy import declination
-from toolbox_utils import tsutils
+
+from .toolbox_utils.src.toolbox_utils import tsutils
 
 
 def _check_cols(*args):

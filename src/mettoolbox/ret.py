@@ -3,9 +3,15 @@ from typing import Optional, Union
 
 import pandas as pd
 import pydaymet.pet as daypet
-from pydantic import PositiveInt, confloat, validate_arguments
-from toolbox_utils import tsutils
+from pydantic import PositiveInt, confloat
 from tstoolbox.tstoolbox import read
+
+from .toolbox_utils.src.toolbox_utils import tsutils
+
+try:
+    from pydantic import validate_arguments as validate_call
+except ImportError:
+    from pydantic import validate_call
 
 warnings.filterwarnings("ignore")
 
@@ -30,7 +36,7 @@ def prepare_daymet(
     return read(*read_args, **read_kwds)
 
 
-@validate_arguments
+@validate_call
 def penman_monteith(
     lat: confloat(ge=-90, le=90),
     lon: confloat(ge=-180, le=180),

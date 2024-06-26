@@ -5,8 +5,7 @@ from typing import Literal, Optional, Union
 
 import numpy as np
 import pandas as pd
-from pydantic import PositiveInt, confloat, validate_arguments
-from toolbox_utils import tsutils
+from pydantic import PositiveInt, confloat
 from tstoolbox import tstoolbox
 
 from . import tdew as tdew_melo
@@ -21,10 +20,16 @@ from .melodist.melodist.util.util import (
     get_sun_times,
 )
 from .melodist.melodist.wind import disaggregate_wind
+from .toolbox_utils.src.toolbox_utils import tsutils
+
+try:
+    from pydantic import validate_arguments as validate_call
+except ImportError:
+    from pydantic import validate_call
 
 
 @tsutils.transform_args(source_units=tsutils.make_list, target_units=tsutils.make_list)
-@validate_arguments
+@validate_call
 def single_target_units(source_units, target_units, default=None, cnt=1):
     if default is None:
         return source_units
@@ -48,7 +53,7 @@ def single_target_units(source_units, target_units, default=None, cnt=1):
     return [target_units[0]] * len(source_units)
 
 
-@validate_arguments(config={"arbitrary_types_allowed": True})
+@validate_call(config={"arbitrary_types_allowed": True})
 def temperature(
     method: Literal[
         "sine_min_max", "sine_mean", "sine", "mean_course_min_max", "mean_course_mean"
@@ -246,7 +251,7 @@ def temperature(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@validate_arguments(config={"arbitrary_types_allowed": True})
+@validate_call(config={"arbitrary_types_allowed": True})
 def prepare_hum_tdew(
     method: Literal[
         "equal",
@@ -496,7 +501,7 @@ def prepare_hum_tdew(
     return tsd, hourly_temp, month_hour_precip_mean
 
 
-@validate_arguments(config={"arbitrary_types_allowed": True})
+@validate_call(config={"arbitrary_types_allowed": True})
 def humidity(
     method: Literal[
         "equal",
@@ -582,7 +587,7 @@ def humidity(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@validate_arguments(config={"arbitrary_types_allowed": True})
+@validate_call(config={"arbitrary_types_allowed": True})
 def dewpoint_temperature(
     method: Literal[
         "equal",
@@ -671,7 +676,7 @@ def dewpoint_temperature(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@validate_arguments(config={"arbitrary_types_allowed": True})
+@validate_call(config={"arbitrary_types_allowed": True})
 def wind_speed(
     method: Literal["equal", "cosine", "random"],
     source_units,
@@ -746,7 +751,7 @@ def wind_speed(
     )
 
 
-@validate_arguments(config={"arbitrary_types_allowed": True})
+@validate_call(config={"arbitrary_types_allowed": True})
 def radiation(
     method: Literal["pot_rad", "pot_rad_via_ssd", "pot_rad_via_bc", "mean_course"],
     source_units,
@@ -885,7 +890,7 @@ def radiation(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@validate_arguments(config={"arbitrary_types_allowed": True})
+@validate_call(config={"arbitrary_types_allowed": True})
 def precipitation(
     method: Literal["equal", "cascade", "masterstation"],
     source_units,
@@ -973,7 +978,7 @@ def precipitation(
     return tsutils.return_input(print_input, tsd, ntsd)
 
 
-@validate_arguments(config={"arbitrary_types_allowed": True})
+@validate_call(config={"arbitrary_types_allowed": True})
 def evaporation(
     method: Literal["trap", "fixed"],
     source_units,

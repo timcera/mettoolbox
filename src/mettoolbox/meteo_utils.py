@@ -1,6 +1,4 @@
-"""The meteo_utils module contains utility functions for meteorological data
-
-"""
+"""The meteo_utils module contains utility functions for meteorological data"""
 
 from numpy import arccos, array, clip, cos, exp, log, minimum, mod, pi, sin, tan
 from pandas import to_numeric

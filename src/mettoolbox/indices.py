@@ -1,9 +1,15 @@
 from typing import Optional, Union
 
 import pandas as pd
-from pydantic import PositiveInt, validate_arguments
+from pydantic import PositiveInt
 from standard_precip.spi import SPI
-from toolbox_utils import tsutils
+
+from .toolbox_utils.src.toolbox_utils import tsutils
+
+try:
+    from pydantic import validate_arguments as validate_call
+except ImportError:
+    from pydantic import validate_call
 
 
 def _nlarge_nsmall(
@@ -43,7 +49,7 @@ def _nlarge_nsmall(
 
 
 @tsutils.transform_args(source_units=tsutils.make_list)
-@validate_arguments(config={"arbitrary_types_allowed": True})
+@validate_call(config={"arbitrary_types_allowed": True})
 def spei(
     rainfall: Union[PositiveInt, str, pd.DataFrame],
     pet: Union[PositiveInt, str, pd.DataFrame],
@@ -105,7 +111,7 @@ def spei(
 
 
 @tsutils.transform_args(source_units=tsutils.make_list)
-@validate_arguments(config={"arbitrary_types_allowed": True})
+@validate_call(config={"arbitrary_types_allowed": True})
 def pe(
     rainfall: Union[PositiveInt, str, pd.DataFrame],
     pet: Union[PositiveInt, str, pd.DataFrame],

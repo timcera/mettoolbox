@@ -3,8 +3,7 @@ build-backend = "setuptools.build_meta"
 requires = [
     "setuptools>=45",
     "setuptools_scm[toml]>=6.2",
-    "wheel",
-    "oldest-supported-numpy"
+    "wheel"
 ]
 
 [project]
@@ -12,9 +11,9 @@ name = "mettoolbox"
 dynamic = ["readme", "version"]
 description = "mettoolbox is set of command line and Python tools for the analysis and reporting of meteorological data."
 dependencies = [
-    "toolbox_utils >= 5.0.0, < 6.0.0",
     "tstoolbox",
     "cltoolbox",
+    "numpy",
     "solarpy",
     "standard-precip",
     "pydaymet",
@@ -59,34 +58,6 @@ keywords = [
 license = {text = "BSD-3-Clause"}
 requires-python = ">=3.8"
 
-[project.optional-dependencies]
-dev = [
-    "bandit",
-    "black",
-    "blacken-docs",
-    "black-nbconvert",
-    "cleanpy",
-    "commitizen",
-    "coverage[toml]",
-    "isort",
-    "mypy",
-    "pre-commit",
-    "pyflakes",
-    "pylama",
-    "pyle",
-    "pylint",
-    "pyre",
-    "pyroma",
-    "pytest",
-    "pytest-cov",
-    "pytest-mpl",
-    "pyupgrade",
-    "twine",
-    "unimport",
-    "velin",
-    "vulture"
-]
-
 [project.scripts]
 mettoolbox = "mettoolbox.mettoolbox:main"
 
@@ -94,12 +65,6 @@ mettoolbox = "mettoolbox.mettoolbox:main"
 documentation = "https://timcera.bitbucket.io/mettoolbox/docs/index.html#mettoolbox-documentation"
 github = "https://github.com/timcera/mettoolbox"
 bitbucket = "https://bitbucket.org/timcera/mettoolbox/src/main/"
-
-[tool.check-manifest]
-ignore = [
-    ".travis.yml",
-    "docs/_function_autosummary/*"
-]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -111,6 +76,9 @@ version_files = ["VERSION"]
 [tool.isort]
 profile = "black"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
 [tool.setuptools]
 license-files = ["LICENSE.txt"]
 include-package-data = true
@@ -120,7 +88,6 @@ readme = {file = "README.rst"}
 version = {file = "VERSION"}
 
 [tool.setuptools.packages.find]
-exclude = ["tests*", "examples*", "tools*", "docs*", "mettoolbox.tests*"]
 where = ["src"]
 
 [tool.setuptools_scm]

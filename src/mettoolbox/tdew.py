@@ -32,7 +32,6 @@ from typing import Literal
 
 import numpy as np
 import pandas as pd
-from pydantic import validate_arguments
 
 from .melodist.melodist.util.util import (
     dewpoint_temperature,
@@ -41,8 +40,13 @@ from .melodist.melodist.util.util import (
     vapor_pressure,
 )
 
+try:
+    from pydantic import validate_arguments as validate_call
+except ImportError:
+    from pydantic import validate_call
 
-@validate_arguments
+
+@validate_call
 def disaggregate_tdew(
     data_daily,
     method: Literal[

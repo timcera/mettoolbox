@@ -4,12 +4,17 @@ from typing import Optional, Union
 import pandas as pd
 import pydaymet.pet as daypet
 from numpy import exp
-from pydantic import PositiveInt, confloat, validate_arguments
-from toolbox_utils import tsutils
+from pydantic import PositiveInt, confloat
 from tstoolbox.tstoolbox import read
 
 from . import utils
 from .meteo_utils import calc_ea, calc_es, daylight_hours
+from .toolbox_utils.src.toolbox_utils import tsutils
+
+try:
+    from pydantic import validate_arguments as validate_call
+except ImportError:
+    from pydantic import validate_call
 
 warnings.filterwarnings("ignore")
 
@@ -200,7 +205,7 @@ def et0_pm(
     )
 
 
-@validate_arguments
+@validate_call
 def blaney_criddle(
     bright_hours_col,
     source_units: Optional[Union[str, list]],
@@ -248,7 +253,7 @@ def blaney_criddle(
     return tsutils.return_input(print_input, tsd, pet)
 
 
-@validate_arguments
+@validate_call
 def hamon(
     lat: confloat(ge=-90, le=90),
     source_units: Optional[Union[str, list]],
@@ -397,7 +402,7 @@ def linacre(
     return tsutils.return_input(print_input, tsd, pet)
 
 
-@validate_arguments
+@validate_call
 def hargreaves(
     lat: confloat(ge=-90, le=90),
     temp_min_col: Optional[Union[PositiveInt, str, list]],
@@ -456,7 +461,7 @@ def hargreaves(
     return tsutils.return_input(print_input, tsd, pe)
 
 
-@validate_arguments
+@validate_call
 def oudin_form(
     lat: confloat(ge=-90, le=90),
     temp_min_col: Optional[Union[PositiveInt, str]],
@@ -509,7 +514,7 @@ def oudin_form(
     return tsutils.return_input(print_input, tsd, pe)
 
 
-@validate_arguments
+@validate_call
 def allen(
     lat: confloat(ge=-90, le=90),
     temp_min_col: Optional[Union[PositiveInt, str]],
@@ -581,7 +586,7 @@ def prepare_daymet(
     return read(*read_args, **read_kwds)
 
 
-@validate_arguments
+@validate_call
 def priestley_taylor(
     lat: confloat(ge=-90, le=90),
     lon: confloat(ge=-180, le=180),
@@ -625,7 +630,7 @@ def priestley_taylor(
     return tsutils.return_input(print_input, tsd, pe)
 
 
-@validate_arguments
+@validate_call
 def penman_monteith(
     lat: confloat(ge=-90, le=90),
     lon: confloat(ge=-180, le=180),
