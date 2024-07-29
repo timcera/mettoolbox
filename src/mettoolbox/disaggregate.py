@@ -743,7 +743,7 @@ def wind_speed(
     for _, column_data in tsd.iteritems():
         df = disaggregate_wind(column_data, method=method, a=a, b=b, t_shift=t_shift)
         ndf = ndf.join(df, how="outer")
-
+    ndf.columns = ["windspeed:{target_units[0]}:disagg"]
     return tsutils.return_input(
         print_input,
         tsd,
