@@ -2,14 +2,16 @@ from typing import Optional, Union
 
 import pandas as pd
 from pydantic import PositiveInt
-from standard_precip.spi import SPI
 
+from .standard_precip.standard_precip.spi import SPI
 from .toolbox_utils.src.toolbox_utils import tsutils
 
 try:
     from pydantic import validate_arguments as validate_call
 except ImportError:
     from pydantic import validate_call
+
+__all__ = ["spei", "pe"]
 
 
 def _nlarge_nsmall(

@@ -6,7 +6,6 @@ Python API Function Summary
 .. autosummary::
     :toctree: _function_autosummary
 
-    mettoolbox.about
     mettoolbox.disaggregate.dewpoint_temperature
     mettoolbox.disaggregate.evaporation
     mettoolbox.disaggregate.humidity

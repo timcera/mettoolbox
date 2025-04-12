@@ -116,9 +116,9 @@ def disaggregate_tdew(
                 index=temp.index, data=100 * sat_vap_press_tdew / sat_vap_press_t
             )
     elif method == "min_max":
-        assert (
-            "hum_min" in data_daily.columns and "hum_max" in data_daily.columns
-        ), "Minimum and maximum humidity must be present in data frame"
+        assert "hum_min" in data_daily.columns and "hum_max" in data_daily.columns, (
+            "Minimum and maximum humidity must be present in data frame"
+        )
 
         hmin = distribute_equally(data_daily.hum_min)
         hmax = distribute_equally(data_daily.hum_max)

@@ -4,8 +4,8 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from solarpy import declination
 
+from .solarpy import declination
 from .toolbox_utils.src.toolbox_utils import tsutils
 
 

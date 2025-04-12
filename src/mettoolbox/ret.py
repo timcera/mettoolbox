@@ -13,6 +13,8 @@ try:
 except ImportError:
     from pydantic import validate_call
 
+__all__ = ["penman_monteith"]
+
 warnings.filterwarnings("ignore")
 
 

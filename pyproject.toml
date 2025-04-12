@@ -14,8 +14,6 @@ dependencies = [
     "tstoolbox",
     "cltoolbox",
     "numpy",
-    "solarpy",
-    "standard-precip",
     "pydaymet",
     "pyet"
 ]
