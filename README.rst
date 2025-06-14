@@ -18,11 +18,6 @@
     :target: https://pypi.python.org/pypi/mettoolbox/
     :height: 20
 
-.. image:: https://img.shields.io/pypi/dd/mettoolbox.svg
-    :alt: mettoolbox downloads
-    :target: https://pypi.python.org/pypi/mettoolbox/
-    :height: 20
-
 .. image:: https://img.shields.io/pypi/pyversions/mettoolbox
     :alt: PyPI - Python Version
     :target: https://pypi.org/project/mettoolbox/
