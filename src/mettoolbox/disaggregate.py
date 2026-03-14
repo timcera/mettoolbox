@@ -21,6 +21,7 @@ from .melodist.melodist.util.util import (
 )
 from .melodist.melodist.wind import disaggregate_wind
 from .toolbox_utils.src.toolbox_utils import tsutils
+from .toolbox_utils.src.toolbox_utils.utils import pandas_offset_by_version
 
 try:
     from pydantic import validate_arguments as validate_call
@@ -965,14 +966,18 @@ def precipitation(
             )
 
         # Should only be one hourly column in the input.
-        dsum = mhour.groupby(pd.Grouper(freq="D")).sum().asfreq("H", method="ffill")
+        dsum = (
+            mhour.groupby(pd.Grouper(freq="D"))
+            .sum()
+            .asfreq(pandas_offset_by_version("h"), method="ffill")
+        )
         master = mhour.join(dsum, rsuffix="sum")
         mask = master.iloc[:, 0] > 0.0
         master = (
             master.loc[mask, master.columns[0]] / master.loc[mask, master.columns[1]]
         ).to_frame()
         ntsd = tsd.loc[:, tsd.columns != masterstation_hour_col].asfreq(
-            "H", method="ffill"
+            pandas_offset_by_version("h"), method="ffill"
         )
         ntsd = ntsd.join(master)
         ntsd = ntsd.loc[:, tsd.columns != masterstation_hour_col].multiply(
@@ -981,7 +986,7 @@ def precipitation(
         # All the remaining columns are daily.
         ntsd = (
             tsd.loc[:, tsd.columns != masterstation_hour_col]
-            .asfreq("H", method="ffill")
+            .asfreq(pandas_offset_by_version("h"), method="ffill")
             .mul(master, axis="rows")
         )
 
