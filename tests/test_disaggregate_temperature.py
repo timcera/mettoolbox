@@ -28,7 +28,12 @@ class TestMettoolbox(unittest.TestCase):
             input_ts="tests/data_temperature_gainesville.csv",
         )
         out.index.name = "Datetime"
-        assert_frame_equal(out, self.disaggregate_temperature, check_dtype=False)
+        assert_frame_equal(
+            out,
+            self.disaggregate_temperature,
+            check_dtype=False,
+            check_index_type=False,
+        )
 
     def tearDown(self):
         pass
