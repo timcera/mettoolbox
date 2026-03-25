@@ -7,9 +7,10 @@ from numpy import exp
 from pydantic import PositiveInt, confloat
 from tstoolbox.tstoolbox import read
 
-from . import utils
-from .meteo_utils import calc_ea, calc_es, daylight_hours
-from .toolbox_utils.src.toolbox_utils import tsutils
+from mettoolbox import utils
+from mettoolbox.meteo_utils import calc_ea, calc_es, daylight_hours
+from mettoolbox.mettoolbox_utils import _LOCAL_DOCSTRINGS
+from mettoolbox.toolbox_utils.src.toolbox_utils import tsutils
 
 try:
     from pydantic import validate_arguments as validate_call
@@ -25,7 +26,6 @@ __all__ = [
     "oudin_form",
     "allen",
     "priestley_taylor",
-    "penman_monteith",
 ]
 
 warnings.filterwarnings("ignore")
@@ -187,37 +187,8 @@ def _preprocess(
     return tsd
 
 
-def et0_pm(
-    input_ts="-",
-    columns=None,
-    start_date=None,
-    end_date=None,
-    dropna="no",
-    clean=False,
-    round_index=None,
-    skiprows=None,
-    index_type="datetime",
-    names=None,
-    source_units=None,
-    target_units=None,
-):
-    """Penman-Monteith evaporation."""
-    return tsutils.common_kwds(
-        tsutils.read_iso_ts(
-            input_ts, skiprows=skiprows, names=names, index_type=index_type
-        ),
-        start_date=start_date,
-        end_date=end_date,
-        pick=columns,
-        round_index=round_index,
-        dropna=dropna,
-        source_units=source_units,
-        target_units=target_units,
-        clean=clean,
-    )
-
-
 @validate_call
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def blaney_criddle(
     bright_hours_col,
     source_units: Optional[Union[str, list]],
@@ -235,7 +206,89 @@ def blaney_criddle(
     target_units="mm",
     print_input=False,
 ):
-    """Evaporation calculated according to (Blaney, 1952)."""
+    """
+    Evaporation calculated according to [blaney_1952]_.
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ----------
+    bright_hours_col
+        The column number (data columns start at 1) or column name that holds
+        the time-series of the number of bright hours each day.
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hamon 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hamon(24,
+                              1,
+                              2,
+                              ["degF", "degF"],
+                              input_ts="tmin_tmax_data.csv")
+    temp_mean_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+    temp_min_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    k : float
+        A scaling factor, defaults to 1.  This is an adjustment for local conditions,
+        for example, Lu, 2005 found that k=1.2 was a better fit for the southeastern
+        United States.
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+
+    Returns
+    -------
+    pandas.Series containing the calculated evaporation.
+
+    Examples
+    --------
+    >>> et_blaney_criddle = blaney_criddle(tmean)
+
+    Notes
+    -----
+    Based on equation 6 in [xu_2001]_.
+
+    .. math:: PE=kp(0.46 * T_a + 8.13)
+
+    References
+    ----------
+    .. [blaney_1952] Blaney, H. F. (1952). Determining water requirements in
+       irrigated areas from climatological and irrigation data.
+    .. [xu_2001] Xu, C. Y., & Singh, V. P. (2001). Evaluation and
+       generalization of temperature‐based methods for calculating evaporation.
+       Hydrological processes, 15(2), 305-319.
+    """
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
@@ -266,6 +319,7 @@ def blaney_criddle(
 
 
 @validate_call
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def hamon(
     lat: confloat(ge=-90, le=90),
     source_units: Optional[Union[str, list]],
@@ -282,7 +336,98 @@ def hamon(
     target_units=None,
     print_input=False,
 ):
-    """Evaporation calculated according to (Hamon, 1961)."""
+    """
+    Hamon PET: f(Tavg, latitude)
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ----------
+    lat: float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    k: float
+        A scaling factor, defaults to 1.  This is an adjustment for local conditions,
+        for example, Lu, 2005 found that k=1.2 was a better fit for the southeastern
+        United States.
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hamon 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hamon(24,
+                              1,
+                              2,
+                              ["degF", "degF"],
+                              input_ts="tmin_tmax_data.csv")
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+
+    Returns
+    -------
+    pandas.Series containing the calculated evaporation.
+
+    Examples
+    --------
+    >>> et_hamon = hamon(tmean, lat)
+
+    Notes
+    -----
+    Following [hamon_1961]_, [oudin_2005]_, and [lu_2005]_.
+
+    .. math:: PE = (\\frac{DL}{12})^2 exp(\\frac{T_a}{16})
+
+    References
+    ----------
+    .. [hamon_1961] Hamon, W. R. (1963). Estimating potential
+       evapotranspiration. Transactions of the American Society of Civil
+       Engineers, 128(1), 324-338.
+    .. [oudin_2005] Oudin, L., Hervieu, F., Michel, C., Perrin, C.,
+       Andréassian, V., Anctil, F., & Loumagne, C. (2005). Which potential
+       evapotranspiration input for a lumped rainfall–runoff model?:
+       Part 2—Towards a simple and efficient potential evapotranspiration model
+       for rainfall–runoff modelling. Journal of hydrology, 303(1-4), 290-306.
+    .. [lu_2005] Lu et al. (2005). A comparison of six potential
+       evapotranspiration methods for regional use in the southeastern United
+       States. Journal of the American Water Resources Association, 41, 621-
+       633.
+    """
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
@@ -306,6 +451,7 @@ def hamon(
     return tsutils.return_input(print_input, tsd, pet)
 
 
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def romanenko(
     source_units: Optional[Union[str, list]],
     temp_mean_col=None,
@@ -323,7 +469,88 @@ def romanenko(
     target_units=None,
     print_input=False,
 ):
-    """Evaporation calculated according to (Romanenko, 1961)."""
+    """
+    Evaporation calculated according to [romanenko_1961]_.
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ----------
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    rh_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily average relative humidity.
+    k: float
+        A scaling factor, defaults to 1.  This is an adjustment for local
+        conditions, for example, Lu, 2005 found that k=1.2 was a better fit for
+        the southeastern United States.
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hamon 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hamon(24,
+                              1,
+                              2,
+                              ["degF", "degF"],
+                              input_ts="tmin_tmax_data.csv")
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+
+    Returns
+    -------
+    pandas.Series containing the calculated evaporation.
+
+    Examples
+    --------
+    >>> et_romanenko = romanenko(tmean, rh)
+
+    Notes
+    -----
+    Based on equation 11 in [xu_2001]_.
+
+    .. math:: PE=4.5(1 + (\\frac{T_a}{25})^2 (1  \\frac{e_a}{e_s})
+
+    References
+    ----------
+    .. [romanenko_1961] Romanenko, V. A. (1961). Computation of the autumn soil
+       moisture using a universal relationship for a large area. Proc. of
+       Ukrainian Hydrometeorological Research Institute, 3, 12-25.
+    """
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
@@ -356,6 +583,7 @@ def romanenko(
     return tsutils.return_input(print_input, tsd, pet)
 
 
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def linacre(
     lat: confloat(ge=-90, le=90),
     elevation,
@@ -374,7 +602,91 @@ def linacre(
     target_units=None,
     print_input=False,
 ):
-    """Evaporation calculated according to (Linacre, 1977)."""
+    """
+    Evaporation calculated according to [linacre_1977]_.
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ----------
+    lat: float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+    elevation: float
+        The elevation of the station in
+        meters.
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hargreaves 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hargreaves(24,
+                                   1,
+                                   2,
+                                   ["degF", "degF"],
+                                   input_ts="tmin_tmax_data.csv")
+    temp_mean_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+    temp_min_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col: str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    tdew_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily dewpoint temperature.
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+
+    Returns
+    -------
+    pandas.Series containing the calculated evaporation.
+
+    Examples
+    --------
+    >>> et_linacre = linacre(tmean, elevation, lat)
+
+    Notes
+    -----
+    Based on equation 5 in [xu_2001]_.
+
+    .. math:: PE = \\frac{\\frac{500 T_m}{(100-A)}+15 (T_a-T_d)}{80-T_a}
+
+    References
+    -----
+    .. [linacre_1977] Linacre, E. T. (1977). A simple formula for estimating
+       evaporation rates in various climates, using temperature data alone.
+       Agricultural meteorology, 18(6), 409-424.
+    """
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
@@ -415,6 +727,7 @@ def linacre(
 
 
 @validate_call
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def hargreaves(
     lat: confloat(ge=-90, le=90),
     temp_min_col: Optional[Union[PositiveInt, str, list]],
@@ -432,7 +745,65 @@ def hargreaves(
     target_units="mm",
     print_input=False,
 ):
-    """hargreaves"""
+    """
+    Hargreaves PET: f(Tmin, Tmax, Tavg, latitude)
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ----------
+    lat : float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+    temp_min_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hargreaves 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hargreaves(24,
+                                   1,
+                                   2,
+                                   ["degF", "degF"],
+                                   input_ts="tmin_tmax_data.csv")
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    temp_mean_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+    """
     # If temp_min_col, temp_max_col, or temp_mean_col have a "," then the
     # source is the first comma delimited word, and the remaining words are
     # modifiers.
@@ -474,6 +845,7 @@ def hargreaves(
 
 
 @validate_call
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def oudin_form(
     lat: confloat(ge=-90, le=90),
     temp_min_col: Optional[Union[PositiveInt, str]],
@@ -493,7 +865,100 @@ def oudin_form(
     target_units=None,
     print_input=False,
 ):
-    """oudin form"""
+    """
+    Oudin PET: f(Tavg, latitude)
+
+    This model uses daily mean temperature to estimate PET based
+    on the Julian day of year and latitude. The later are used
+    to estimate extraterrestrial solar radiation.
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    The constants `k1` and `k2` are used in the generic form of the equation to
+    adjust the PET.
+
+    The defaults for k1 and k2 for this function are from Oudin with k1=100 and
+    k2=5.
+
+    Jensen-Haise presented k1=40, and k2=0,
+
+    Mcguiness presented k1=68, and k2=5.
+
+    Reference::
+
+        Ludovic Oudin et al, Which potential evapotranspiration input for
+        a lumped rainfall–runoff model?: Part 2—Towards a simple and efficient
+        potential evapotranspiration model for rainfall–runoff modelling,
+        Journal of Hydrology, Volume 303, Issues 1–4, 1 March 2005, Pages
+        290-306, ISSN 0022-1694,
+        http://dx.doi.org/10.1016/j.jhydrol.2004.08.026.
+        (http://www.sciencedirect.com/science/article/pii/S0022169404004056)
+
+    Parameters
+    ----------
+    lat : float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+    temp_min_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    temp_mean_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+    k1:
+        [optional, default to 100]
+
+        The `k1` value is used to calibrate the equation to different
+        conditions.
+
+        The k1 parameter is a scaling parameter.
+    k2:
+        [optional, default to 5]
+
+        The `k2` value is used to calibrate the equation to different
+        conditions.
+
+        The k2 parameter represents the point in degrees C at which potential
+        evaporation is 0.
+    source_units
+        If unit is specified for the column as the second field of a
+        ':' delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet oudin_form 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.oudin_form(24, 1, 2, ["degF", "degF"], input_ts="tmin_tmax_data.csv")
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    """
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
@@ -527,6 +992,7 @@ def oudin_form(
 
 
 @validate_call
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def allen(
     lat: confloat(ge=-90, le=90),
     temp_min_col: Optional[Union[PositiveInt, str]],
@@ -544,7 +1010,65 @@ def allen(
     target_units=None,
     print_input=False,
 ):
-    """Allen"""
+    """
+    Allen PET: f(Tmin, Tmax, Tavg, latitude)
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ----------
+    lat : float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+    temp_min_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet allen 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.allen(24,
+                              1,
+                              2,
+                              ["degF", "degF"],
+                              input_ts="tmin_tmax_data.csv")
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    temp_mean_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+    """
     tsd = _temp_read(
         temp_min_col,
         temp_max_col,
@@ -599,6 +1123,7 @@ def prepare_daymet(
 
 
 @validate_call
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def priestley_taylor(
     lat: confloat(ge=-90, le=90),
     lon: confloat(ge=-180, le=180),
@@ -613,7 +1138,77 @@ def priestley_taylor(
     target_units="mm",
     print_input=False,
 ):
-    """priestley_taylor"""
+    """
+    priestley_taylor PET: f(Tmin, Tmax, Tavg, latitude)
+
+    Average daily temperature can be supplied or if not, calculated by
+    (Tmax+Tmin)/2.
+
+    Parameters
+    ----------
+    ${input_ts}
+    lat : float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+    lon : float
+        The longitude of the station.  Positive specifies east of the
+        prime meridian, and negative values represent west of the
+        prime meridian.
+    temp_min_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    srad_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily solar radiation.
+    dayl_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily day light fraction.
+    source_units
+        If unit is specified for the column as the second field of a ':'
+        delimited column name, then the specified units and the
+        'source_units' must match exactly.
+
+        Any unit string compatible with the 'pint' library can be
+        used.
+
+        Since there are two required input columns ("temp_min_col" and
+        "temp_max_col") and one optional input column ("temp_mean_col")
+        you need to supply units for each input column in `source_units`.
+
+        Command line::
+
+            mettoolbox pet hargreaves 24 1 2 degF,degF < tmin_tmax_data.csv
+
+        Python::
+
+            from mettoolbox import mettoolbox as mt
+            df = mt.pet.hargreaves(24,
+                                   1,
+                                   2,
+                                   ["degF", "degF"],
+                                   input_ts="tmin_tmax_data.csv")
+    rh_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily average relative humidity.
+    u2_col:
+        The column name or number (data columns start numbering at 1) in the
+        input data that represents daily u2.
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    """
     if isinstance(input_ts, (pd.DataFrame, pd.Series)):
         tsd = input_ts
     else:
@@ -639,48 +1234,4 @@ def priestley_taylor(
 
     pe = daypet.PETCoords(tsd, (lon, lat))
     pe = pe.priestley_taylor().iloc[:, -1]
-    return tsutils.return_input(print_input, tsd, pe)
-
-
-@validate_call
-def penman_monteith(
-    lat: confloat(ge=-90, le=90),
-    lon: confloat(ge=-180, le=180),
-    tmin_col: Optional[Union[PositiveInt, str, list]],
-    tmax_col: Optional[Union[PositiveInt, str, list]],
-    srad_col: Optional[Union[PositiveInt, str, list]],
-    dayl_col: Optional[Union[PositiveInt, str, list]],
-    source_units: Optional[Union[str, list]],
-    rh_col=None,
-    u2_col=None,
-    input_ts="-",
-    target_units="mm",
-    print_input=False,
-):
-    """reference penman-monteith"""
-    if isinstance(input_ts, (pd.DataFrame, pd.Series)):
-        tsd = input_ts
-    else:
-        tsd = prepare_daymet(
-            tmin_col,
-            tmax_col,
-            srad_col,
-            dayl_col,
-            rh_col,
-            u2_col,
-            source_units,
-            target_units,
-        )
-    rename = {
-        "tmin:degC": "tmin (degrees C)",
-        "tmax:degC": "tmax (degrees C)",
-        "srad:W/m^2": "srad (W/m2)",
-        "dayl:s": "dayl (s)",
-        "rh:": "rh",
-        "u2:m/s": "u2 (m/s)",
-    }
-    tsd = tsd.rename(columns=rename)
-
-    pe = daypet.PETCoords(tsd, (lon, lat))
-    pe = pe.penman_monteith().iloc[:, -1]
     return tsutils.return_input(print_input, tsd, pe)

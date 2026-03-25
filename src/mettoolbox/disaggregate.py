@@ -8,20 +8,24 @@ import pandas as pd
 from pydantic import PositiveInt, confloat
 from tstoolbox import tstoolbox
 
-from . import tdew as tdew_melo
-from .melodist.melodist.humidity import (
+from mettoolbox import tdew as tdew_melo
+from mettoolbox.melodist.melodist.humidity import (
     calculate_month_hour_precip_mean,
     disaggregate_humidity,
 )
-from .melodist.melodist.radiation import disaggregate_radiation
-from .melodist.melodist.temperature import disaggregate_temperature, get_shift_by_data
-from .melodist.melodist.util.util import (
+from mettoolbox.melodist.melodist.radiation import disaggregate_radiation
+from mettoolbox.melodist.melodist.temperature import (
+    disaggregate_temperature,
+    get_shift_by_data,
+)
+from mettoolbox.melodist.melodist.util.util import (
     calculate_mean_daily_course_by_month,
     get_sun_times,
 )
-from .melodist.melodist.wind import disaggregate_wind
-from .toolbox_utils.src.toolbox_utils import tsutils
-from .toolbox_utils.src.toolbox_utils.utils import pandas_offset_by_version
+from mettoolbox.melodist.melodist.wind import disaggregate_wind
+from mettoolbox.mettoolbox_utils import _LOCAL_DOCSTRINGS
+from mettoolbox.toolbox_utils.src.toolbox_utils import tsutils
+from mettoolbox.toolbox_utils.src.toolbox_utils.utils import pandas_offset_by_version
 
 try:
     from pydantic import validate_arguments as validate_call
@@ -65,6 +69,7 @@ def single_target_units(source_units, target_units, default=None, cnt=1):
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def temperature(
     method: Literal[
         "sine_min_max", "sine_mean", "sine", "mean_course_min_max", "mean_course_mean"
@@ -91,7 +96,119 @@ def temperature(
     lon: Optional[confloat(ge=-180, le=180)] = None,
     hourly: Optional[Union[str, pd.Series]] = None,
 ):
-    """Disaggregate daily temperature to hourly temperature."""
+    """
+    Disaggregate daily temperature to hourly temperature.
+
+    For straight disaggregation the temperature units are not relevant,
+    however other tools in mettoolbox require metric units.  You can use
+    `source_units` and `target_units` keywords to change units.
+
+    +---------------+--------------------------------------------------------+
+    | Input Data    | Description                                            |
+    +===============+========================================================+
+    | temp_min_col  | Required column name or number representing the        |
+    |               | minimum daily temperature.                             |
+    +---------------+--------------------------------------------------------+
+    | temp_max_col  | Required column name or number representing the        |
+    |               | maximum daily temperature.                             |
+    +---------------+--------------------------------------------------------+
+    | temp_mean_col | Optional column name or number representing the        |
+    |               | average daily temperature. Default is None and if None |
+    |               | will be calculated as average of `temp_min_col` and    |
+    |               | `temp_max_col`.                                        |
+    +---------------+--------------------------------------------------------+
+
+    Parameters
+    ----------
+    method : str
+        Disaggregation methods available for temperature.
+
+        +---------------------+------------------------------------------+
+        | `method`            | Description                              |
+        +=====================+==========================================+
+        | sine_min_max        | Standard sine redistribution; preserves  |
+        |                     | Tmin and Tmax but not Tmean.             |
+        +---------------------+------------------------------------------+
+        | sine_mean           | Sine redistribution; preserves Tmean and |
+        |                     | the diurnal temperature range (Tmax –    |
+        |                     | Tmin) but not Tmin and Tmax.             |
+        +---------------------+------------------------------------------+
+        | mean_course_min_max | Redistribute following a prescribed      |
+        |                     | temperature course calculated from       |
+        |                     | hourly observations; preserves Tmin and  |
+        |                     | Tmax. Hourly CSV filename specified with |
+        |                     | the `hourly` keyword.                    |
+        +---------------------+------------------------------------------+
+        | mean_course_mean    | Redistribute following a prescribed      |
+        |                     | temperature course calculated from       |
+        |                     | hourly observations; preserves Tmean and |
+        |                     | the diurnal temperature range. Hourly    |
+        |                     | CSV filename specified with the `hourly` |
+        |                     | keyword.                                 |
+        +---------------------+------------------------------------------+
+
+    ${psource_units}
+    min_max_time : str
+
+        +----------------+------------------------------------------------+
+        | `min_max_time` | Description                                    |
+        +================+================================================+
+        | fix            | The diurnal course of temperature is fixed     |
+        |                | without any seasonal variations for sine       |
+        |                | method                                         |
+        +----------------+------------------------------------------------+
+        | sun_loc        | The diurnal course of temperature is modelled  |
+        |                | based on sunrise, noon and sunset calculations |
+        |                | for sine method.                               |
+        +----------------+------------------------------------------------+
+        | sun_loc_shift  | This option activates empirical corrections of |
+        |                | the ideal course modelled by sun_loc for sine  |
+        |                | method. Hourly CSV filename specifiedwith the  |
+        |                | `hourly` keyword.                              |
+        +----------------+------------------------------------------------+
+
+    mod_nighttime : bool
+        Allows one to apply a linear interpolation of night time values,
+        which proves preferable during polar nights.
+    ${input_ts}
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    temp_min_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily minimum temperature.
+    temp_max_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily maximum temperature.
+    temp_mean_col : str, int
+        The column name or number (data columns start numbering at 1) in
+        the input data that represents the daily mean temperature.  If
+        None will be estimated by the average of `temp_min_col` and
+        `temp_max_col`.
+    lat : float
+        The latitude of the station.  Required if `min_max_time` is
+        "sun_loc" or "sun_loc_shift".
+    lon : float
+        The longitude of the station.  Required if `min_max_time` is
+        "sun_loc" or "sun_loc_shift".
+    hourly : str
+        File name that contains the hourly time series of temperatures
+        to use when `method` is "mean_course_min" or "mean_course_mean"
+        or when `max_delta` is True.
+    max_delta : bool
+        Uses maximum delta of hourly values for each month to constrain
+        the disaggregated hourly temperature values.  If set to True
+        requires an hourly time-series filename specified with the
+        `hourly` keyword.
+    """
     target_units = single_target_units(source_units, target_units, "degC")
 
     pd.options.display.width = 60
@@ -513,6 +630,7 @@ def prepare_hum_tdew(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def humidity(
     method: Literal[
         "equal",
@@ -548,7 +666,160 @@ def humidity(
     hourly_precip_hum=None,
     preserve_daily_mean=None,
 ):
-    """Disaggregate daily humidity to hourly humidity data."""
+    """
+    Disaggregate daily relative humidity to hourly humidity.
+
+    Relative humidity disaggregation requires the following input data.
+
+    +--------------+-----------------------------------------------------+
+    | Input data   | Description                                         |
+    +==============+=====================================================+
+    | hum_min_col  | Required column name or number representing the     |
+    |              | minimum daily relative humidity.                    |
+    +--------------+-----------------------------------------------------+
+    | hum_max_col  | Required column name or number representing the     |
+    |              | maximum daily relative humidity.                    |
+    +--------------+-----------------------------------------------------+
+    | hum_mean_col | Optional column name or number representing the     |
+    |              | average daily relative humidity. Default is None    |
+    |              | and if None will be calculated as average of        |
+    |              | `hum_min_col` and `hum_max_col`.                    |
+    +--------------+-----------------------------------------------------+
+    | temp_min_col | Required column name or number representing the     |
+    |              | minimum daily temperature for `minimal`, `dewpoint  |
+    |              | regression`, `linear dewpoint variation`, and       |
+    |              | `min_max` methods.                                  |
+    +--------------+-----------------------------------------------------+
+    | temp_max_col | Required column name or number representing the     |
+    |              | maximum daily temperature for min_max method.       |
+    +--------------+-----------------------------------------------------+
+    | precip_col   | Required column name or number representing the     |
+    |              | total precipitation for month_hour_precip_mean      |
+    |              | method.                                             |
+    +--------------+-----------------------------------------------------+
+
+    Parameters
+    ----------
+    method : str
+        Available disaggregation methods for
+        humidity.
+
+        +---------------------------+-----------------------------------+
+        | `method`                  | Description                       |
+        +===========================+===================================+
+        | equal                     | Duplicate mean daily humidity for |
+        |                           | the 24 hours of the day.          |
+        +---------------------------+-----------------------------------+
+        | minimal                   | The dew point temperature is set  |
+        |                           | to the minimum temperature on     |
+        |                           | that day.                         |
+        +---------------------------+-----------------------------------+
+        | dewpoint_regression       | Using hourly observations, a      |
+        |                           | regression approach is applied to |
+        |                           | calculate daily dew point         |
+        |                           | temperature. Regression           |
+        |                           | parameters must be specified.     |
+        +---------------------------+-----------------------------------+
+        | linear_dewpoint_variation | This method extends through       |
+        |                           | linearly varying dew point        |
+        |                           | temperature between consecutive   |
+        |                           | days. The parameter kr needs to   |
+        |                           | be specified (kr=6 if monthly     |
+        |                           | radiation exceeds 100 W/m2 else   |
+        |                           | kr=12).                           |
+        +---------------------------+-----------------------------------+
+        | min_max                   | This method requires minimum and  |
+        |                           | maximum relative humidity for     |
+        |                           | each day.                         |
+        +---------------------------+-----------------------------------+
+        | month_hour_precip_mean    | Calculate hourly humidity from    |
+        |                           | categorical [month, hour,         |
+        |                           | precip(y/n)] mean values derived  |
+        |                           | from observations.                |
+        +---------------------------+-----------------------------------+
+
+        Required keywords for each method.  The "Column Name/Index
+        Keywords" represent the column name or index (data columns
+        starting numbering at 1) in the input dataset.
+
+        +---------------------------+----------------+---------------+
+        | `method`                  | Column Name/   | Other         |
+        |                           | Index Keywords | Keywords      |
+        +---------------------------+----------------+---------------+
+        | equal                     | `hum_mean_col` |               |
+        +---------------------------+----------------+---------------+
+        | minimal                   | `temp_min_col` | `hourly_temp` |
+        +---------------------------+----------------+---------------+
+        | dewpoint_regression       | `temp_min_col` | `a0`          |
+        |                           |                | `a1`          |
+        |                           |                | `hourly_temp` |
+        +---------------------------+----------------+---------------+
+        | linear_dewpoint_variation | `temp_min_col` | `a0`          |
+        |                           |                | `a1`          |
+        |                           |                | `kr`          |
+        |                           |                | `hourly_temp` |
+        +---------------------------+----------------+---------------+
+        | min_max                   | `hum_min_col`  | `hourly_temp` |
+        |                           | `hum_max_col`  |               |
+        |                           | `temp_min_col` |               |
+        |                           | `temp_max_col` |               |
+        +---------------------------+----------------+---------------+
+        | month_hour_precip_mean    | `precip_col`   |               |
+        +---------------------------+----------------+---------------+
+
+    ${psource_units}
+    ${input_ts}
+    ${columns}
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    precip_col
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily precipitation.
+    temp_min_col
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily minimum temperature.
+    temp_max_col
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily maximum temperature.
+    hum_min_col
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily minimum humidity.
+    hum_max_col
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily maximum humidity.
+    hum_mean_col
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily maximum humidity.
+    a0 : float
+        The "a0"
+        parameter.
+    a1 : float
+        The "a1"
+        parameter.
+    kr : int
+        Parameter for the "linear_dewpoint_variation"
+        method.
+    hourly_temp : str
+        Filename of a CSV file that contains an hourly time series of
+        temperatures.
+    hourly_precip_hum : str
+        Filename of a CSV file that contains an hourly time series of
+        precipitation and humidity.
+    preserve_daily_mean : str
+        Column name or index (data columns start at 1) that identifies
+        the observed daily mean humidity.  If not None will correct the
+        daily mean values of the disaggregated data with the observed
+        daily mean humidity.
+    """
     target_units = single_target_units(source_units, target_units, "")
 
     tsd, hourly_temp, month_hour_precip_mean = prepare_hum_tdew(
@@ -599,6 +870,7 @@ def humidity(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def dewpoint_temperature(
     method: Literal[
         "equal",
@@ -634,7 +906,158 @@ def dewpoint_temperature(
     hourly_precip_hum=None,
     preserve_daily_mean=None,
 ):
-    """Disaggregate daily humidity to hourly humidity data."""
+    """
+    Disaggregate daily relative humidity to hourly dew point.
+
+    Dewpoint disaggregation requires the following input data.
+
+    +--------------+---------------------------------------------------+
+    | Input data   | Description                                       |
+    +==============+===================================================+
+    | hum_min_col  | Required column name or number representing the   |
+    |              | minimum daily relative humidity.                  |
+    +--------------+---------------------------------------------------+
+    | hum_max_col  | Required column name or number representing the   |
+    |              | maximum daily relative humidity.                  |
+    +--------------+---------------------------------------------------+
+    | hum_mean_col | Optional column name or number representing the   |
+    |              | average daily relative humidity. Default is None  |
+    |              | and if None will be calculated as average of      |
+    |              | `hum_min_col` and `hum_max_col`.                  |
+    +--------------+---------------------------------------------------+
+    | temp_min_col | Required column name or number representing the   |
+    |              | minimum daily temperature for `minimal`,          |
+    |              | `dewpoint regression`, `linear dewpoint           |
+    |              | variation`, and `min_max` methods.                |
+    +--------------+---------------------------------------------------+
+    | temp_max_col | Required column name or number representing the   |
+    |              | maximum daily temperature for min_max method.     |
+    +--------------+---------------------------------------------------+
+    | precip_col   | Required column name or number representing the   |
+    |              | total precipitation for month_hour_precip_mean    |
+    |              | method.                                           |
+    +--------------+---------------------------------------------------+
+
+    Parameters
+    ----------
+    method : str
+        Available disaggregation methods for
+        humidity.
+
+        +---------------------------+----------------------------------+
+        | `method`                  | Description                      |
+        +===========================+==================================+
+        | equal                     | Duplicate mean daily humidity    |
+        |                           | for the 24 hours of the day.     |
+        +---------------------------+----------------------------------+
+        | minimal                   | The dew point temperature is set |
+        |                           | to the minimum temperature on    |
+        |                           | that day.                        |
+        +---------------------------+----------------------------------+
+        | dewpoint_regression       | Using hourly observations, a     |
+        |                           | regression approach is applied   |
+        |                           | to calculate daily dew point     |
+        |                           | temperature. Regression          |
+        |                           | parameters must be specified.    |
+        +---------------------------+----------------------------------+
+        | linear_dewpoint_variation | This method extends through      |
+        |                           | linearly varying dew point       |
+        |                           | temperature between consecutive  |
+        |                           | days. The parameter kr needs to  |
+        |                           | be specified (kr=6 if monthly    |
+        |                           | radiation exceeds 100 W/m2 else  |
+        |                           | kr=12).                          |
+        +---------------------------+----------------------------------+
+        | min_max                   | This method requires minimum and |
+        |                           | maximum relative humidity for    |
+        |                           | each day.                        |
+        +---------------------------+----------------------------------+
+        | month_hour_precip_mean    | Calculate hourly humidity from   |
+        |                           | categorical [month, hour,        |
+        |                           | precip(y/n)] mean values derived |
+        |                           | from observations.               |
+        +---------------------------+----------------------------------+
+
+        Required keywords for each method.  The "Column Name/Index
+        Keywords" represent the column name or index (data columns
+        starting numbering at 1) in the input dataset.
+
+        +---------------------------+----------------+---------------+
+        | `method`                  | Column Name/   | Other         |
+        |                           | Index Keywords | Keywords      |
+        +===========================+================+===============+
+        | equal                     | `hum_mean_col` | `hourly_temp` |
+        +---------------------------+----------------+---------------+
+        | minimal                   | `temp_min_col` |               |
+        +---------------------------+----------------+---------------+
+        | dewpoint_regression       | `temp_min_col` | `a0` `a1`     |
+        |                           |                | `hourly_temp` |
+        +---------------------------+----------------+---------------+
+        | linear_dewpoint_variation | `temp_min_col` | `a0` `a1`     |
+        |                           |                | `kr`          |
+        |                           |                | `hourly_temp` |
+        +---------------------------+----------------+---------------+
+        | min_max                   | `hum_min_col`  | `hourly_temp` |
+        |                           | `hum_max_col`  |               |
+        |                           | `temp_min_col` |               |
+        |                           | `temp_max_col` |               |
+        +---------------------------+----------------+---------------+
+        | month_hour_precip_mean    | `precip_col`   |               |
+        +---------------------------+----------------+---------------+
+
+    ${psource_units}
+    ${input_ts}
+    ${columns}
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    precip_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily precipitation.
+    temp_min_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily minimum temperature.
+    temp_max_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily maximum temperature.
+    hum_min_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily minimum humidity.
+    hum_max_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily maximum humidity.
+    hum_mean_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily maximum humidity.
+    a0 : float
+        The "a0"
+        parameter.
+    a1 : float
+        The "a1"
+        parameter.
+    kr : int
+        Parameter for the "linear_dewpoint_variation"
+        method.
+    hourly_temp : str
+        Filename of a CSV file that contains an hourly time series of
+        temperatures.
+    hourly_precip_hum : str
+        Filename of a CSV file that contains an hourly time series of
+        precipitation and humidity.
+    preserve_daily_mean : str
+        Column name or index (data columns start at 1) that identifies
+        the observed daily mean humidity.  If not None will correct the
+        daily mean values of the disaggregated data with the observed
+        daily mean humidity.
+    """
     # target_units = single_target_units(source_units, target_units, "")
     target_units = single_target_units(source_units, target_units, "degK")
 
@@ -688,6 +1111,7 @@ def dewpoint_temperature(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def wind_speed(
     method: Literal["equal", "cosine", "random"],
     source_units,
@@ -707,7 +1131,52 @@ def wind_speed(
     b=None,
     t_shift=None,
 ):
-    """Disaggregate daily to hourly data."""
+    """
+    Disaggregate daily wind speed to hourly wind speed.
+
+    Parameters
+    ----------
+    method : str
+        Disaggregation methods available for wind speed.
+
+        +----------+---------------------------------------------------+
+        | `method` | Description                                       |
+        +==========+===================================================+
+        | equal    | If this method is chosen, the daily average wind  |
+        |          | speed is assumed to be valid for each hour on     |
+        |          | that day.                                         |
+        +----------+---------------------------------------------------+
+        | cosine   | The cosine function option simulates a diurnal    |
+        |          | course of wind speed and requires calibration     |
+        |          | (calc_wind_stats()).                              |
+        +----------+---------------------------------------------------+
+        | random   | This option is a stochastic method that draws     |
+        |          | random numbers to disaggregate wind speed taking  |
+        |          | into account the daily average (no parameter      |
+        |          | estimation required).                             |
+        +----------+---------------------------------------------------+
+
+    ${psource_units}
+    ${input_ts}
+    ${columns}
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    a : float
+        Parameter `a` when method is equal to "cosine".
+    b : float
+        Parameter `b` when method is equal to "cosine".
+    t_shift : float
+        Parameter `t_shift` when method is equal to "cosine".
+    """
     target_units = single_target_units(source_units, target_units, "m/s")
 
     if method == "cosine" and (a is None or b is None or t_shift is None):
@@ -763,6 +1232,7 @@ def wind_speed(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def radiation(
     method: Literal["pot_rad", "pot_rad_via_ssd", "pot_rad_via_bc", "mean_course"],
     source_units,
@@ -791,7 +1261,84 @@ def radiation(
     temp_max_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
     ssd_col: Optional[Union[PositiveInt, str, pd.Series]] = None,
 ):
-    """Disaggregate daily to hourly data."""
+    """
+    Disaggregate daily radiation to hourly radiation.
+
+    Parameters
+    ----------
+    method : str
+        Disaggregation methods available for radiation
+
+        +-----------------+--------------------------------------------+
+        | `method`        | Description                                |
+        +=================+============================================+
+        | pot_rad         | This method allows one to disaggregate     |
+        |                 | daily averages of shortwave radiation      |
+        |                 | using hourly values of potential (clear-   |
+        |                 | sky) radiation calculated for the location |
+        |                 | of the station.                            |
+        +-----------------+--------------------------------------------+
+        | pot_rad_via_ssd | If daily sunshine recordings are           |
+        |                 | available, the Angstrom model is applied   |
+        |                 | to transform sunshine duration to          |
+        |                 | shortwave radiation.                       |
+        +-----------------+--------------------------------------------+
+        | pot_rad_via_bc  | In this case, the Bristow-Campbell model   |
+        |                 | is applied which relates minimum and       |
+        |                 | maximum temperature to shortwave           |
+        |                 | radiation.                                 |
+        +-----------------+--------------------------------------------+
+        | mean_course     | hourly radiation follows an observed       |
+        |                 | average course (calculated for each month) |
+        |                 | while preserving the daily mean.           |
+        +-----------------+--------------------------------------------+
+
+    ${input_ts}
+    ${columns}
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${psource_units}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    pot_rad : str
+        hourly dataframe including potential radiation
+    angstr_a : float
+        parameter a of the Angstrom model (intercept)
+    angstr_b : float
+        parameter b of the Angstrom model (slope)
+    bristcamp_a : float
+        parameter a for bristcamp
+    bristcamp_c : float
+        parameter c for bristcamp
+    hourly_rad : str
+        monthly values of the mean hourly radiation course
+    lat : float
+        Latitude
+    lon : float
+        Longitude
+    mean_course:
+        Filename of HOURLY CSV file that contains radiation values to be
+        used with the "mean_course" method.
+    glob_swr_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the mean global radiation.
+    ssd_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the solar duration.
+    temp_min_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily minimum temperature.
+    temp_max_col:
+        Column index (data columns start numbering at 1) or column name
+        from the input data that contains the daily maximum temperature.
+    """
     target_units = single_target_units(source_units, target_units, "W/m**2")
 
     # target_units = target_units[0] * len(source_units)
@@ -902,6 +1449,7 @@ def radiation(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def precipitation(
     method: Literal["equal", "cascade", "masterstation"],
     source_units,
@@ -919,7 +1467,50 @@ def precipitation(
     columns=None,
     masterstation_hour_col: Optional[Union[PositiveInt, str]] = None,
 ):
-    """Disaggregate daily to hourly data."""
+    """
+    Disaggregate daily precipitation to hourly precipitation.
+
+    Parameters
+    ----------
+    method : str
+        Disaggregation methods available for precipitation.
+
+        +---------------+----------------------------------------------+
+        | `method`      | Description                                  |
+        +===============+==============================================+
+        | equal         | In order to derive hourly from daily values, |
+        |               | the daily total is simply divided by 24      |
+        |               | resulting in an equal distribution.          |
+        +---------------+----------------------------------------------+
+        | cascade       | The cascade model is more complex and        |
+        |               | requires a parameter estimation method.      |
+        +---------------+----------------------------------------------+
+        | masterstation | If hourly values are available for another   |
+        |               | site in the vicinity of the station          |
+        |               | considered, the cumulative sub-daily mass    |
+        |               | curve can be transferred from the station    |
+        |               | that provides hourly values to the station   |
+        |               | of interest.                                 |
+        +---------------+----------------------------------------------+
+
+    ${psource_units}
+    ${input_ts}
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    ${columns}
+    masterstation_hour_col
+        The column number or name that contains the hourly data used as the reference
+        station.
+    """
     target_units = single_target_units(source_units, target_units, "mm")
 
     pd.options.display.width = 60
@@ -994,6 +1585,7 @@ def precipitation(
 
 
 @validate_call(config={"arbitrary_types_allowed": True})
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def evaporation(
     method: Literal["trap", "fixed"],
     source_units,
@@ -1011,7 +1603,37 @@ def evaporation(
     print_input=False,
     lat: Optional[confloat(ge=-90, le=90)] = None,
 ):
-    """Disaggregate daily to hourly data."""
+    """
+    Disaggregate daily evaporation to hourly evaporation.
+
+    Parameters
+    ----------
+    method : str
+        This is the method that will be used to disaggregate
+        the daily evaporation data.
+
+        There are two methods, a trapezoidal shape from sunrise to
+        sunset called "trap" and a fixed, smooth curve starting at 0700
+        (7 am) and stopping at 1900 (7 pm) called "fixed".
+    ${source_units}
+    ${input_ts}
+    ${columns}
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    lat : float
+        The latitude of the station.  Positive specifies the Northern
+        Hemisphere, and negative values represent the Southern
+        Hemisphere.
+    """
     target_units = single_target_units(source_units, target_units)
 
     pd.options.display.width = 60

@@ -3,8 +3,9 @@ from typing import Optional, Union
 import pandas as pd
 from pydantic import PositiveInt
 
-from .standard_precip.standard_precip.spi import SPI
-from .toolbox_utils.src.toolbox_utils import tsutils
+from mettoolbox.mettoolbox_utils import _LOCAL_DOCSTRINGS
+from mettoolbox.standard_precip.standard_precip.spi import SPI
+from mettoolbox.toolbox_utils.src.toolbox_utils import tsutils
 
 try:
     from pydantic import validate_arguments as validate_call
@@ -52,6 +53,7 @@ def _nlarge_nsmall(
 
 @tsutils.transform_args(source_units=tsutils.make_list)
 @validate_call(config={"arbitrary_types_allowed": True})
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def spei(
     rainfall: Union[PositiveInt, str, pd.DataFrame],
     pet: Union[PositiveInt, str, pd.DataFrame],
@@ -70,6 +72,98 @@ def spei(
     skiprows=None,
     index_type="datetime",
 ):
+    """
+    Standard Precipitation/Evaporation Index.
+
+    Calculates a windows cumulative sum of daily precipitation minus
+    evaporation.
+
+    Parameters
+    ----------
+    rainfall
+        A csv, wdm, hdf5, xlsx file or a pandas DataFrame or Series or
+        an integer column or string name of standard input.
+
+        Represents a daily time-series of precipitation in units specified in
+        `source_units`.
+    pet
+        A csv, wdm, hdf5, xlsx file or a pandas DataFrame or Series or
+        an integer column or string name of standard input.
+
+        Represents a daily time-series of evaporation in units specified in
+        `source_units`.
+    ${source_units}
+    nsmallest : int
+        [optional, default is None]
+
+        Return the "n" days with the smallest precipitation minus evaporation
+        index value within the `groupby` pandas offset period.
+
+        Cannot assign both `nsmallest` and `nlargest` keywords.
+    nlargest : int
+        [optional, default is None]
+
+        Return the "n" days with the largest precipitation minus evaporation
+        index value within the `groupby` pandas offset period.
+
+        Cannot assign both `nsmallest` and `nlargest` keywords.
+    groupby : str
+        Pandas offset period string representing the time over which the
+        `nsmallest` or `nlargest` values would be evaluated.
+    fit_type : str ("lmom" or "mle")
+        Specify the type of fit to use for fitting distribution to the
+        precipitation data. Either L-moments (lmom) or Maximum Likelihood
+        Estimation (mle). Note use L-moments when comparing to NCAR's NCL code
+        and R's packages to calculate SPI and SPEI.
+    dist_type : str
+        The distribution type to fit using either L-moments (fit_type="lmom")
+        or MLE (fit_type="mle").
+
+        +-----------+---------------------------+-----------+----------+
+        | dist_type | Distribution              | fit_type  | fit_type |
+        |           |                           | lmom      | mle      |
+        +===========+===========================+===========+==========+
+        | gam       | Gamma                     | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | exp       | Exponential               | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | gev       | Generalized Extreme Value | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | gpa       | Generalized Pareto        | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | gum       | Gumbel                    | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | nor       | Normal                    | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | pe3       | Pearson III               | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | wei       | Weibull                   | X         | X        |
+        +-----------+---------------------------+-----------+----------+
+        | glo       | Generalized Logistic      |           | X        |
+        +-----------+---------------------------+-----------+----------+
+        | gno       | Generalized Normal        |           | X        |
+        +-----------+---------------------------+-----------+----------+
+        | kap       | Kappa                     |           | X        |
+        +-----------+---------------------------+-----------+----------+
+        | wak       | Wakeby                    | X         |          |
+        +-----------+---------------------------+-----------+----------+
+
+    scale : int (default=1)
+        Integer to specify the number of time periods over which the
+        standardized precipitation index is to be calculated. If freq="M" then
+        this is the number of months.
+    ${input_ts}
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${skiprows}
+    ${index_type}
+    ${names}
+    ${print_input}
+    ${tablefmt}
+    """
     from tstoolbox.tstoolbox import read
 
     tsd = read(
@@ -114,6 +208,7 @@ def spei(
 
 @tsutils.transform_args(source_units=tsutils.make_list)
 @validate_call(config={"arbitrary_types_allowed": True})
+@tsutils.doc(_LOCAL_DOCSTRINGS)
 def pe(
     rainfall: Union[PositiveInt, str, pd.DataFrame],
     pet: Union[PositiveInt, str, pd.DataFrame],
@@ -128,6 +223,77 @@ def pe(
     closed=None,
     target_units="mm",
 ):
+    """
+    Precipitation minus evaporation index.
+
+    Calculates a windows cumulative sum of daily precipitation minus evaporation.
+
+    Parameters
+    ----------
+    rainfall
+        A csv, wdm, hdf5, xlsx file or a pandas DataFrame or Series or
+        an integer column or string name of standard input.
+
+        Represents a daily time-series of precipitation in units specified in
+        `source_units`.
+    pet
+        A csv, wdm, hdf5, xlsx file or a pandas DataFrame or Series or
+        an integer column or string name of standard input.
+
+        Represents a daily time-series of evaporation in units specified in
+        `source_units`.
+    ${source_units}
+    nsmallest : int
+        [optional, default is None]
+
+        Return the "n" days with the smallest precipitation minus evaporation
+        index value within the `groupby` pandas offset period.
+
+        Cannot assign both `nsmallest` and `nlargest` keywords.
+    nlargest : int
+        [optional, default is None]
+
+        Return the "n" days with the largest precipitation minus evaporation
+        index value within the `groupby` pandas offset period.
+
+        Cannot assign both `nsmallest` and `nlargest` keywords.
+    groupby : str
+        Pandas offset period string representing the time over which the
+        `nsmallest` or `nlargest` values would be evaluated.
+    window : int
+        [optional, default is 30]
+
+        Size of the moving window. This is the number of observations used for
+        calculating the statistic. Each window will be a fixed size.
+
+        If its an offset then this will be the time period of each window. Each
+        window will be a variable sized based on the observations included in
+        the time-period. This is only valid for datetimelike indexes.
+    min_periods : int, default 170 days
+        Minimum number of observations in window required to have a value
+        (otherwise result is NA). For a window that is specified by an offset,
+        min_periods will default to 1. Otherwise, min_periods will default to
+        the size of the window.
+    center : bool, default False
+        Set the labels at the center of the window.
+    win_type : str, default None
+        Provide a window type. If None, all points are evenly weighted. See the
+        notes below for further information.
+    closed : str, default None
+        Make the interval closed on the ‘right’, ‘left’, ‘both’ or ‘neither’
+        endpoints. Defaults to ‘right’.
+    ${input_ts}
+    ${start_date}
+    ${end_date}
+    ${dropna}
+    ${clean}
+    ${round_index}
+    ${index_type}
+    ${names}
+    ${target_units}
+    ${print_input}
+    ${tablefmt}
+    """
     from tstoolbox.tstoolbox import read
 
     tsd = read(
