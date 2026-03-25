@@ -1666,7 +1666,7 @@ def evaporation(
             columns=tsd.columns, index=[tsd.index[-1] + datetime.timedelta(days=1)]
         )
     )
-    ndata = ntsd.resample("H").ffill()
+    ndata = ntsd.resample(pandas_offset_by_version("h")).ffill()
 
     fdata = pd.DataFrame(columns=ndata.columns, index=ndata.index, dtype="f")
 
@@ -1720,7 +1720,13 @@ def evaporation(
 
         fdata = fdata.fillna(0.0)
 
-        fdata = fdata / fdata.groupby(pd.Grouper(freq="D")).sum().resample("H").ffill()
+        fdata = (
+            fdata
+            / fdata.groupby(pd.Grouper(freq="D"))
+            .sum()
+            .resample(pandas_offset_by_version("h"))
+            .ffill()
+        )
 
         fdata = fdata * ndata
 
