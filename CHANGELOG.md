@@ -1,3 +1,10 @@
+## v7.1.1 (2026-03-29)
+
+### Fix
+
+- support setting time codes per version
+- change main to encompass all the cli interfaces and remove type hints that were failing on python 3.14
+
 ## v7.1.0 (2026-03-14)
 
 ## v7.0.1 (2025-07-20)
