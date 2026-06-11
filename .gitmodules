@@ -1,9 +1,12 @@
 [submodule "mettoolbox/melodist"]
 	path = src/mettoolbox/melodist
-	url = https://github.com/timcera/melodist.git
+	url = git@github.com:timcera/melodist.git
+	branch = master
 [submodule "src/mettoolbox/toolbox_utils"]
 	path = src/mettoolbox/toolbox_utils
 	url = git@github.com:timcera/toolbox_utils.git
+	branch = main
 [submodule "src/mettoolbox/standard_precip"]
 	path = src/mettoolbox/standard_precip
 	url = git@github.com:e-baumer/standard_precip.git
+	branch = master
