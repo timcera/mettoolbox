@@ -1,16 +1,15 @@
+# Standard library imports
 from typing import Optional, Union
 
+# Third party imports
 import pandas as pd
 from pydantic import PositiveInt
+from pydantic import validate_arguments as validate_call
 
+# First party imports
 from mettoolbox.mettoolbox_utils import _LOCAL_DOCSTRINGS
 from mettoolbox.standard_precip.standard_precip.spi import SPI
 from mettoolbox.toolbox_utils.src.toolbox_utils import tsutils
-
-try:
-    from pydantic import validate_arguments as validate_call
-except ImportError:
-    from pydantic import validate_call
 
 __all__ = ["spei", "pe"]
 
@@ -164,11 +163,8 @@ def spei(
     ${print_input}
     ${tablefmt}
     """
-    from tstoolbox.tstoolbox import read
-
-    tsd = read(
-        rainfall,
-        pet,
+    tsd = tsutils.common_kwds(
+        input_ts=[rainfall, pet],
         names=["rainfall", "pet"],
         source_units=source_units,
         target_units=["mm", "mm"],
@@ -294,11 +290,8 @@ def pe(
     ${print_input}
     ${tablefmt}
     """
-    from tstoolbox.tstoolbox import read
-
-    tsd = read(
-        rainfall,
-        pet,
+    tsd = tsutils.common_kwds(
+        input_ts=[rainfall, pet],
         names=["rainfall", "pet"],
         source_units=source_units,
         target_units=["mm", "mm"],

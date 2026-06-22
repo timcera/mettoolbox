@@ -1,13 +1,16 @@
+# Standard library imports
 import datetime
 import warnings
 from contextlib import suppress
 from typing import Literal, Optional, Union
 
+# Third party imports
 import numpy as np
 import pandas as pd
 from pydantic import PositiveInt, confloat
-from tstoolbox import tstoolbox
+from pydantic import validate_arguments as validate_call
 
+# First party imports
 from mettoolbox import tdew as tdew_melo
 from mettoolbox.melodist.melodist.humidity import (
     calculate_month_hour_precip_mean,
@@ -26,11 +29,6 @@ from mettoolbox.melodist.melodist.wind import disaggregate_wind
 from mettoolbox.mettoolbox_utils import _LOCAL_DOCSTRINGS
 from mettoolbox.toolbox_utils.src.toolbox_utils import tsutils
 from mettoolbox.toolbox_utils.src.toolbox_utils.utils import pandas_offset_by_version
-
-try:
-    from pydantic import validate_arguments as validate_call
-except ImportError:
-    from pydantic import validate_call
 
 __all__ = [
     "temperature",
@@ -234,7 +232,7 @@ def temperature(
         or min_max_time == "sun_loc_shift"
         or max_delta
     ):
-        hourly = tstoolbox.read(hourly)
+        hourly = tsutils.common_kwds(input_ts=hourly)
         mean_course = calculate_mean_daily_course_by_month(
             hourly.squeeze(), normalize=True
         )
@@ -606,7 +604,7 @@ def prepare_hum_tdew(
             "linear_dewpoint_variation",
             "min_max",
         ]:
-            hourly_temp = tstoolbox.read(hourly_temp)
+            hourly_temp = tsutils.common_kwds(hourly_temp)
             hourly_temp = hourly_temp.astype(float).squeeze()
     elif disagg_type == "dewpoint":
         if method in [
@@ -617,11 +615,11 @@ def prepare_hum_tdew(
             "min_max",
             "month_hour_precip_mean",
         ]:
-            hourly_temp = tstoolbox.read(hourly_temp)
+            hourly_temp = tsutils.common_kwds(hourly_temp)
             hourly_temp = hourly_temp.astype(float).squeeze()
 
     if method == "month_hour_precip_mean":
-        hourly_precip_hum = tstoolbox.read(hourly_precip_hum)
+        hourly_precip_hum = tsutils.common_kwds(hourly_precip_hum)
         month_hour_precip_mean = calculate_month_hour_precip_mean(hourly_precip_hum)
     else:
         month_hour_precip_mean = "None"
@@ -1416,14 +1414,14 @@ def radiation(
         tsd.columns = ["ssd"]
 
     if method == "mean_course":
-        hourly_rad = tstoolbox.read(hourly_rad)
+        hourly_rad = tsutils.common_kwds(hourly_rad)
         hourly_rad = hourly_rad.astype(float).squeeze()
         mean_course = calculate_mean_daily_course_by_month(
             hourly_rad.squeeze(), normalize=True
         )
         pot_rad = None
     else:
-        pot_rad = tstoolbox.read(pot_rad)
+        pot_rad = tsutils.common_kwds(pot_rad)
         pot_rad = pot_rad.astype(float).squeeze()
         mean_course = None
 

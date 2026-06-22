@@ -5,17 +5,20 @@ test_mettoolbox
 Tests for `mettoolbox` module.
 """
 
+# Standard library imports
 import unittest
 
+# Third party imports
 from pandas.testing import assert_frame_equal
-from tstoolbox import tstoolbox
 
+# First party imports
 from mettoolbox import mettoolbox
+from mettoolbox.toolbox_utils.src.toolbox_utils import tsutils
 
 
 class TestMettoolbox(unittest.TestCase):
     def setUp(self):
-        self.disaggregate_temperature = tstoolbox.read(
+        self.disaggregate_temperature = tsutils.common_kwds(
             "tests/data_temperature_gainesville_disaggregate_sine_mean.csv"
         )
 

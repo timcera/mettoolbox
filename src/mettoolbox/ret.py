@@ -1,18 +1,16 @@
+# Standard library imports
 import warnings
 from typing import Optional, Union
 
+# Third party imports
 import pandas as pd
 import pydaymet.pet as daypet
 from pydantic import PositiveInt, confloat
-from tstoolbox.tstoolbox import read
+from pydantic import validate_arguments as validate_call
 
+# First party imports
 from mettoolbox.mettoolbox_utils import _LOCAL_DOCSTRINGS
 from mettoolbox.toolbox_utils.src.toolbox_utils import tsutils
-
-try:
-    from pydantic import validate_arguments as validate_call
-except ImportError:
-    from pydantic import validate_call
 
 __all__ = ["penman_monteith"]
 
@@ -36,7 +34,7 @@ def prepare_daymet(
         read_args.append(u2_col)
         read_kwds["names"].append("u2")
         read_kwds["target_units"].append("m/s")
-    return read(*read_args, **read_kwds)
+    return tsutils.common_kwds(read_args, **read_kwds)
 
 
 @validate_call

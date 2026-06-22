@@ -28,22 +28,21 @@
 ########################################################################
 
 
+# Standard library imports
 from typing import Literal
 
+# Third party imports
 import numpy as np
 import pandas as pd
+from pydantic import validate_arguments as validate_call
 
+# Local folder imports
 from .melodist.melodist.util.util import (
     dewpoint_temperature,
     distribute_equally,
     linregress,
     vapor_pressure,
 )
-
-try:
-    from pydantic import validate_arguments as validate_call
-except ImportError:
-    from pydantic import validate_call
 
 
 @validate_call

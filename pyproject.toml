@@ -30,10 +30,18 @@ classifiers = [
 ]
 dependencies = [
     "cltoolbox",
+    "dateparser",
     "numpy",
+    "numpy",
+    "openpyxl",
+    "pandas[excel]",
+    "pint",
+    "pint-pandas",
+    "pydantic >=2",
     "pydaymet",
     "pyet",
-    "tstoolbox"
+    "scipy",
+    "tabulate"
 ]
 description = "mettoolbox is set of command line and Python tools for the analysis and reporting of meteorological data."
 dynamic = ["readme", "version"]
@@ -65,6 +73,7 @@ documentation = "https://timcera.bitbucket.io/mettoolbox/docs/index.html#mettool
 github = "https://github.com/timcera/mettoolbox"
 
 [tool.commitizen]
+multiline = true
 name = "cz_conventional_commits"
 tag_format = "v$version"
 update_changelog_on_bump = true
@@ -74,8 +83,29 @@ version_files = ["VERSION"]
 [tool.isort]
 profile = "black"
 
+[tool.jupytext]
+formats = "auto:percent"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+exclude = [
+    "src/*/melodist/**/*.py",
+    "src/*/standard_precip/**/*.py",
+    "src/*/toolbox_utils/**/*.py"
+]
+fix = true
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.ruff.lint.isort.import-heading]
+first-party = "First party imports"
+future = "Future imports"
+local-folder = "Local folder imports"
+standard-library = "Standard library imports"
+third-party = "Third party imports"
 
 [tool.setuptools]
 include-package-data = true
