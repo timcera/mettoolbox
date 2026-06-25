@@ -7,6 +7,11 @@ Help::
 
     mettoolbox --help
 
+about
+~~~~~
+.. program-output:: mettoolbox about --help
+   :prompt:
+
 disaggregate
 ~~~~~~~~~~~~
 .. program-output:: mettoolbox disaggregate --help
