@@ -1,7 +1,9 @@
+# Standard library imports
 import os.path
 import sys
 import warnings
 
+# First party imports
 from mettoolbox import disaggregate, indices, pet, ret
 from mettoolbox.toolbox_utils.src.toolbox_utils import tsutils
 
@@ -9,6 +11,7 @@ warnings.filterwarnings("ignore")
 
 
 def main():
+    # Third party imports
     from cltoolbox import Program
     from cltoolbox.rst_text_formatter import RSTHelpFormatter
 
@@ -22,7 +25,10 @@ def main():
     @program.command()
     def about():
         """Display version number and system information."""
-        tsutils.about(__name__)
+        # Standard library imports
+        from pprint import pprint
+
+        pprint(tsutils.about(__name__))
 
     @program.disaggregate.command("evaporation", formatter_class=RSTHelpFormatter)
     @tsutils.copy_doc(disaggregate.evaporation)
